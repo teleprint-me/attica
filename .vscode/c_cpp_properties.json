@@ -5,6 +5,7 @@
       "includePath": [
         "/usr/include",
         "/usr/local/include",
+        "${workspaceFolder}/mods/logger/include",
         "${workspaceFolder}/include"
       ],
       "defines": [],
