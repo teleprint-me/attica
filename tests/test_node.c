@@ -29,7 +29,7 @@ int test_node_create(void) {
 
     // Create some sample data
     int* data = (int*) malloc(sizeof(int));
-    if (data == NULL) {
+    if (NULL == data) {
         LOG_ERROR("Failed to allocate memory for test data.\n");
         return 1; // Failure
     }
@@ -37,7 +37,7 @@ int test_node_create(void) {
 
     // Create a node
     Node* node = node_create(data);
-    if (node == NULL) {
+    if (NULL == node) {
         LOG_ERROR("Failed to create node.\n");
         free(data);
         return 1; // Failure
@@ -69,7 +69,7 @@ int test_node_data_allocation(void) {
 
     // Create some sample data
     double* data = (double*) malloc(sizeof(double));
-    if (data == NULL) {
+    if (NULL == data) {
         LOG_ERROR("Failed to allocate memory for test data.\n");
         return 1; // Failure
     }
@@ -77,7 +77,7 @@ int test_node_data_allocation(void) {
 
     // Create a node
     Node* node = node_create(data);
-    if (node == NULL) {
+    if (NULL == node) {
         LOG_ERROR("Failed to create node.\n");
         free(data);
         return 1; // Failure
