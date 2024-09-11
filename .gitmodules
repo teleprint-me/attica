@@ -1,0 +1,3 @@
+[submodule "mods/logger"]
+	path = mods/logger
+	url = https://github.com/teleprint-me/logger.c
