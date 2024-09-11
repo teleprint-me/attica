@@ -22,8 +22,15 @@ typedef struct Node {
     struct Node* next; // Pointer to the next node
 } Node;
 
+/**
+ * @brief Function to create a new node.
+ */
 Node* node_create(void* data);
-void  node_free(Node* node);
+
+/**
+ * @brief Function to free a node.
+ */
+void node_free(Node* node);
 
 #ifdef __cplusplus
 }
