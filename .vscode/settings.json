@@ -81,6 +81,7 @@
     "sdl_render.h": "c",
     "vector.h": "c",
     "stddef.h": "c",
-    "*.tcc": "c"
+    "*.tcc": "c",
+    "cstdlib": "c"
   }
 }
