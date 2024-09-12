@@ -101,6 +101,15 @@ bool linked_list_is_empty(const linked_list_t* list);
 typedef int (*linked_list_compare_t)(const void*, const void*);
 
 /**
+ * @brief Default comparison function for numeric data.
+ *
+ * @param a Pointer to the first number.
+ * @param b Pointer to the second number.
+ * @return -1 if a < b, 0 if a == b, 1 if a > b.
+ */
+int linked_list_numeric_compare(const void* a, const void* b);
+
+/**
  * @brief Find the first node containing the matching data.
  *
  * @param list Pointer to the linked list.
