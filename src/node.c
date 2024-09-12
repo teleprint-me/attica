@@ -10,13 +10,13 @@
 #include <stddef.h> // For NULL
 #include <stdlib.h> // For malloc and free
 
-Node* node_create(void* data) {
+node_t* node_create(void* data) {
     // Allocate memory for the new node
-    Node* new_node = (Node*) malloc(sizeof(Node));
+    node_t* new_node = (node_t*) malloc(sizeof(node_t));
 
     // Check if memory allocation was successful
     if (NULL == new_node) {
-        LOG_ERROR("Failed to allocate memory to new Node.\n");
+        LOG_ERROR("Failed to allocate memory to new node_t.\n");
         return NULL; // Return NULL if allocation fails
     }
 
@@ -27,7 +27,7 @@ Node* node_create(void* data) {
     return new_node;
 }
 
-void node_free(Node* node) {
+void node_free(node_t* node) {
     if (NULL == node) {
         return; // Nothing to free
     }

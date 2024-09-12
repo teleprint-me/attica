@@ -36,7 +36,7 @@ int test_node_create(void) {
     *data = 42;
 
     // Create a node
-    Node* node = node_create(data);
+    node_t* node = node_create(data);
     if (NULL == node) {
         LOG_ERROR("Failed to create node.\n");
         free(data);
@@ -76,7 +76,7 @@ int test_node_data_allocation(void) {
     *data = 3.14;
 
     // Create a node
-    Node* node = node_create(data);
+    node_t* node = node_create(data);
     if (NULL == node) {
         LOG_ERROR("Failed to create node.\n");
         free(data);
