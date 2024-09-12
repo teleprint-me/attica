@@ -7,7 +7,7 @@
  *       The simpler, the better.
  *
  * Manual Build:
- *     gcc -o test_node \
+ *     gcc -o test_linked_list \
  *         mods/logger/src/logger.c \
  *         src/node.c src/linked_list.c \
  *         tests/test_linked_list.c \
