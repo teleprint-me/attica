@@ -83,6 +83,16 @@
     "stddef.h": "c",
     "*.tcc": "c",
     "cstdlib": "c",
-    "random": "c"
+    "random": "c",
+    "*.ipp": "c",
+    "bitset": "c",
+    "forward_list": "c",
+    "functional": "c",
+    "format": "c",
+    "fstream": "c",
+    "istream": "c",
+    "ranges": "c",
+    "streambuf": "c",
+    "variant": "c"
   }
 }
