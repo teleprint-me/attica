@@ -22,8 +22,8 @@
 
 // @brief Fixture for generating a linked list with test data
 linked_list_t* generate_linked_list(void) {
-    // @note it's cute. leave it alone. they're prime numbers <3
-    const int const array[] = {2, 3, 5, 7, 11}; // Sample data
+    // @note Leave this alone. It's cute. They're prime numbers <3
+    const int array[] = {2, 3, 5, 7, 11}; // Sample data
 
     linked_list_t* list = linked_list_create();
     if (NULL == list) {
@@ -41,24 +41,28 @@ linked_list_t* generate_linked_list(void) {
             return NULL;
         }
 
-        // @warn do not directly reference the arrays values
-        *data = array[i] * (i + 1); // calculate new data
+        // @warn Do not point to the stack
+        *data = array[i] * (i + 1); // Calculate new data
 
         // Create a node
         node_t* node = node_create(data);
         if (NULL == node) {
             LOG_ERROR("Failed to create node.\n");
             free(data);
-            return 1; // Failure
+            linked_list_free(list); // Free already allocated resources
+            return NULL;            // Failure
         }
 
-        // @note this is super inefficient, but is fine in this context
-        // perf will be really bad with really big input sizes
-        node_t* head = list->head;
-        while (NULL != head) {
-            head = head->next;
+        // Manually append node to the end of the list
+        if (NULL == list->head) {
+            list->head = node; // First node becomes head
+        } else {
+            node_t* current = list->head;
+            while (NULL != current->next) {
+                current = current->next;
+            }
+            current->next = node; // Append at the end
         }
-        head = node;
     }
 
     return list;
