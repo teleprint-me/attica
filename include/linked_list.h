@@ -98,7 +98,7 @@ bool linked_list_is_empty(const linked_list_t* list);
  * - Zero if the first argument is equal to the second.
  * - A positive value if the first argument is greater than the second.
  */
-typedef int (*compare_t)(const void*, const void*);
+typedef int (*linked_list_compare_t)(const void*, const void*);
 
 /**
  * @brief Find the first node containing the matching data.
@@ -109,7 +109,7 @@ typedef int (*compare_t)(const void*, const void*);
  * @return A pointer to the found node, or NULL if not found.
  */
 node_t* linked_list_find(
-    const linked_list_t* list, const void* data, compare_t compare
+    const linked_list_t* list, const void* data, linked_list_compare_t compare
 );
 
 /**
