@@ -71,19 +71,23 @@ linked_list_t* generate_linked_list(void) {
 /**
  * @brief Test the correctness of linked_list_create() and linked_list_free()
  *
- * @return True on success, false on failure
+ * @return 0 on success, 1 on failure
  */
-bool test_linked_list_create(void) {
+int test_linked_list_create(void) {
+    int result = 0; // assuming success
+
+    // get the pre-allocated linked list
     linked_list_t* list = generate_linked_list();
     if (NULL == list) {
         LOG_ERROR("Failed to generate linked list.\n");
-        return false;
+        result = 1; // signal failure
     }
 
+    // @note This should gracefully handle a null pointer
     linked_list_free(list); // Free the sample data
 
-    printf("."); // Test passed indicator
-    return true; // Test succeeded
+    printf("%s", 0 == result ? "." : "x");
+    return result;
 }
 
 /**
@@ -92,10 +96,10 @@ bool test_linked_list_create(void) {
  * @return 0 on success, non-zero on failure
  */
 int main(void) {
-    bool all_passed = true;
+    int passed = 0; // assuming success
 
-    all_passed &= test_linked_list_create(); // Chain test results
-    printf("\n");                            // Print newline after test output
+    passed |= test_linked_list_create(); // Chain test results
+    printf("\n");                        // Print newline after test output
 
-    return all_passed ? 0 : 1; // Return appropriate exit status
+    return passed;
 }
