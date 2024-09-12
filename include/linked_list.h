@@ -91,6 +91,16 @@ uint32_t linked_list_size(const linked_list_t* list);
 bool linked_list_is_empty(const linked_list_t* list);
 
 /**
+ * @brief Comparison function type for linked list operations.
+ *
+ * This function should return:
+ * - A negative value if the first argument is less than the second.
+ * - Zero if the first argument is equal to the second.
+ * - A positive value if the first argument is greater than the second.
+ */
+typedef int (*compare_t)(const void*, const void*);
+
+/**
  * @brief Find the first node containing the matching data.
  *
  * @param list Pointer to the linked list.
@@ -99,9 +109,7 @@ bool linked_list_is_empty(const linked_list_t* list);
  * @return A pointer to the found node, or NULL if not found.
  */
 node_t* linked_list_find(
-    const linked_list_t* list,
-    const void*          data,
-    int (*compare)(const void*, const void*)
+    const linked_list_t* list, const void* data, compare_t compare
 );
 
 /**
