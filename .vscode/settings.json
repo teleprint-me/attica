@@ -82,6 +82,7 @@
     "vector.h": "c",
     "stddef.h": "c",
     "*.tcc": "c",
-    "cstdlib": "c"
+    "cstdlib": "c",
+    "random": "c"
   }
 }
