@@ -9,6 +9,8 @@
 
 #include <stdlib.h> // For malloc, free
 
+int linked_list_numeric_compare(const void* a, const void* b);
+
 linked_list_t* linked_list_create(void) {
     // Allocate memory for the linked list
     linked_list_t* list = (linked_list_t*) malloc(sizeof(linked_list_t));
@@ -136,7 +138,9 @@ void linked_list_insert(linked_list_t* list, void* data, uint32_t index) {
     list->size++;
 }
 
-void linked_list_remove(linked_list_t* list, void* data);
+void linked_list_remove(
+    linked_list_t* list, void* data, linked_list_compare_t compare
+);
 
 uint32_t linked_list_size(const linked_list_t* list);
 

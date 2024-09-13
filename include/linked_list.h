@@ -28,6 +28,25 @@ typedef struct LinkedList {
 } linked_list_t;
 
 /**
+ * @brief Comparison function type for linked list operations.
+ *
+ * This function should return:
+ * - A negative value if the first argument is less than the second.
+ * - Zero if the first argument is equal to the second.
+ * - A positive value if the first argument is greater than the second.
+ */
+typedef int (*linked_list_compare_t)(const void*, const void*);
+
+/**
+ * @brief Default comparison function for numeric data.
+ *
+ * @param a Pointer to the first number.
+ * @param b Pointer to the second number.
+ * @return -1 if a < b, 0 if a == b, 1 if a > b.
+ */
+int linked_list_numeric_compare(const void* a, const void* b);
+
+/**
  * @brief Initialize a new linked list.
  *
  * @return A pointer to the newly created linked list.
@@ -81,7 +100,9 @@ void linked_list_insert(linked_list_t* list, void* data, uint32_t index);
  * @param list Pointer to the linked list.
  * @param data Pointer to the data to be matched for removal.
  */
-void linked_list_remove(linked_list_t* list, void* data);
+void linked_list_remove(
+    linked_list_t* list, void* data, linked_list_compare_t compare
+);
 
 /**
  * @brief Get the number of nodes in the list.
@@ -98,25 +119,6 @@ uint32_t linked_list_size(const linked_list_t* list);
  * @return True if the list is empty, false otherwise.
  */
 bool linked_list_is_empty(const linked_list_t* list);
-
-/**
- * @brief Comparison function type for linked list operations.
- *
- * This function should return:
- * - A negative value if the first argument is less than the second.
- * - Zero if the first argument is equal to the second.
- * - A positive value if the first argument is greater than the second.
- */
-typedef int (*linked_list_compare_t)(const void*, const void*);
-
-/**
- * @brief Default comparison function for numeric data.
- *
- * @param a Pointer to the first number.
- * @param b Pointer to the second number.
- * @return -1 if a < b, 0 if a == b, 1 if a > b.
- */
-int linked_list_numeric_compare(const void* a, const void* b);
 
 /**
  * @brief Find the first node containing the matching data.
