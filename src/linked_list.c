@@ -9,7 +9,12 @@
 
 #include <stdlib.h> // For malloc, free
 
-int linked_list_numeric_compare(const void* a, const void* b);
+int linked_list_numeric_compare(const void* a, const void* b) {
+    int numA = *(int*) a;
+    int numB = *(int*) b;
+
+    return (numA < numB) ? -1 : ((numA > numB) ? 1 : 0);
+}
 
 linked_list_t* linked_list_create(void) {
     // Allocate memory for the linked list
