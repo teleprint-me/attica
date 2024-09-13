@@ -10,10 +10,11 @@
 #include <stdlib.h> // For malloc, free
 
 int linked_list_numeric_compare(const void* a, const void* b) {
-    int numA = *(int*) a;
-    int numB = *(int*) b;
-
-    return (numA < numB) ? -1 : ((numA > numB) ? 1 : 0);
+    // dereference numbers a and b
+    int n_a = *(const int*) a;
+    int n_b = *(const int*) b;
+    // -1 if a < b, 0 if a == b, 1 if a > b.
+    return (n_a > n_b) - (n_a < n_b);
 }
 
 linked_list_t* linked_list_create(void) {
@@ -132,7 +133,7 @@ void linked_list_insert(linked_list_t* list, void* data, uint32_t index) {
 
         if (NULL == current) {
             LOG_ERROR("Invalid insertion position.\n");
-            free(node);
+            node_free(node);
             return;
         }
 
@@ -146,22 +147,41 @@ void linked_list_insert(linked_list_t* list, void* data, uint32_t index) {
 void linked_list_remove(
     linked_list_t* list, void* data, linked_list_compare_t compare
 ) {
-    node_t* current = list->head;
-
-    while (current != NULL && compare(data, current->data) > 0) {
-        current = current->next;
+    // Ensure the list is valid
+    if (NULL == list || NULL == list->head) {
+        LOG_ERROR("Invalid list or empty list.\n");
+        return;
     }
 
-    if (current == NULL || current->data == data) {
-        // Remove the matched node
-        if (list->head == current) {
-            list->head = current->next;
+    node_t* current  = list->head;
+    node_t* previous = NULL;
+
+    // Traverse the list to find the matching node
+    while (NULL != current) {
+        if (compare(data, current->data) == 0) {
+            // Found the matching node to remove
+            if (NULL == previous) {
+                // Removing the head node
+                list->head = current->next;
+            } else {
+                // Remove from the middle or end
+                previous->next = current->next;
+            }
+
+            node_free(current); // Free the node's memory
+            list->size--;
+
+            LOG_INFO("Node removed successfully.\n");
+            return;
         }
 
-        free(current);
-
-        list->size--;
+        // Move to the next node
+        previous = current;
+        current  = current->next;
     }
+
+    // If we reached here, the data was not found
+    LOG_ERROR("Data not found in the list.\n");
 }
 
 uint32_t linked_list_size(const linked_list_t* list);
