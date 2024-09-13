@@ -49,8 +49,8 @@ int test_linked_list_create(void) {
         node_t* node = node_create(&data);
         if (NULL == node) {
             LOG_ERROR("Failed to create node.\n");
-            linked_list_free(list); // Free already allocated resources
-            return 1;               // Failure
+            linked_list_free(list, NULL); // Free already allocated resources
+            return 1;                     // Failure
         }
 
         // Manually append node to the end of the list
@@ -66,7 +66,7 @@ int test_linked_list_create(void) {
     }
 
     // @note This should gracefully handle a null pointer
-    linked_list_free(list); // Free the sample data
+    linked_list_free(list, NULL); // Free the sample data
 
     printf("%s", 0 == result ? "." : "x");
     return result;
@@ -95,7 +95,7 @@ int test_linked_list_append(void) {
            && list->head->next->data == &data2);
 
     // Now, we free the list itself, without worrying about the data
-    linked_list_free(list);
+    linked_list_free(list, NULL);
 
     printf("%s", pass ? "." : "x");
     return 0; // success
@@ -124,7 +124,7 @@ int test_linked_list_prepend(void) {
            && list->head->next->data == &data1);
 
     // Now, we free the list itself, without worrying about the data
-    linked_list_free(list);
+    linked_list_free(list, NULL);
 
     printf("%s", pass ? "." : "x");
     return 0; // success
