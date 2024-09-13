@@ -29,8 +29,6 @@
  * @return 0 on success, 1 on failure
  */
 int test_linked_list_create(void) {
-    int result = 0; // assuming success
-
     // @note Leave this alone. It's cute. They're prime numbers <3
     const int array[] = {2, 3, 5, 7, 11}; // Sample data
 
@@ -65,11 +63,11 @@ int test_linked_list_create(void) {
         }
     }
 
-    // @note This should gracefully handle a null pointer
+    // @note This should gracefully handle list as a null pointer
     linked_list_free(list, NULL); // Free the sample data
 
-    printf("%s", 0 == result ? "." : "x");
-    return result;
+    printf("%s", (1) ? "." : "x");
+    return 0;
 }
 
 /**
