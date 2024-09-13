@@ -290,8 +290,8 @@ int main(void) {
     result |= test_linked_list_append();
     result |= test_linked_list_prepend();
     result |= test_linked_list_insert();
-    result |= test_linked_list_numeric_compare(); // Test comparison function
-    result |= test_linked_list_remove();          // Test removal function
+    result |= test_linked_list_numeric_compare();
+    result |= test_linked_list_remove();
     printf("\n"); // Print newline after test output
 
     return result;
