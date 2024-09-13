@@ -70,10 +70,10 @@ void linked_list_prepend(linked_list_t* list, void* data);
  * @brief Insert a node at a given index in the list.
  *
  * @param list Pointer to the linked list.
- * @param index Position where the new node will be inserted.
  * @param data Pointer to the data to be stored in the new node.
+ * @param index Position where the new node will be inserted.
  */
-void linked_list_insert(linked_list_t* list, uint32_t index, void* data);
+void linked_list_insert(linked_list_t* list, void* data, uint32_t index);
 
 /**
  * @brief Remove the first node with matching data.
