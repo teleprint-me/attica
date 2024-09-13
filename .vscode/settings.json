@@ -72,27 +72,6 @@
   },
   "files.associations": {
     "*.tcss": "jinja-css",
-    "*.h": "c",
-    "sdl.h": "c",
-    "math.h": "c",
-    "stdio.h": "c",
-    "sdl_events.h": "c",
-    "stdbool.h": "c",
-    "sdl_render.h": "c",
-    "vector.h": "c",
-    "stddef.h": "c",
-    "*.tcc": "c",
-    "cstdlib": "c",
-    "random": "c",
-    "*.ipp": "c",
-    "bitset": "c",
-    "forward_list": "c",
-    "functional": "c",
-    "format": "c",
-    "fstream": "c",
-    "istream": "c",
-    "ranges": "c",
-    "streambuf": "c",
-    "variant": "c"
+    "*.h": "c"
   }
 }
