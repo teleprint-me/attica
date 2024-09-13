@@ -20,7 +20,7 @@
 #include <stdlib.h> // For malloc and free
 
 /**
- * @brief Test the correctness of node_create and node_free
+ * @brief Test the correctness of node_create() and node_free()
  *
  * @return 1 on failure, 0 on success
  */
