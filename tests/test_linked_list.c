@@ -129,16 +129,72 @@ int test_linked_list_prepend(void) {
 }
 
 /**
+ * @brief Test the correctness of linked_list_insert()
+ *
+ * @return 0 on success, 1 on failure
+ */
+int test_linked_list_insert(void) {
+    int result = 0; // Assume success
+
+    linked_list_t* list = linked_list_create();
+    if (NULL == list) {
+        LOG_ERROR("Failed to create linked list.\n");
+        return 1; // Failure
+    }
+
+    // Sample data
+    int data1 = 10, data2 = 20, data3 = 30, data4 = 40;
+
+    // Test 1: Insert at the beginning
+    linked_list_insert(list, &data1, 0);
+    if (list->size != 1 || list->head->data != &data1) {
+        LOG_ERROR("Test 1 failed: Incorrect insertion at the beginning.\n");
+        result = 1;
+    }
+
+    // Test 2: Insert at the end
+    linked_list_insert(list, &data2, 1);
+    if (list->size != 2 || list->head->next->data != &data2) {
+        LOG_ERROR("Test 2 failed: Incorrect insertion at the end.\n");
+        result = 1;
+    }
+
+    // Test 3: Insert in the middle
+    linked_list_insert(list, &data3, 1); // Insert at index 1
+    if (list->size != 3 || list->head->next->data != &data3
+        || list->head->next->next->data != &data2) {
+        LOG_ERROR("Test 3 failed: Incorrect insertion in the middle.\n");
+        result = 1;
+    }
+
+    // Test 4: Attempt to insert out-of-bounds
+    linked_list_insert(list, &data4, 5); // Invalid index
+    if (list->size != 3) {               // Size should remain unchanged
+        LOG_ERROR("Test 4 failed: Out-of-bounds insertion should not change "
+                  "the size.\n");
+        result = 1;
+    }
+
+    // Clean up
+    linked_list_free(list, NULL);
+
+    printf("%s", result == 0 ? "." : "x");
+    return result;
+}
+
+/**
  * @brief Main function to run all unit tests.
  *
  * @return 0 on success, non-zero on failure
  */
 int main(void) {
-    int result = 0; // assuming success
+    int result = 0; // Assuming success
 
-    result |= test_linked_list_create(); // Chain test results
+    // Chain test results
+    result |= test_linked_list_create();
     result |= test_linked_list_append();
     result |= test_linked_list_prepend();
+    result |= test_linked_list_insert();
     printf("\n"); // Print newline after test output
 
     return result;
