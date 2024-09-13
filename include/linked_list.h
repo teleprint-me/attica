@@ -38,8 +38,23 @@ linked_list_t* linked_list_create(void);
  * @brief Free a linked list and all its nodes.
  *
  * @param list Pointer to the linked list to be freed.
+ *
+ * @note Safe to use with stack or heap allocated data.
+ *
+ * @warning Does not free associated data.
  */
 void linked_list_free(linked_list_t* list);
+
+/**
+ * @brief Free a linked list, all its nodes, and associated data.
+ *
+ * @param list Pointer to the linked list to be freed.
+ *
+ * @note Unsafe to use with stack allocated data.
+ *
+ * @warning Assumes all node data is heap allocated memory.
+ */
+void linked_list_free_with_data(linked_list_t* list);
 
 /**
  * @brief Add a node to the end of a list.

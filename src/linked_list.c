@@ -25,6 +25,7 @@ linked_list_t* linked_list_create(void) {
 }
 
 void linked_list_free(linked_list_t* list) {
+    // safe to use with stack or heap allocated memory
     if (NULL == list) {
         return;
     }
@@ -38,6 +39,23 @@ void linked_list_free(linked_list_t* list) {
     }
 
     // Free the list structure itself
+    free(list);
+}
+
+void linked_list_free_with_data(linked_list_t* list) {
+    // assumes all node data is heap allocated memory
+    if (NULL == list) {
+        return;
+    }
+
+    node_t* current = list->head;
+    while (NULL != current) {
+        node_t* next = current->next;
+        free(current->data); // Assume data is dynamically allocated
+        free(current);
+        current = next;
+    }
+
     free(list);
 }
 
