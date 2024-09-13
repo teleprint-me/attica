@@ -43,6 +43,11 @@ void linked_list_free(linked_list_t* list, void (*callback)(void*)) {
 }
 
 void linked_list_append(linked_list_t* list, void* data) {
+    if (NULL == list) {
+        LOG_ERROR("List is NULL.\n");
+        return;
+    }
+
     // Create a new node
     node_t* node = node_create(data);
     if (NULL == node) {
@@ -67,6 +72,11 @@ void linked_list_append(linked_list_t* list, void* data) {
 }
 
 void linked_list_prepend(linked_list_t* list, void* data) {
+    if (NULL == list) {
+        LOG_ERROR("List is NULL.\n");
+        return;
+    }
+
     // Create a new node
     node_t* new_head = node_create(data);
     if (NULL == new_head) {
@@ -82,7 +92,49 @@ void linked_list_prepend(linked_list_t* list, void* data) {
     list->size++;
 }
 
-void linked_list_insert(linked_list_t* list, uint32_t index, void* data);
+void linked_list_insert(linked_list_t* list, void* data, uint32_t index) {
+    // Handle null list case
+    if (NULL == list) {
+        LOG_ERROR("List is NULL.\n");
+        return;
+    }
+
+    // Check for invalid insertion index
+    if (index > list->size) { // Allow inserting at the end
+        LOG_ERROR("Invalid insertion position.\n");
+        return;
+    }
+
+    // Create a new node
+    node_t* node = node_create(data);
+    if (NULL == node) {
+        LOG_ERROR("Failed to create node.\n");
+        return;
+    }
+
+    if (0 == index) {
+        // Insert at the beginning
+        node->next = list->head;
+        list->head = node;
+    } else {
+        node_t* current = list->head;
+
+        for (uint32_t i = 1; i < index && NULL != current->next; ++i) {
+            current = current->next;
+        }
+
+        if (NULL == current) {
+            LOG_ERROR("Invalid insertion position.\n");
+            free(node);
+            return;
+        }
+
+        node->next    = current->next;
+        current->next = node;
+    }
+
+    list->size++;
+}
 
 void linked_list_remove(linked_list_t* list, void* data);
 
