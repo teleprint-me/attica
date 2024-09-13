@@ -4,7 +4,9 @@
  * @file tests/test_linked_list.c
  *
  * @note Keep fixtures and tests as simple as reasonably possible.
- *       The simpler, the better.
+ *       - Tests must be kept simple. The simpler, the better.
+ *       - Tests must return an integer with 0 on success and 1 on failure.
+ *         - I'll admit this is weird, but the shell and cmake test for this.
  *
  * Manual Build:
  *     gcc -o test_linked_list \
@@ -17,40 +19,38 @@
 #include "linked_list.h"
 #include "logger.h"
 
-#include <stdio.h>  // For printf
-#include <stdlib.h> // For malloc and free
+#include <stdbool.h> // For type bool, true, and false
+#include <stdio.h>   // For printf
+#include <stdlib.h>  // For malloc and free
 
-// @brief Fixture for generating a linked list with test data
-linked_list_t* generate_linked_list(void) {
+/**
+ * @brief Test the correctness of linked_list_create() and linked_list_free()
+ *
+ * @return 0 on success, 1 on failure
+ */
+int test_linked_list_create(void) {
+    int result = 0; // assuming success
+
     // @note Leave this alone. It's cute. They're prime numbers <3
     const int array[] = {2, 3, 5, 7, 11}; // Sample data
 
     linked_list_t* list = linked_list_create();
     if (NULL == list) {
         LOG_ERROR("Failed to create linked list.\n");
-        return NULL;
+        return 1; // signal failure
     }
 
     list->size = 5; // Number of nodes
     for (uint32_t i = 0; i < list->size; i++) {
-        // Allocate memory for new data
-        int* data = (int*) malloc(sizeof(int));
-        if (NULL == data) {
-            LOG_ERROR("Failed to allocate memory for test data.\n");
-            linked_list_free(list); // Free already allocated resources
-            return NULL;
-        }
-
-        // @warn Do not point to the stack
-        *data = array[i] * (i + 1); // Calculate new data
+        // (n * (i + 1)) = {2, 6, 15, 28, 55}
+        int data = array[i] * (i + 1); // Calculate new data
 
         // Create a node
-        node_t* node = node_create(data);
+        node_t* node = node_create(&data);
         if (NULL == node) {
             LOG_ERROR("Failed to create node.\n");
-            free(data);
             linked_list_free(list); // Free already allocated resources
-            return NULL;            // Failure
+            return 1;               // Failure
         }
 
         // Manually append node to the end of the list
@@ -65,24 +65,6 @@ linked_list_t* generate_linked_list(void) {
         }
     }
 
-    return list;
-}
-
-/**
- * @brief Test the correctness of linked_list_create() and linked_list_free()
- *
- * @return 0 on success, 1 on failure
- */
-int test_linked_list_create(void) {
-    int result = 0; // assuming success
-
-    // get the pre-allocated linked list
-    linked_list_t* list = generate_linked_list();
-    if (NULL == list) {
-        LOG_ERROR("Failed to generate linked list.\n");
-        result = 1; // signal failure
-    }
-
     // @note This should gracefully handle a null pointer
     linked_list_free(list); // Free the sample data
 
@@ -91,15 +73,75 @@ int test_linked_list_create(void) {
 }
 
 /**
+ * @brief Test the correctness of linked_list_append()
+ *
+ * @return 0 on success, 1 on failure
+ */
+int test_linked_list_append(void) {
+    linked_list_t* list = linked_list_create();
+    if (NULL == list) {
+        LOG_ERROR("Failed to create linked list.\n");
+        return 1; // failed
+    }
+
+    int data1 = 42, data2 = 84;
+
+    // Append two nodes to the list
+    linked_list_append(list, &data1);
+    linked_list_append(list, &data2);
+
+    bool pass
+        = (list->size == 2 && list->head->data == &data1
+           && list->head->next->data == &data2);
+
+    // Now, we free the list itself, without worrying about the data
+    linked_list_free(list);
+
+    printf("%s", pass ? "." : "x");
+    return 0; // success
+}
+
+/**
+ * @brief Test the correctness of linked_list_prepend()
+ *
+ * @return 0 on success, 1 on failure
+ */
+int test_linked_list_prepend(void) {
+    linked_list_t* list = linked_list_create();
+    if (NULL == list) {
+        LOG_ERROR("Failed to create linked list.\n");
+        return 1; // failure
+    }
+
+    int data1 = 42, data2 = 84;
+
+    // Prepend two nodes to the list
+    linked_list_prepend(list, &data1);
+    linked_list_prepend(list, &data2);
+
+    bool pass
+        = (list->size == 2 && list->head->data == &data2
+           && list->head->next->data == &data1);
+
+    // Now, we free the list itself, without worrying about the data
+    linked_list_free(list);
+
+    printf("%s", pass ? "." : "x");
+    return 0; // success
+}
+
+/**
  * @brief Main function to run all unit tests.
  *
  * @return 0 on success, non-zero on failure
  */
 int main(void) {
-    int passed = 0; // assuming success
+    int result = 0; // assuming success
 
-    passed |= test_linked_list_create(); // Chain test results
-    printf("\n");                        // Print newline after test output
+    result |= test_linked_list_create(); // Chain test results
+    result |= test_linked_list_append();
+    result |= test_linked_list_prepend();
+    printf("\n"); // Print newline after test output
 
-    return passed;
+    return result;
 }
