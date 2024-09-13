@@ -42,8 +42,7 @@ void linked_list_free(linked_list_t* list) {
     free(list);
 }
 
-void linked_list_free_with_data(linked_list_t* list) {
-    // assumes all node data is heap allocated memory
+void linked_list_free_data(linked_list_t* list, void (*callback)(void*)) {
     if (NULL == list) {
         return;
     }
@@ -51,7 +50,9 @@ void linked_list_free_with_data(linked_list_t* list) {
     node_t* current = list->head;
     while (NULL != current) {
         node_t* next = current->next;
-        free(current->data); // Assume data is dynamically allocated
+        if (callback) {
+            callback(current->data);
+        }
         free(current);
         current = next;
     }

@@ -46,15 +46,14 @@ linked_list_t* linked_list_create(void);
 void linked_list_free(linked_list_t* list);
 
 /**
- * @brief Free a linked list, all its nodes, and associated data.
+ * @brief Free a linked list, all its nodes, and associated data using a custom
+ *        cleanup function.
  *
  * @param list Pointer to the linked list to be freed.
- *
- * @note Unsafe to use with stack allocated data.
- *
- * @warning Assumes all node data is heap allocated memory.
+ * @param callback Function pointer to a user-defined cleanup function for
+ *                 freeing node data.
  */
-void linked_list_free_with_data(linked_list_t* list);
+void linked_list_free_data(linked_list_t* list, void (*callback)(void*));
 
 /**
  * @brief Add a node to the end of a list.
