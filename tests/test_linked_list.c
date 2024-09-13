@@ -213,6 +213,71 @@ int test_linked_list_numeric_compare(void) {
 }
 
 /**
+ * @brief Test the correctness of linked_list_remove().
+ *
+ * @return 0 on success, 1 on failure
+ */
+int test_linked_list_remove(void) {
+    linked_list_t* list = linked_list_create();
+    if (NULL == list) {
+        LOG_ERROR("Failed to create linked list.\n");
+        return 1; // Failed
+    }
+
+    int data1 = 5, data2 = 10, data3 = 15;
+
+    // Append nodes with data1, data2, data3
+    linked_list_append(list, &data1);
+    linked_list_append(list, &data2);
+    linked_list_append(list, &data3);
+
+    // Test removal of the middle node (data2)
+    linked_list_remove(list, &data2, linked_list_numeric_compare);
+
+    // Verify data2 is removed
+    if (list->size != 2
+        || linked_list_numeric_compare(list->head->data, &data1) != 0
+        || linked_list_numeric_compare(list->head->next->data, &data3) != 0) {
+        LOG_ERROR("Failed: expected data2 to be removed.\n");
+        linked_list_free(list, NULL);
+        return 1;
+    }
+
+    // Test removal of the head node (data1)
+    linked_list_remove(list, &data1, linked_list_numeric_compare);
+    if (list->size != 1
+        || linked_list_numeric_compare(list->head->data, &data3) != 0) {
+        LOG_ERROR("Failed: expected data1 to be removed.\n");
+        linked_list_free(list, NULL);
+        return 1;
+    }
+
+    // Test removal of the last remaining node (data3)
+    linked_list_remove(list, &data3, linked_list_numeric_compare);
+    if (list->size != 0 || list->head != NULL) {
+        LOG_ERROR("Failed: expected data3 to be removed.\n");
+        linked_list_free(list, NULL);
+        return 1;
+    }
+
+    // Test removal of non-existent data
+    linked_list_remove(
+        list, &data1, linked_list_numeric_compare
+    ); // Should not crash
+    if (list->size != 0) {
+        LOG_ERROR(
+            "Failed: expected no change when removing non-existent data.\n"
+        );
+        linked_list_free(list, NULL);
+        return 1;
+    }
+
+    linked_list_free(list, NULL);
+    printf(".");
+    return 0; // Success
+}
+
+/**
  * @brief Main function to run all unit tests.
  *
  * @return 0 on success, non-zero on failure
@@ -225,7 +290,8 @@ int main(void) {
     result |= test_linked_list_append();
     result |= test_linked_list_prepend();
     result |= test_linked_list_insert();
-    result |= test_linked_list_numeric_compare();
+    result |= test_linked_list_numeric_compare(); // Test comparison function
+    result |= test_linked_list_remove();          // Test removal function
     printf("\n"); // Print newline after test output
 
     return result;
