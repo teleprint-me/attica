@@ -78,15 +78,15 @@ void linked_list_prepend(linked_list_t* list, void* data) {
     }
 
     // Create a new node
-    node_t* new_head = node_create(data);
-    if (NULL == new_head) {
+    node_t* node = node_create(data);
+    if (NULL == node) {
         LOG_ERROR("Failed to create node.\n");
         return;
     }
 
     // Insert the new node at the beginning
-    new_head->next = list->head;
-    list->head     = new_head;
+    node->next = list->head;
+    list->head = node;
 
     // Increment the size of the list
     list->size++;
