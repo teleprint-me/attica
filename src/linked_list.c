@@ -46,9 +46,39 @@ void linked_list_free(linked_list_t* list) {
     free(list);
 }
 
-void linked_list_append(linked_list_t* list, void* data);
+void linked_list_append(linked_list_t* list, void* data) {
+    node_t* node = node_create(data);
+    if (NULL == node) {
+        LOG_ERROR("Failed to create node.\n");
+        return;
+    }
 
-void linked_list_prepend(linked_list_t* list, void* data);
+    if (NULL == list->head) {
+        list->head = node;
+    } else {
+        node_t* current = list->head;
+        while (NULL != current->next) {
+            current = current->next;
+        }
+        current->next = node;
+    }
+}
+
+void linked_list_prepend(linked_list_t* list, void* data) {
+    node_t* new_head = node_create(data);
+    if (NULL == new_head) {
+        LOG_ERROR("Failed to create node.\n");
+        return;
+    }
+
+    if (NULL == list->head) {
+        list->head = new_head;
+    } else {
+        node_t* old_head = list->head;
+        new_head->next   = old_head;
+        list->head       = new_head;
+    }
+}
 
 void linked_list_insert(linked_list_t* list, uint32_t index, void* data);
 
