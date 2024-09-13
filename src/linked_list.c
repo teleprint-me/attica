@@ -33,12 +33,7 @@ void linked_list_free(linked_list_t* list) {
     node_t* current = list->head;
     while (NULL != current) {
         node_t* next = current->next;
-        // @warn Assuming data points to the heap, not the stack
-        if (current->data) {
-            // @warn Assuming the data is dynamically allocated
-            free(current->data);
-        }
-        free(current);
+        free(current); // Free the node itself, but not the data
         current = next;
     }
 
