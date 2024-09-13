@@ -12,19 +12,19 @@
 
 node_t* node_create(void* data) {
     // Allocate memory for the new node
-    node_t* new_node = (node_t*) malloc(sizeof(node_t));
+    node_t* node = (node_t*) malloc(sizeof(node_t));
 
     // Check if memory allocation was successful
-    if (NULL == new_node) {
+    if (NULL == node) {
         LOG_ERROR("Failed to allocate memory to new node_t.\n");
         return NULL; // Return NULL if allocation fails
     }
 
     // Initialize the new node's data and next pointer
-    new_node->data = data;
-    new_node->next = NULL;
+    node->data = data;
+    node->next = NULL;
 
-    return new_node;
+    return node;
 }
 
 void node_free(node_t* node) {
