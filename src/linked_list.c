@@ -24,25 +24,7 @@ linked_list_t* linked_list_create(void) {
     return list;
 }
 
-void linked_list_free(linked_list_t* list) {
-    // safe to use with stack or heap allocated memory
-    if (NULL == list) {
-        return;
-    }
-
-    // Traverse the list and free all nodes
-    node_t* current = list->head;
-    while (NULL != current) {
-        node_t* next = current->next;
-        free(current); // Free the node itself, but not the data
-        current = next;
-    }
-
-    // Free the list structure itself
-    free(list);
-}
-
-void linked_list_free_data(linked_list_t* list, void (*callback)(void*)) {
+void linked_list_free(linked_list_t* list, void (*callback)(void*)) {
     if (NULL == list) {
         return;
     }

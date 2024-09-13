@@ -35,25 +35,14 @@ typedef struct LinkedList {
 linked_list_t* linked_list_create(void);
 
 /**
- * @brief Free a linked list and all its nodes.
+ * @brief Free a linked list, all its nodes, and optionally its associated data
+ * using a custom cleanup function.
  *
  * @param list Pointer to the linked list to be freed.
- *
- * @note Safe to use with stack or heap allocated data.
- *
- * @warning Does not free associated data.
+ * @param callback Optional function pointer to a user-defined cleanup function
+ * for freeing node data. Pass NULL if no custom cleanup is needed.
  */
-void linked_list_free(linked_list_t* list);
-
-/**
- * @brief Free a linked list, all its nodes, and associated data using a custom
- *        cleanup function.
- *
- * @param list Pointer to the linked list to be freed.
- * @param callback Function pointer to a user-defined cleanup function for
- *                 freeing node data.
- */
-void linked_list_free_data(linked_list_t* list, void (*callback)(void*));
+void linked_list_free(linked_list_t* list, void (*callback)(void*));
 
 /**
  * @brief Add a node to the end of a list.
