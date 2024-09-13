@@ -183,6 +183,36 @@ int test_linked_list_insert(void) {
 }
 
 /**
+ * @brief Test the correctness of linked_list_numeric_compare().
+ *
+ * @return 0 on success, 1 on failure
+ */
+int test_linked_list_numeric_compare(void) {
+    int a = 5, b = 10, c = 5;
+
+    // Test case: a < b
+    if (linked_list_numeric_compare(&a, &b) >= 0) {
+        LOG_ERROR("Failed: expected a < b.\n");
+        return 1;
+    }
+
+    // Test case: a == c
+    if (linked_list_numeric_compare(&a, &c) != 0) {
+        LOG_ERROR("Failed: expected a == c.\n");
+        return 1;
+    }
+
+    // Test case: b > a
+    if (linked_list_numeric_compare(&b, &a) <= 0) {
+        LOG_ERROR("Failed: expected b > a.\n");
+        return 1;
+    }
+
+    printf(".");
+    return 0; // Success
+}
+
+/**
  * @brief Main function to run all unit tests.
  *
  * @return 0 on success, non-zero on failure
@@ -195,6 +225,7 @@ int main(void) {
     result |= test_linked_list_append();
     result |= test_linked_list_prepend();
     result |= test_linked_list_insert();
+    result |= test_linked_list_numeric_compare();
     printf("\n"); // Print newline after test output
 
     return result;
