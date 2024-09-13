@@ -158,7 +158,7 @@ void linked_list_remove(
 
     // Traverse the list to find the matching node
     while (NULL != current) {
-        if (compare(data, current->data) == 0) {
+        if (0 == compare(data, current->data)) {
             // Found the matching node to remove
             if (NULL == previous) {
                 // Removing the head node
