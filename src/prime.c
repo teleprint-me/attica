@@ -4,6 +4,7 @@
  * @file src/prime.c
  */
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -13,10 +14,10 @@
  * @param data The sampled data
  * @param size The number of data points
  */
-typedef struct SamplePrime {
+typedef struct PrimeSample {
     int*     data; // The sampled data
     uint32_t size; // The number of data points
-} sample_data_t;
+} prime_sample_t;
 
 /**
  * @brief Create an array of prime numbers as sample data.
@@ -26,38 +27,49 @@ typedef struct SamplePrime {
  *
  * @note It's cute <3
  */
-int* samples_create(uint32_t size);
+int* prime_sample_create(uint32_t size);
 
 /**
  * @brief Free the allocated sample data.
  *
  * @param samples Pointer to the sample_data_t structure.
  */
-void samples_free(sample_data_t* samples);
+void prime_sample_free(prime_sample_t* samples);
 
-int* samples_create(uint32_t size) {
+int* prime_sample_create(uint32_t size) {
     if (0 == size) {
-        LOG_ERROR("Sample size must be 1 or greater.\n");
         return NULL;
     }
 
-    sample_data_t* samples = (sample_data_t*) malloc(sizeof(sample_data_t));
-    samples->data          = (int*) malloc(size * sizeof(int));
+    prime_sample_t* samples = calloc(1, sizeof(*samples));
 
     // @note Samples is a list of prime numbers <3
-    for (uint32_t i = 2; i < size; i++) {
-        // @note Test if prime once and only once
-        if (0 == (i % 2)) {
-            continue; // Skip non-prime values
+    for (uint32_t i = 2, j = 0; i <= size && j < size; ++i) {
+        bool is_prime = true;
+
+        if (!(i & 1)) {
+            continue; // Skip even numbers greater than 2
         }
-        // if is prime, typecast unsigned int to signed int
-        samples->data[i] = (int) i;
+
+        for (uint32_t divisor = 2; divisor * divisor <= i; ++divisor) {
+            if (!(i % divisor)) {
+                is_prime = false;
+                break;
+            }
+        }
+
+        // If the number is prime, assign its value to samples
+        if (is_prime) {
+            samples->data[j++] = i;
+        }
     }
 
-    return samples;
+    samples->size = j;
+
+    return samples->data;
 }
 
-void samples_free(sample_data_t* samples) {
+void prime_sample_free(prime_sample_t* samples) {
     if (samples == NULL) {
         LOG_ERROR("Sample data is NULL.\n");
         return;
