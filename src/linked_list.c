@@ -145,7 +145,24 @@ void linked_list_insert(linked_list_t* list, void* data, uint32_t index) {
 
 void linked_list_remove(
     linked_list_t* list, void* data, linked_list_compare_t compare
-);
+) {
+    node_t* current = list->head;
+
+    while (current != NULL && compare(data, current->data) > 0) {
+        current = current->next;
+    }
+
+    if (current == NULL || current->data == data) {
+        // Remove the matched node
+        if (list->head == current) {
+            list->head = current->next;
+        }
+
+        free(current);
+
+        list->size--;
+    }
+}
 
 uint32_t linked_list_size(const linked_list_t* list);
 
