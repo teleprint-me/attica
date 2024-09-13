@@ -39,8 +39,14 @@ linked_list_t* linked_list_create(void);
  * using a custom cleanup function.
  *
  * @param list Pointer to the linked list to be freed.
- * @param callback Optional function pointer to a user-defined cleanup function
- * for freeing node data. Pass NULL if no custom cleanup is needed.
+ * @param callback (Optional) Function pointer to a user-defined cleanup
+ * function for freeing node data. Pass NULL if no custom cleanup is needed,
+ * free() for simple cleanup, or a custom function for more complex objects.
+ *
+ * This function will:
+ * - Free the memory occupied by each node in the linked list
+ * - If a callback function is provided, call it with the corresponding data
+ *   pointer from each node before freeing its memory
  */
 void linked_list_free(linked_list_t* list, void (*callback)(void*));
 
