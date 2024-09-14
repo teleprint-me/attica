@@ -15,9 +15,9 @@ prime_sample_t* prime_sample_create(uint32_t size) {
         return NULL;
     }
 
-    // Over-allocate by assuming every odd number is prime.
-    // We can resize the array later.
+    // Allocate memory for sampling
     prime_sample_t* sample = (prime_sample_t*) malloc(sizeof(prime_sample_t));
+    // Allocate memory for number of sampled data points
     sample->data           = malloc(size * sizeof(int));
 
     uint32_t j = 0;
