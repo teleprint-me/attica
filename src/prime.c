@@ -17,13 +17,13 @@ prime_sample_t* prime_sample_create(uint32_t size) {
 
     // Over-allocate by assuming every odd number is prime.
     // We can resize the array later.
-    prime_sample_t* samples = calloc(1, sizeof(*samples));
-    samples->data           = malloc(size * sizeof(int));
+    prime_sample_t* sample = (prime_sample_t*) malloc(sizeof(prime_sample_t));
+    sample->data           = malloc(size * sizeof(int));
 
     uint32_t j = 0;
 
     // Handle the first prime (2) directly.
-    samples->data[j++] = 2;
+    sample->data[j++] = 2;
 
     // Generate primes starting from 3
     for (uint32_t i = 3; i <= size; i += 2) {
@@ -37,26 +37,26 @@ prime_sample_t* prime_sample_create(uint32_t size) {
         }
 
         if (is_prime) {
-            samples->data[j++] = i;
+            sample->data[j++] = i;
         }
     }
 
     // Resize array to actual number of primes found
-    samples->data = realloc(samples->data, j * sizeof(int));
-    samples->size = j;
+    sample->data = realloc(sample->data, j * sizeof(int));
+    sample->size = j;
 
-    return samples;
+    return sample;
 }
 
-void prime_sample_free(prime_sample_t* samples) {
-    if (samples == NULL) {
+void prime_sample_free(prime_sample_t* sample) {
+    if (sample == NULL) {
         LOG_ERROR("Sample data is NULL.\n");
         return;
     }
 
-    if (samples->data) {
-        free(samples->data);
+    if (sample->data) {
+        free(sample->data);
     }
 
-    free(samples);
+    free(sample);
 }
