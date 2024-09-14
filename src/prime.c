@@ -2,6 +2,9 @@
  * Copyright © 2024 Austin Berrio
  *
  * @file src/prime.c
+ *
+ * @ref Miller-Rabin Primality Test
+ * - https://rosettacode.org/wiki/Miller%E2%80%93Rabin_primality_test
  */
 
 #include "prime.h"
