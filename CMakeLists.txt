@@ -19,6 +19,9 @@ set(MODULES node linked_list) # Add more modules here as needed
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
+# Enable testing
+enable_testing()
+
 # Add dependencies
 foreach(SUBMODULE IN LISTS SUBMODULES)
     add_subdirectory(mods/${SUBMODULE})
@@ -59,6 +62,3 @@ install(
     ARCHIVE DESTINATION lib
     PUBLIC_HEADER DESTINATION include
 )
-
-# Enable testing
-enable_testing()
