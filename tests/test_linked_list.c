@@ -24,27 +24,82 @@
 #include <stdlib.h>  // For malloc and free
 
 /**
+ * @brief Data structure representing the sampled data
+ *
+ * @param data The sampled data
+ * @param size The number of data points
+ */
+typedef struct SampleData {
+    int*     data; // The sampled data
+    uint32_t size; // The number of data points
+} sample_data_t;
+
+/**
+ * @brief Create an array of prime numbers as sample data.
+ *
+ * @param size Number of prime numbers to generate.
+ * @return Pointer to a dynamically allocated sample_data_t structure.
+ *
+ * @note It's cute <3
+ */
+int* samples_create(uint32_t size) {
+    if (0 == size) {
+        LOG_ERROR("Sample size must be 1 or greater.\n");
+        return NULL;
+    }
+
+    sample_data_t* samples = (sample_data_t*) malloc(sizeof(sample_data_t));
+    samples->data          = (int*) malloc(size * sizeof(int));
+
+    // @note Samples is a list of prime numbers <3
+    for (uint32_t i = 2; i < size; i++) {
+        // @note Test if prime once and only once
+        if (0 == (i % 2)) {
+            continue; // Skip non-prime values
+        }
+        // if is prime, typecast unsigned int to signed int
+        samples->data[i] = (int) i;
+    }
+
+    return samples;
+}
+
+/**
+ * @brief Free the allocated sample data.
+ *
+ * @param samples Pointer to the sample_data_t structure.
+ */
+void samples_free(sample_data_t* samples) {
+    if (samples == NULL) {
+        LOG_ERROR("Sample data is NULL.\n");
+        return;
+    }
+
+    if (samples->data) {
+        free(samples->data);
+    }
+
+    free(samples);
+}
+
+/**
  * @brief Test the correctness of linked_list_create() and linked_list_free()
  *
  * @return 0 on success, 1 on failure
  */
 int test_linked_list_create(void) {
-    // @note Leave this alone. It's cute. They're prime numbers <3
-    const int array[] = {2, 3, 5, 7, 11}; // Sample data
-
     linked_list_t* list = linked_list_create();
     if (NULL == list) {
         LOG_ERROR("Failed to create linked list.\n");
         return 1; // signal failure
     }
 
-    list->size = 5; // Number of nodes
-    for (uint32_t i = 0; i < list->size; i++) {
-        // (n * (i + 1)) = {2, 6, 15, 28, 55}
-        int data = array[i] * (i + 1); // Calculate new data
+    const sample_data_t* samples = samples_create(5);
+    list->size                   = samples->size;
 
+    for (uint32_t i = 0; i < list->size; i++) {
         // Create a node
-        node_t* node = node_create(&data);
+        node_t* node = node_create(&samples->data[i]);
         if (NULL == node) {
             LOG_ERROR("Failed to create node.\n");
             linked_list_free(list, NULL); // Free already allocated resources
@@ -64,9 +119,10 @@ int test_linked_list_create(void) {
     }
 
     // @note This should gracefully handle list as a null pointer
-    linked_list_free(list, NULL); // Free the sample data
+    linked_list_free(list, NULL);
+    samples_free(samples);
 
-    printf("%s", (1) ? "." : "x");
+    printf(".");
     return 0;
 }
 
@@ -82,18 +138,19 @@ int test_linked_list_append(void) {
         return 1; // failed
     }
 
-    int data1 = 42, data2 = 84;
+    int* samples = samples_create(2);
 
     // Append two nodes to the list
-    linked_list_append(list, &data1);
-    linked_list_append(list, &data2);
+    linked_list_append(list, &samples[0]);
+    linked_list_append(list, &samples[1]);
 
     bool pass
-        = (list->size == 2 && list->head->data == &data1
-           && list->head->next->data == &data2);
+        = (2 == list->size && &samples[0] == list->head->data
+           && &samples[1] == list->head->next->data);
 
     // Now, we free the list itself, without worrying about the data
     linked_list_free(list, NULL);
+    samples_free(samples);
 
     printf("%s", pass ? "." : "x");
     return 0; // success
@@ -191,19 +248,19 @@ int test_linked_list_numeric_compare(void) {
     int a = 5, b = 10, c = 5;
 
     // Test case: a < b
-    if (linked_list_numeric_compare(&a, &b) >= 0) {
+    if (0 <= linked_list_numeric_compare(&a, &b)) {
         LOG_ERROR("Failed: expected a < b.\n");
         return 1;
     }
 
     // Test case: a == c
-    if (linked_list_numeric_compare(&a, &c) != 0) {
+    if (0 != linked_list_numeric_compare(&a, &c)) {
         LOG_ERROR("Failed: expected a == c.\n");
         return 1;
     }
 
     // Test case: b > a
-    if (linked_list_numeric_compare(&b, &a) <= 0) {
+    if (0 >= linked_list_numeric_compare(&b, &a)) {
         LOG_ERROR("Failed: expected b > a.\n");
         return 1;
     }
@@ -235,9 +292,9 @@ int test_linked_list_remove(void) {
     linked_list_remove(list, &data2, linked_list_numeric_compare);
 
     // Verify data2 is removed
-    if (list->size != 2
-        || linked_list_numeric_compare(list->head->data, &data1) != 0
-        || linked_list_numeric_compare(list->head->next->data, &data3) != 0) {
+    if (2 != list->size
+        || 0 != linked_list_numeric_compare(list->head->data, &data1)
+        || 0 != linked_list_numeric_compare(list->head->next->data, &data3)) {
         LOG_ERROR("Failed: expected data2 to be removed.\n");
         linked_list_free(list, NULL);
         return 1;
@@ -245,8 +302,8 @@ int test_linked_list_remove(void) {
 
     // Test removal of the head node (data1)
     linked_list_remove(list, &data1, linked_list_numeric_compare);
-    if (list->size != 1
-        || linked_list_numeric_compare(list->head->data, &data3) != 0) {
+    if (1 != list->size
+        || 0 != linked_list_numeric_compare(list->head->data, &data3)) {
         LOG_ERROR("Failed: expected data1 to be removed.\n");
         linked_list_free(list, NULL);
         return 1;
@@ -254,7 +311,7 @@ int test_linked_list_remove(void) {
 
     // Test removal of the last remaining node (data3)
     linked_list_remove(list, &data3, linked_list_numeric_compare);
-    if (list->size != 0 || list->head != NULL) {
+    if (0 != list->size || NULL != list->head) {
         LOG_ERROR("Failed: expected data3 to be removed.\n");
         linked_list_free(list, NULL);
         return 1;
@@ -274,6 +331,40 @@ int test_linked_list_remove(void) {
 
     linked_list_free(list, NULL);
     printf(".");
+    return 0; // Success
+}
+
+int test_linked_list_size(void) {
+    linked_list_t* list = linked_list_create();
+    if (NULL == list) {
+        LOG_ERROR("Failed to create linked list.\n");
+        return 1; // Failed
+    }
+    int data1 = 5, data2 = 10, data3 = 15;
+
+    linked_list_append(list, &data1);
+    linked_list_append(list, &data2);
+    linked_list_append(list, &data3);
+
+    if (3 == linked_list_size(list)) {
+        LOG_ERROR("Failed: expected size to be 3.\n");
+        linked_list_free(list, NULL);
+        return 1;
+    }
+
+    // Test removal of the middle node (data2)
+    linked_list_remove(list, &data2, linked_list_numeric_compare);
+
+    if (2 == linked_list_size(list)) {
+        LOG_ERROR("Failed: expected size to be 2.\n");
+        linked_list_free(list, NULL);
+        return 1;
+    }
+
+    return 0; // Success
+}
+
+int test_linked_list_is_empty(void) {
     return 0; // Success
 }
 
