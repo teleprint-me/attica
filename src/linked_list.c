@@ -184,9 +184,13 @@ void linked_list_remove(
     LOG_ERROR("Data not found in the list.\n");
 }
 
-uint32_t linked_list_size(const linked_list_t* list);
+uint32_t linked_list_size(const linked_list_t* list) {
+    return list->size;
+}
 
-bool linked_list_is_empty(const linked_list_t* list);
+bool linked_list_is_empty(const linked_list_t* list) {
+    return 0 == list->size;
+}
 
 node_t* linked_list_find(
     const linked_list_t* list, const void* data, linked_list_compare_t compare
