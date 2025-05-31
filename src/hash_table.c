@@ -1,5 +1,5 @@
 /**
- * Copyright © 2024 Austin Berrio
+ * Copyright © 2023 Austin Berrio
  *
  * @file src/hash_table.c
  * @brief Minimalistic hash table implementation providing mapping between integers, strings, and

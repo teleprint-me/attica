@@ -1,5 +1,5 @@
 /**
- * Copyright © 2024 Austin Berrio
+ * Copyright © 2023 Austin Berrio
  *
  * @file src/linked_list.c
  */

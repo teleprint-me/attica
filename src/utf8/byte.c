@@ -1,5 +1,5 @@
 /**
- * Copyright © 2024 Austin Berrio
+ * Copyright © 2023 Austin Berrio
  *
  * @file src/utf8/byte.c
  * @brief Low-level API for handling core UTF-8 codepoint pre-processing.

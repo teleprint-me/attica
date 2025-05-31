@@ -1,5 +1,5 @@
 /**
- * Copyright © 2025 Austin Berrio
+ * Copyright © 2023 Austin Berrio
  *
  * @file src/lease.c
  * @brief A dynamic runtime allocator for tracking memory address states.

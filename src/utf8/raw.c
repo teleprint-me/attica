@@ -1,5 +1,5 @@
 /**
- * Copyright © 2024 Austin Berrio
+ * Copyright © 2023 Austin Berrio
  *
  * @file src/utf8/raw.c
  * @brief Mid-level API for handling raw UTF-8 pointer-to-char processing.
