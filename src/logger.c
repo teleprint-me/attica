@@ -2,7 +2,6 @@
  * Copyright © 2024 Austin Berrio
  *
  * @file src/logger.c
- *
  * @brief A simple and lightweight logger written in pure C
  *
  * `logger.c` provides a minimal logging library that allows you to log
@@ -26,16 +25,16 @@ const char* LOG_TYPE_NAME[] = {"unknown", "stream", "file"};
  *
  * @return True if the type and name were set successfully, false otherwise.
  */
-bool set_logger_type_and_name(logger_t* logger, log_type_t log_type) {
+bool set_logger_type_and_name(Logger* logger, LogType log_type) {
     // Set logger type based on provided logger type
     switch (log_type) {
         case LOG_TYPE_UNKNOWN:
         case LOG_TYPE_STREAM:
-            logger->log_type      = LOG_TYPE_STREAM;
+            logger->log_type = LOG_TYPE_STREAM;
             logger->log_type_name = LOG_TYPE_NAME[LOG_TYPE_STREAM];
             return true;
         case LOG_TYPE_FILE:
-            logger->log_type      = LOG_TYPE_FILE;
+            logger->log_type = LOG_TYPE_FILE;
             logger->log_type_name = LOG_TYPE_NAME[LOG_TYPE_FILE];
             return true;
         default:
@@ -61,7 +60,7 @@ bool set_logger_type_and_name(logger_t* logger, log_type_t log_type) {
  *
  * @return True if the file path was set successfully, false otherwise.
  */
-bool set_logger_file_path_and_stream(logger_t* logger, const char* file_path) {
+bool set_logger_file_path_and_stream(Logger* logger, const char* file_path) {
     if (file_path == NULL) {
         // set the logger type to stream upon failure.
         set_logger_type_and_name(logger, LOG_TYPE_STREAM);
@@ -93,9 +92,9 @@ bool set_logger_file_path_and_stream(logger_t* logger, const char* file_path) {
  * @return A pointer to the newly created logger instance, or NULL if memory
  * allocation fails or if the logger type is invalid.
  */
-logger_t* logger_new(log_type_t log_type) {
+Logger* logger_new(LogType log_type) {
     // Allocate memory for the logger instance
-    logger_t* logger = (logger_t*) malloc(sizeof(logger_t));
+    Logger* logger = (Logger*) malloc(sizeof(Logger));
 
     // Check if memory allocation was successful
     if (NULL == logger) {
@@ -108,22 +107,18 @@ logger_t* logger_new(log_type_t log_type) {
 
     // Set logger type and name
     if (!set_logger_type_and_name(logger, log_type)) {
-        fprintf(
-            stderr, "Failed to initialize logger with type: %d\n", log_type
-        );
+        fprintf(stderr, "Failed to initialize logger with type: %d\n", log_type);
         free(logger); // Clean up allocated memory to avoid memory leaks
         return NULL;
     }
 
-    logger->file_path   = NULL;
+    logger->file_path = NULL;
     logger->file_stream = NULL;
 
     // Initialize the mutex for thread safety
     int error_code = pthread_mutex_init(&logger->thread_lock, NULL);
     if (0 != error_code) {
-        fprintf(
-            stderr, "Failed to initialize mutex with error: %d\n", error_code
-        );
+        fprintf(stderr, "Failed to initialize mutex with error: %d\n", error_code);
         free(logger); // Clean up allocated memory to avoid memory leaks
         return NULL;
     }
@@ -148,11 +143,9 @@ logger_t* logger_new(log_type_t log_type) {
  * @return A pointer to the newly created logger instance, or NULL if memory
  * allocation fails or if the specified log file cannot be opened.
  */
-logger_t* logger_create(
-    log_level_t log_level, log_type_t log_type, const char* file_path
-) {
+Logger* logger_create(LogLevel log_level, LogType log_type, const char* file_path) {
     // Create a new logger instance
-    logger_t* logger = logger_new(log_type);
+    Logger* logger = logger_new(log_type);
     if (logger == NULL) {
         return NULL;
     }
@@ -169,10 +162,7 @@ logger_t* logger_create(
             break;
         case LOG_TYPE_FILE:
             if (!set_logger_file_path_and_stream(logger, file_path)) {
-                fprintf(
-                    stderr,
-                    "Failed to set log file path. Fallback to stderr.\n"
-                );
+                fprintf(stderr, "Failed to set log file path. Fallback to stderr.\n");
             }
             break;
         default:
@@ -194,7 +184,7 @@ logger_t* logger_create(
  * @param logger A pointer to the logger instance to be destroyed.
  * @return True if the logger was successfully destroyed, false otherwise.
  */
-bool logger_free(logger_t* logger) {
+bool logger_free(Logger* logger) {
     if (NULL == logger) {
         return false;
     }
@@ -202,9 +192,7 @@ bool logger_free(logger_t* logger) {
     // Close the log file if it's a file logger
     if (LOG_TYPE_FILE == logger->log_type && NULL != logger->file_stream) {
         if (fclose(logger->file_stream) != 0) {
-            fprintf(
-                stderr, "Failed to close log file: %s\n", logger->file_path
-            );
+            fprintf(stderr, "Failed to close log file: %s\n", logger->file_path);
             return false; // return false to prevent dangling pointers
         }
     }
@@ -212,9 +200,7 @@ bool logger_free(logger_t* logger) {
     // Destroy the mutex
     int mutex_error = pthread_mutex_destroy(&logger->thread_lock);
     if (0 != mutex_error) {
-        fprintf(
-            stderr, "Failed to destroy mutex with error: %d\n", mutex_error
-        );
+        fprintf(stderr, "Failed to destroy mutex with error: %d\n", mutex_error);
         return false; // return false to prevent dangling pointers
     }
 
@@ -237,17 +223,14 @@ bool logger_free(logger_t* logger) {
  *
  * @return true if the message was successfully logged, false otherwise.
  */
-bool logger_message(
-    logger_t* logger, log_level_t log_level, const char* format, ...
-) {
-    // block if and only if the log_level is less than the logger->log_level
+bool logger_message(Logger* logger, LogLevel log_level, const char* format, ...) {
+    // block if and only if the LogLevel is less than the logger->LogLevel
     if (log_level < logger->log_level) {
         return false; // Do not log messages below the current
-                      // logger->log_level
+                      // logger->LogLevel
     }
 
-    int err
-        = errno; // Capture errno at the start of the function to avoid changes
+    int err = errno; // Capture errno at the start of the function to avoid changes
 
     // Apply lazy initialization for global logger
     if (NULL == logger->file_stream) {
@@ -255,7 +238,7 @@ bool logger_message(
         // WARN: DO NOT REINITIALIZE THE MUTEX
     }
 
-    // Only lock the thread if log_level is valid!
+    // Only lock the thread if LogLevel is valid!
     pthread_mutex_lock(&logger->thread_lock);
 
     // Prefix log messages based on the level
@@ -320,12 +303,12 @@ bool logger_message(
  * @warning Modifying the global logger object or attempting to reinitialize
  * the mutex after initialization can lead to undefined behavior.
  */
-logger_t global_logger = {
-    LOG_LEVEL_DEBUG,          /**< Logging level */
-    LOG_TYPE_STREAM,          /**< Logger type */
-    "stream",                 /**< Logger type name */
-    NULL,                     /**< File stream */
-    NULL,                     /**< File path */
+Logger global_logger = {
+    LOG_LEVEL_DEBUG, /**< Logging level */
+    LOG_TYPE_STREAM, /**< Logger type */
+    "stream", /**< Logger type name */
+    NULL, /**< File stream */
+    NULL, /**< File path */
     PTHREAD_MUTEX_INITIALIZER /**< Mutex for thread safety */
 };
 
@@ -349,16 +332,16 @@ logger_t global_logger = {
  * global logger has been initialized to prevent unintended side effects.
  */
 void initialize_global_logger(
-    log_level_t log_level,
-    log_type_t  log_type,
+    LogLevel log_level,
+    LogType log_type,
     const char* log_type_name,
-    FILE*       file_stream,
+    FILE* file_stream,
     const char* file_path
 ) {
-    global_logger.log_level     = log_level;
-    global_logger.log_type      = log_type;
+    global_logger.log_level = log_level;
+    global_logger.log_type = log_type;
     global_logger.log_type_name = log_type_name;
-    global_logger.file_stream   = file_stream;
-    global_logger.file_path     = file_path;
+    global_logger.file_stream = file_stream;
+    global_logger.file_path = file_path;
     // WARN: DO NOT REINITIALIZE THE MUTEX
 }
