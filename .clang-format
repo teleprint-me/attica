@@ -5,6 +5,8 @@
 BasedOnStyle: LLVM
 Language: Cpp
 
+SortIncludes: false
+
 # Pointer and reference alignment
 DerivePointerAlignment: false
 PointerAlignment: Left
@@ -35,21 +37,22 @@ FixNamespaceComments: true
 # Alignment
 AlignAfterOpenBracket: BlockIndent
 AlignConsecutiveAssignments:
-  Enabled: true
+  Enabled: false
   AcrossComments: true
-  AlignCompound: true
+  AlignCompound: false
 AlignConsecutiveDeclarations:
-  Enabled: true
+  Enabled: false
   AcrossComments: true
 AlignConsecutiveMacros:
-  Enabled: true
+  Enabled: false
   AcrossEmptyLines: true
   AcrossComments: true
-AlignEscapedNewlines: Left
+AlignEscapedNewlines: DontAlign
 MaxEmptyLinesToKeep: 1
 AlignTrailingComments:
-  Kind: Always
-  OverEmptyLines: 0  # Is set to 1 is MaxEmptyLinesToKeep is 2
+  Kind: Never
+  OverEmptyLines: 0  # Is set to 1 if MaxEmptyLinesToKeep is 2
+AlignArrayOfStructures: None
 
 # Spacing
 SpaceAfterCStyleCast: true
@@ -88,11 +91,12 @@ InsertTrailingCommas: Wrapped
 
 # Miscellaneous insertions
 InsertBraces: true  # Warn: Setting this option to true could break code
+Cpp11BracedListStyle: true
 InsertNewlineAtEOF: true
 SeparateDefinitionBlocks: Always
 
 # Line width and wrapping
-ColumnLimit: 79
+ColumnLimit: 100
 
 # Commented out options (for version compatibility or preference)
 # BracedInitializerIndentWidth: 4  # Requires clang-format version 17 or higher
