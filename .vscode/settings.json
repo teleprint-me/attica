@@ -1,10 +1,15 @@
 {
+  "window.zoomLevel": 0,
   "editor.defaultFormatter": null,
   "editor.stickyTabStops": true,
   "editor.tabCompletion": "on",
   "editor.wordWrap": "on",
   "editor.fontSize": 10,
+  "editor.detectIndentation": false,
+  "editor.tabSize": 4,
+  "editor.insertSpaces": true,
   "editor.lightbulb.enabled": "off",
+  "editor.wordWrapColumn": 80,
   "editor.fontFamily": "'Noto Sans Mono', 'Source Code Pro', 'Droid Sans Mono'",
   "[markdown]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
@@ -17,32 +22,9 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true
   },
-  "[javascript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[javascriptreact]": {
-    "editor.defaultFormatter": "vscode.typescript-language-features"
-  },
-  "python.analysis.extraPaths": [
-    "${workspaceFolder}/.venv/bin",
-    "${workspaceFolder}/.venv/lib/python3.11/site-packages"
-  ],
-  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
-  "python.languageServer": "Jedi",
-  "python.analysis.typeCheckingMode": "strict",
-  "black-formatter.args": ["--line-length=79"],
-  "[python]": {
-    "editor.defaultFormatter": "ms-python.black-formatter",
-    "editor.formatOnSave": true,
-    "editor.formatOnPaste": false,
-    "editor.codeActionsOnSave": {
-      "source.organizeImports": "explicit"
-    }
-  },
-  "isort.args": ["--profile", "black"],
-  // C/C++ specific settings
+  // C specific settings
   "clang-format.executable": "/usr/bin/clang-format",
-  // Enable clang-format on save for C/C++ code
+  // Enable clang-format on save for C code
   "editor.codeActionsOnSave": {
     "source.organizeImports": "explicit"
   },
@@ -61,17 +43,7 @@
   "[c]": {
     "editor.defaultFormatter": "xaver.clang-format",
     "editor.tabSize": 4,
-    "editor.formatOnSave": true,
+    "editor.formatOnSave": false,
     "editor.insertSpaces": true
-  },
-  "[cpp]": {
-    "editor.defaultFormatter": "xaver.clang-format",
-    "editor.tabSize": 4,
-    "editor.formatOnSave": true,
-    "editor.insertSpaces": true
-  },
-  "files.associations": {
-    "*.tcss": "jinja-css",
-    "*.h": "c"
   }
 }
