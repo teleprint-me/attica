@@ -1,4 +1,6 @@
 /**
+ * Copyright © 2023 Austin Berrio
+ * 
  * @file include/utf8/string.h
  * @brief ASCII and UTF-8 Structured API.
  * High-level API for abstracting Codepoint and Raw pointer-to-char interfaces.

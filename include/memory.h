@@ -1,5 +1,5 @@
 /**
- * Copyright © 2024 Austin Berrio
+ * Copyright © 2023 Austin Berrio
  *
  * @file include/memory.h
  * @brief Utility functions for memory alignment, padding, and allocation.

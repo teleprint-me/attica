@@ -1,5 +1,5 @@
 /**
- * Copyright © 2024 Austin Berrio
+ * Copyright © 2023 Austin Berrio
  *
  * @file include/utf8/byte.h
  * @brief ASCII and UTF-8 Codepoint API.
