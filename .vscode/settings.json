@@ -47,6 +47,7 @@
     "editor.insertSpaces": true
   },
   "files.associations": {
-    "logger.h": "c"
+    "logger.h": "c",
+    "generator": "c"
   }
 }
