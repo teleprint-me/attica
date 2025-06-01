@@ -53,6 +53,7 @@
     "stdio.h": "c",
     "stdbool.h": "c",
     "stdalign.h": "c",
-    "memory.h": "c"
+    "memory.h": "c",
+    "random": "c"
   }
 }
