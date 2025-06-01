@@ -10,73 +10,56 @@
 #ifndef NUMERIC_CONSTANTS_H
 #define NUMERIC_CONSTANTS_H
 
-/** Mathematical Constants */
+#include <stddef.h> // for size_t
+#include <stdint.h> // for fixed-width types
 
-#ifndef M_PI
-    #define M_PI 3.14159265358979323846f /* Circumference / diameter */
-#endif
+/** Math Constants */
+#define PI 3.14159265358979323846
+#define SQRT_2 1.41421356237309504880
+#define SQRT_2_PI 0.79788456080286535588
 
-#ifndef PI
-    #define PI M_PI
-#endif
+/** Epsilon */
+#define DOUBLE_EPSILON 1e-15
+#define SINGLE_EPSILON 1e-7f
 
-#ifndef SQRT_2
-    #define SQRT_2 1.41421356237309504880f /* sqrt(2) */
-#endif
+/** Inline type-safe functions */
+static inline int min_int(int a, int b) { return a < b ? a : b; }
+static inline unsigned int min_uint(unsigned int a, unsigned int b) { return a < b ? a : b; }
+static inline long min_long(long a, long b) { return a < b ? a : b; }
+static inline unsigned long min_ulong(unsigned long a, unsigned long b) { return a < b ? a : b; }
+static inline float min_float(float a, float b) { return a < b ? a : b; }
+static inline double min_double(double a, double b) { return a < b ? a : b; }
 
-#ifndef SQRT_2_PI
-    #define SQRT_2_PI 0.79788456080286535588f /* sqrt(2/pi) */
-#endif
+static inline int max_int(int a, int b) { return a > b ? a : b; }
+static inline unsigned int max_uint(unsigned int a, unsigned int b) { return a > b ? a : b; }
+static inline long max_long(long a, long b) { return a > b ? a : b; }
+static inline unsigned long max_ulong(unsigned long a, unsigned long b) { return a > b ? a : b; }
+static inline float max_float(float a, float b) { return a > b ? a : b; }
+static inline double max_double(double a, double b) { return a > b ? a : b; }
 
-/** Floating Point Epsilon */
+/** Type-generic dispatch macros using ISO C11 _Generic */
+#define MIN(a, b) \
+    _Generic((a), \
+        int: min_int, \
+        unsigned int: min_uint, \
+        long: min_long, \
+        unsigned long: min_ulong, \
+        float: min_float, \
+        double: min_double, \
+        default: min_ulong \
+    )(a, b)
 
-#ifndef DOUBLE_EPSILON
-    #define DOUBLE_EPSILON 1e-15
-#endif
+#define MAX(a, b) \
+    _Generic((a), \
+        int: max_int, \
+        unsigned int: max_uint, \
+        long: max_long, \
+        unsigned long: max_ulong, \
+        float: max_float, \
+        double: max_double, \
+        default: max_ulong \
+    )(a, b)
 
-#ifndef SINGLE_EPSILON
-    #define SINGLE_EPSILON 1e-7f
-#endif
-
-/** Type-Safe, Single-Eval Math Macros (GNU/Clang only) */
-
-/**
- * @note MIN/MAX/CLAMP use GNU C extensions:
- *   - __typeof__ : Type deduction
- *   - Statement expressions ({ ... })
- * These macros are not standard C or MSVC compatible!
- */
-#if defined(__GNUC__) || defined(__clang__)
-    #ifndef MIN
-        #define MIN(a, b) \
-            ({ \
-                __typeof__(a) _a = (a); \
-                __typeof__(b) _b = (b); \
-                _a < _b ? _a : _b; \
-            })
-    #endif
-    #ifndef MAX
-        #define MAX(a, b) \
-            ({ \
-                __typeof__(a) _a = (a); \
-                __typeof__(b) _b = (b); \
-                _a > _b ? _a : _b; \
-            })
-    #endif
-#else
-    /* Fallback: Classic C macros (may double-evaluate!) */
-    #ifndef MIN
-        #define MIN(a, b) (((a) < (b)) ? (a) : (b))
-    #endif
-    #ifndef MAX
-        #define MAX(a, b) (((a) > (b)) ? (a) : (b))
-    #endif
-
-    /* Or: #warning "MIN, MAX, CLAMP macros use double-evaluation. Use with care!" */
-#endif
-
-#ifndef CLAMP
-    #define CLAMP(x, lo, hi) (MAX((lo), MIN((x), (hi))))
-#endif
+#define CLAMP(x, lo, hi) MAX((lo), MIN((x), (hi)))
 
 #endif /* NUMERIC_CONSTANTS_H */
