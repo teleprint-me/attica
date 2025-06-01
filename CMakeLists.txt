@@ -45,8 +45,15 @@ add_library(dsa SHARED
     "src/unit_test.c"
     "src/lehmer.c"
     "src/hash_table.c"
-    "src/memory.c"
-    "src/lease.c"
+
+    "src/allocator/memory.c"
+    "src/allocator/arena.c"
+    "src/allocator/pool.c"
+    "src/allocator/stack.c"
+    "src/allocator/lease.c"
+
+    "src/numeric/float_is_close.c"
+
     "src/utf8/byte.c"
     "src/utf8/raw.c"
 )
