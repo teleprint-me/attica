@@ -1,4 +1,6 @@
 /**
+ * Copyright © 2023 Austin Berrio
+ *
  * @file lehmer.h
  * @brief Thread-local Lehmer Random Number Generator (LCG, Park-Miller)
  *

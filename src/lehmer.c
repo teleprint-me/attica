@@ -1,5 +1,21 @@
 /**
+ * Copyright © 2023 Austin Berrio
+ *
  * @file src/lehmer.c
+ * @brief Thread-local Lehmer Random Number Generator (LCG, Park-Miller)
+ *
+ * A minimal, fast, and thread-safe Lehmer (Park-Miller) pseudo-random number
+ * generator using 32-bit safe arithmetic and thread-local storage.
+ *
+ * Based on:
+ *  - "Random Number Generators: Good Ones Are Hard to Find" by Park & Miller (1988)
+ *    @ref https://dl.acm.org/doi/10.1145/63039.63042
+ *  - @ref https://www.cs.wm.edu/~va/software/park/park.html
+ *
+ * @note The RNG state is local to each thread using `thread_local`, which avoids
+ * synchronization overhead. Functions are reentrant per-thread.
+ *
+ * @warning Not suitable for cryptographic purposes.
  */
 
 #include "lehmer.h"
