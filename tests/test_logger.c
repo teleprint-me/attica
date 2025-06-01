@@ -1,5 +1,5 @@
 /**
- * Copyright © 2024 Austin Berrio
+ * Copyright © 2023 Austin Berrio
  *
  * @file tests/test_logger.c
  * @brief Automated unit tests for the thread-safe logger implementation.

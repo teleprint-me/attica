@@ -1,4 +1,6 @@
 /**
+ * Copyright © 2023 Austin Berrio
+ *
  * @file tests/test_allocator_memory.c
  * @brief
  */
