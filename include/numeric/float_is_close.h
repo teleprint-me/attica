@@ -19,54 +19,6 @@
 #include <stdint.h>
 
 /**
- * @brief The smallest difference between two distinct double-precision
- *        floating-point numbers (optional).
- *
- * @note For 64-bit doubles with a 53-bit significand, this is approximately
- *       10**-15.
- */
-#ifndef FIC_DOUBLE_EPSILON
-    #define FIC_DOUBLE_EPSILON 1e-15
-#endif
-
-/**
- * @brief The smallest difference between two distinct single-precision
- *        floating-point numbers (optional).
- *
- * @note For 32-bit floats with a 24-bit significand, this is approximately
- *       10**-7.
- */
-#ifndef FIC_SINGLE_EPSILON
-    #define FIC_SINGLE_EPSILON 1e-7
-#endif
-
-/**
- * @brief Get the minimum of two values.
- *
- * @note This macro compares two arguments and returns the smaller one.
- */
-#define FIC_MIN(a, b)                  ((a) < (b) ? (a) : (b))
-
-/**
- * @brief Get the maximum of two values.
- *
- * @note This macro compares two arguments and returns the larger one.
- */
-#define FIC_MAX(a, b)                  ((a) > (b) ? (a) : (b))
-
-/**
- * @brief Clamp a value to a specified range.
- *
- * @param value The input value to bind
- * @param lower The lower boundary
- * @param upper The upper boundary
- *
- * @note This macro ensures that a value stays within a given range by
- *       clamping it to the specified minimum and maximum values.
- */
-#define FIC_CLAMP(value, lower, upper) (FIC_MAX(lower, FIC_MIN(value, upper)))
-
-/**
  * @brief Determine if two double-precision floating-point numbers are close
  *        within a specified tolerance.
  *

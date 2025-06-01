@@ -10,13 +10,14 @@
  * true for the 32-bit implementation.
  */
 
-#include "float_is_close.h"
+#include "numeric/constants.h"
+#include "numeric/float_is_close.h"
 
 #include <math.h>
 #include <stdlib.h>
 
 // Pre-computed lookup table
-static const double const tolerance_table[16]
+static const double tolerance_table[16]
     = {1.0,
        0.1,
        0.01,
@@ -48,7 +49,7 @@ static const double const tolerance_table[16]
  *                    tolerance, false otherwise.
  *
  * @note The significand is clamped if it is out of range.
- * @note FIC_DOUBLE_EPSILON affects relative tolerance.
+ * @note DOUBLE_EPSILON affects relative tolerance.
  */
 bool double_is_close(double a, double b, size_t significand) {
     if (a == b) {
@@ -59,11 +60,11 @@ bool double_is_close(double a, double b, size_t significand) {
         return false;
     }
 
-    significand = FIC_CLAMP(significand, 1, 15);
+    significand = CLAMP(significand, 1, 15);
 
     double absolute_tolerance = tolerance_table[significand];
-    double relative_tolerance = FIC_DOUBLE_EPSILON * fmax(fabs(a), fabs(b));
-    double difference         = fabs(a - b);
+    double relative_tolerance = DOUBLE_EPSILON * fmax(fabs(a), fabs(b));
+    double difference = fabs(a - b);
 
     return difference <= fmax(relative_tolerance, absolute_tolerance);
 }
@@ -82,7 +83,7 @@ bool double_is_close(double a, double b, size_t significand) {
  *                    tolerance, false otherwise.
  *
  * @note The significand is clamped if it is out of range.
- * @note FIC_SINGLE_EPSILON affects relative tolerance.
+ * @note SINGLE_EPSILON affects relative tolerance.
  */
 bool float_is_close(float a, float b, size_t significand) {
     if (a == b) {
@@ -93,11 +94,10 @@ bool float_is_close(float a, float b, size_t significand) {
         return false;
     }
 
-    significand = FIC_CLAMP(significand, 1, 7);
+    significand = CLAMP(significand, 1, 7);
 
     float absolute_tolerance = (float) tolerance_table[significand];
-    float relative_tolerance
-        = ((float) FIC_SINGLE_EPSILON) * fmaxf(fabsf(a), fabsf(b));
+    float relative_tolerance = ((float) SINGLE_EPSILON) * fmaxf(fabsf(a), fabsf(b));
     float difference = fabsf(a - b);
 
     return difference <= fmaxf(relative_tolerance, absolute_tolerance);
