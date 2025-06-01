@@ -88,9 +88,76 @@ int test_constant_is_close_double_suite(void) {
     return test_unit_run(&context, test_constant_is_close_double, NULL);
 }
 
+typedef struct ConstantTestIsCloseFloat {
+    float a;
+    float b;
+    size_t significand;
+    bool expected;
+} ConstantTestIsCloseFloat;
+
+int test_constant_is_close_float(TestCase* test) {
+    ConstantTestIsCloseFloat* unit = (ConstantTestIsCloseFloat*) test->unit;
+
+    bool result = is_close_float(unit->a, unit->b, unit->significand);
+
+    ASSERT(
+        result == unit->expected,
+        "[ConstantTestIsCloseFloat] is_close_float(%g, %g, %zu) → expected=%s, got=%s",
+        (double) unit->a,
+        (double) unit->b,
+        unit->significand,
+        unit->expected ? "true" : "false",
+        result ? "true" : "false"
+    );
+
+    return 0;
+}
+
+int test_constant_is_close_float_suite(void) {
+    static const float expected = 0.053803f;
+
+    static ConstantTestIsCloseFloat cases[] = {
+        {0.053803f, expected, 6, true},
+        {expected, 0.053721f, 6, false},
+        {expected, 0.053951f, 6, false},
+
+        {-0.053803f, -expected, 6, true},
+        {-expected, -0.053721f, 6, false},
+        {-expected, -0.053951f, 6, false},
+
+        {INFINITY, INFINITY, 6, true},
+        {NAN, 0.0f, 6, false},
+        {NAN, NAN, 6, false},
+
+        {1e6f, 1e6f + 1.0f, 0, false},
+        {1e-6f, 1e-6f + 1e-8f, 6, true},
+
+        {123456.1234f, 123456.1234f, 6, true},
+        {123456.1234f, 123456.1235f, 6, false},
+
+        {1e-6f, 2e-6f, 6, true}
+    };
+
+    size_t total_tests = sizeof(cases) / sizeof(ConstantTestIsCloseFloat);
+
+    TestCase test_cases[total_tests];
+    for (size_t i = 0; i < total_tests; i++) {
+        test_cases[i].unit = &cases[i];
+    }
+
+    TestContext context = {
+        .total_tests = total_tests,
+        .test_name = "Constant Test Is Close Float",
+        .test_cases = test_cases,
+    };
+
+    return test_unit_run(&context, test_constant_is_close_float, NULL);
+}
+
 int main(void) {
     static TestRegister suites[] = {
         {"Is Close Double", test_constant_is_close_double_suite},
+        {"Is Close Float",  test_constant_is_close_float_suite},
     };
 
     int result = 0;
