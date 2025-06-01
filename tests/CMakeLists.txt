@@ -3,6 +3,8 @@
 # Define test executables and input directories
 set(C_TESTS
     "test_logger"
+    "test_utf8_byte"
+    "test_utf8_raw"
     "test_numeric_constant"
     # "test_memory"
 )
