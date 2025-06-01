@@ -52,7 +52,9 @@ add_library(dsa SHARED
     "src/allocator/stack.c"
     "src/allocator/lease.c"
 
-    "src/numeric/float_is_close.c"
+    "src/numeric/constant.c"
+    "src/numeric/type.c"
+    "src/numeric/activation.c"
 
     "src/utf8/byte.c"
     "src/utf8/raw.c"
