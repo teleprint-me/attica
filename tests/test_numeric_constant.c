@@ -1,15 +1,15 @@
 /**
  * Copyright © 2024 Austin Berrio
  *
- * @file test_is_float_close.c
+ * @file test_numeric_constant.c
  *
- * @brief A simple test suite for float_is_close.c in pure C
+ * @brief A simple test suite for test_numeric_constant.c in pure C
  *
  * @note The 53-bit significand precision gives from 15 to 17 significant
  *       decimal digits precision (2−53 ≈ 1.11 × 10−16).
  */
 
-#include "float_is_close.h"
+#include "numeric/constant.h"
 
 #include <math.h>
 #include <stdbool.h>
@@ -30,7 +30,7 @@ const double expected = 0.053803;
 // than, or less than anything, including itself.
 // sauce:
 // https://www.gnu.org/software/libc/manual/html_node/Infinity-and-NaN.html
-const test_case_t const tests[] = {
+const test_case_t tests[] = {
     // precision is within a range of 6 digits
     {0.053803, expected, 6, true},  // equal to
     {expected, 0.053721, 6, false}, // less than
@@ -54,18 +54,18 @@ const test_case_t const tests[] = {
 
 const size_t number_of_tests = sizeof(tests) / sizeof(tests[0]);
 
-int test_double_is_close(void) {
-    printf("Running double_is_close tests...\n");
+int test_is_close_double(void) {
+    printf("Running is_close_double tests...\n");
 
     // Iterate over test cases
     for (size_t i = 0; i < number_of_tests; i++) {
         bool result
-            = double_is_close(tests[i].a, tests[i].b, tests[i].significand);
+            = is_close_double(tests[i].a, tests[i].b, tests[i].significand);
 
         // Output the result
         if (result == tests[i].expected) {
             printf(
-                "PASS: double_is_close(%.17f, %.17f, %ld) -> Expected: %d, "
+                "PASS: is_close_double(%.17f, %.17f, %ld) -> Expected: %d, "
                 "Got: %d\n",
                 tests[i].a,
                 tests[i].b,
@@ -75,7 +75,7 @@ int test_double_is_close(void) {
             );
         } else {
             printf(
-                "FAIL: double_is_close(%.17f, %.17f, %ld) -> Expected: %d, "
+                "FAIL: is_close_double(%.17f, %.17f, %ld) -> Expected: %d, "
                 "Got: %d\n",
                 tests[i].a,
                 tests[i].b,
@@ -85,7 +85,7 @@ int test_double_is_close(void) {
             );
             // Output details for failed tests
             printf(
-                "double_is_close: Expected: %.17f, Actual: %.17f, "
+                "is_close_double: Expected: %.17f, Actual: %.17f, "
                 "Significand: %ld\n",
                 tests[i].b,
                 tests[i].a,
@@ -99,5 +99,5 @@ int test_double_is_close(void) {
 }
 
 int main(void) {
-    return test_double_is_close();
+    return test_is_close_double();
 }
