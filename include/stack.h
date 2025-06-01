@@ -4,7 +4,7 @@
  * @file include/stack.h
  */
 
-#include "linked_list.h"
+#include "list/singly.h"
 
 typedef struct Stack {
     LinkedList* list; // Stack implemented as a linked list

@@ -25,7 +25,7 @@ extern "C" {
 typedef struct LinkedList {
     node_t*  head; // Pointer to the first node in the list
     uint32_t size; // Keeps track of the number of elements
-} linked_list_t;
+} LinkedList;
 
 /**
  * @brief Comparison function type for linked list operations.
@@ -51,7 +51,7 @@ int linked_list_numeric_compare(const void* a, const void* b);
  *
  * @return A pointer to the newly created linked list.
  */
-linked_list_t* linked_list_create(void);
+LinkedList* linked_list_create(void);
 
 /**
  * @brief Free a linked list, all its nodes, and optionally its associated data
@@ -67,7 +67,7 @@ linked_list_t* linked_list_create(void);
  * - If a callback function is provided, call it with the corresponding data
  *   pointer from each node before freeing its memory
  */
-void linked_list_free(linked_list_t* list, void (*callback)(void*));
+void linked_list_free(LinkedList* list, void (*callback)(void*));
 
 /**
  * @brief Add a node to the end of a list.
@@ -75,7 +75,7 @@ void linked_list_free(linked_list_t* list, void (*callback)(void*));
  * @param list Pointer to the linked list.
  * @param data Pointer to the data to be stored in the new node.
  */
-void linked_list_append(linked_list_t* list, void* data);
+void linked_list_append(LinkedList* list, void* data);
 
 /**
  * @brief Add a node to the beginning of a list.
@@ -83,7 +83,7 @@ void linked_list_append(linked_list_t* list, void* data);
  * @param list Pointer to the linked list.
  * @param data Pointer to the data to be stored in the new node.
  */
-void linked_list_prepend(linked_list_t* list, void* data);
+void linked_list_prepend(LinkedList* list, void* data);
 
 /**
  * @brief Insert a node at a given index in the list.
@@ -92,7 +92,7 @@ void linked_list_prepend(linked_list_t* list, void* data);
  * @param data Pointer to the data to be stored in the new node.
  * @param index Position where the new node will be inserted.
  */
-void linked_list_insert(linked_list_t* list, void* data, uint32_t index);
+void linked_list_insert(LinkedList* list, void* data, uint32_t index);
 
 /**
  * @brief Remove the first node with matching data.
@@ -101,7 +101,7 @@ void linked_list_insert(linked_list_t* list, void* data, uint32_t index);
  * @param data Pointer to the data to be matched for removal.
  */
 void linked_list_remove(
-    linked_list_t* list, void* data, linked_list_compare_t compare
+    LinkedList* list, void* data, linked_list_compare_t compare
 );
 
 /**
@@ -110,7 +110,7 @@ void linked_list_remove(
  * @param list Pointer to the linked list.
  * @return The number of nodes in the list.
  */
-uint32_t linked_list_size(const linked_list_t* list);
+uint32_t linked_list_size(const LinkedList* list);
 
 /**
  * @brief Check if the list is empty.
@@ -118,7 +118,7 @@ uint32_t linked_list_size(const linked_list_t* list);
  * @param list Pointer to the linked list.
  * @return True if the list is empty, false otherwise.
  */
-bool linked_list_is_empty(const linked_list_t* list);
+bool linked_list_is_empty(const LinkedList* list);
 
 /**
  * @brief Find the first node containing the matching data.
@@ -129,7 +129,7 @@ bool linked_list_is_empty(const linked_list_t* list);
  * @return A pointer to the found node, or NULL if not found.
  */
 node_t* linked_list_find(
-    const linked_list_t* list, const void* data, linked_list_compare_t compare
+    const LinkedList* list, const void* data, linked_list_compare_t compare
 );
 
 /**
@@ -138,7 +138,7 @@ node_t* linked_list_find(
  * @param list Pointer to the linked list.
  * @return Data pointer from the removed node, or NULL if the list is empty.
  */
-void* linked_list_pop_last(linked_list_t* list);
+void* linked_list_pop_last(LinkedList* list);
 
 /**
  * @brief Remove and return the first node in the list.
@@ -146,7 +146,7 @@ void* linked_list_pop_last(linked_list_t* list);
  * @param list Pointer to the linked list.
  * @return Data pointer from the removed node, or NULL if the list is empty.
  */
-void* linked_list_pop_first(linked_list_t* list);
+void* linked_list_pop_first(LinkedList* list);
 
 #ifdef __cplusplus
 }

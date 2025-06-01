@@ -4,8 +4,8 @@
  * @file src/linked_list.c
  */
 
-#include "linked_list.h"
 #include "logger.h"
+#include "list/singly.h"
 
 #include <stdlib.h> // For malloc, free
 
@@ -17,11 +17,11 @@ int linked_list_numeric_compare(const void* a, const void* b) {
     return (n_a > n_b) - (n_a < n_b);
 }
 
-linked_list_t* linked_list_create(void) {
+LinkedList* linked_list_create(void) {
     // Allocate memory for the linked list
-    linked_list_t* list = (linked_list_t*) malloc(sizeof(linked_list_t));
+    LinkedList* list = (LinkedList*) malloc(sizeof(LinkedList));
     if (NULL == list) {
-        LOG_ERROR("Failed to allocate memory to linked_list_t\n");
+        LOG_ERROR("Failed to allocate memory to LinkedList\n");
         return NULL;
     }
 
@@ -32,7 +32,7 @@ linked_list_t* linked_list_create(void) {
     return list;
 }
 
-void linked_list_free(linked_list_t* list, void (*callback)(void*)) {
+void linked_list_free(LinkedList* list, void (*callback)(void*)) {
     if (NULL == list) {
         return;
     }
@@ -50,7 +50,7 @@ void linked_list_free(linked_list_t* list, void (*callback)(void*)) {
     free(list);
 }
 
-void linked_list_append(linked_list_t* list, void* data) {
+void linked_list_append(LinkedList* list, void* data) {
     if (NULL == list) {
         LOG_ERROR("List is NULL.\n");
         return;
@@ -79,7 +79,7 @@ void linked_list_append(linked_list_t* list, void* data) {
     list->size++;
 }
 
-void linked_list_prepend(linked_list_t* list, void* data) {
+void linked_list_prepend(LinkedList* list, void* data) {
     if (NULL == list) {
         LOG_ERROR("List is NULL.\n");
         return;
@@ -100,7 +100,7 @@ void linked_list_prepend(linked_list_t* list, void* data) {
     list->size++;
 }
 
-void linked_list_insert(linked_list_t* list, void* data, uint32_t index) {
+void linked_list_insert(LinkedList* list, void* data, uint32_t index) {
     // Handle null list case
     if (NULL == list) {
         LOG_ERROR("List is NULL.\n");
@@ -145,7 +145,7 @@ void linked_list_insert(linked_list_t* list, void* data, uint32_t index) {
 }
 
 void linked_list_remove(
-    linked_list_t* list, void* data, linked_list_compare_t compare
+    LinkedList* list, void* data, linked_list_compare_t compare
 ) {
     // Ensure the list is valid
     if (NULL == list || NULL == list->head) {
@@ -184,18 +184,18 @@ void linked_list_remove(
     LOG_ERROR("Data not found in the list.\n");
 }
 
-uint32_t linked_list_size(const linked_list_t* list) {
+uint32_t linked_list_size(const LinkedList* list) {
     return list->size;
 }
 
-bool linked_list_is_empty(const linked_list_t* list) {
+bool linked_list_is_empty(const LinkedList* list) {
     return 0 == list->size;
 }
 
 node_t* linked_list_find(
-    const linked_list_t* list, const void* data, linked_list_compare_t compare
+    const LinkedList* list, const void* data, linked_list_compare_t compare
 );
 
-void* linked_list_pop_last(linked_list_t* list);
+void* linked_list_pop_last(LinkedList* list);
 
-void* linked_list_pop_first(linked_list_t* list);
+void* linked_list_pop_first(LinkedList* list);
