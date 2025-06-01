@@ -1,5 +1,5 @@
 /**
- * @file tests/test_memory.c
+ * @file tests/test_allocator_memory.c
  * @brief
  */
 
