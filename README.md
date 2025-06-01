@@ -5,11 +5,6 @@
 A collection of portable C libraries for foundational algorithms and data
 structures, designed for real-world systems programming and experimentation.
 
-## ⚠️ Status
-
-> **Work in progress.** Modules and APIs may change frequently. Pull requests
-> and feedback are welcome!
-
 ## 🚀 Quick Start
 
 ### Clone
@@ -33,22 +28,33 @@ cmake --build build --config Debug -j $(nproc)
 ctest --rerun-failed --output-on-failure --test-dir build
 ```
 
-## 📁 Modules
+## 🪄 Projects
 
-- `float_is_close` — Floating-point comparison utilities
-- `hash_table` — Linear probing hash table
-- `lease` — Simple memory ownership/lease API
-- `lehmer` — Lehmer RNG
-- `linked_list` — Singly-linked list
-- `logger` — Thread-safe logger
-- `memory` — Simple memory management utilities
-- `node` — Generic node struct for tree/list use
-- `prime` — Prime number helpers
-- `queue`, `stack` — Classic queue/stack ADTs
-- `unit_test` — Minimal C unit test framework
-- `utf8` — UTF-8 byte/raw/string utilities
+### ⚠️ Status
+
+> **Work in progress.** Modules and APIs may change frequently. Pull requests
+> and feedback are welcome!
 
 _Note: All modules are evolving. See `tests/` for usage and examples._
+
+### Add as submodule
+
+```sh
+git submodule add https://github.com/teleprint-me/dsa.c dsa
+```
+
+### Add include
+
+```c
+#include "allocator/arena.h"
+#include "logger.h"
+```
+
+### Sync updates
+
+```sh
+git submodule update --remote dsa
+```
 
 ## 📚 References
 
