@@ -1,17 +1,20 @@
 /**
  * Copyright © 2023 Austin Berrio
- * @file include/numeric/constants.h
- * @brief Common mathematical constants and generic math macros.
  *
- * @note This header uses GNU C extensions (__typeof__, statement expressions) for safe,
- * single-evaluation MIN/MAX. If you need ANSI portability, provide your own simpler macros.
+ * @file include/numeric/constant.h
+ *
+ * @brief Compare floating-point numbers with a given tolerance in pure C
+ *
+ * @note see 1.2: Epsilon-Delta Definition of a Limit for details
+ * https://math.libretexts.org/Bookshelves/Calculus/Calculus_3e_(Apex)
  */
 
-#ifndef NUMERIC_CONSTANTS_H
-#define NUMERIC_CONSTANTS_H
+#ifndef NUMERIC_CONSTANT_H
+#define NUMERIC_CONSTANT_H
 
-#include <stddef.h> // for size_t
-#include <stdint.h> // for fixed-width types
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 
 /** Math Constants */
 #define PI 3.14159265358979323846
@@ -19,8 +22,8 @@
 #define SQRT_2_PI 0.79788456080286535588
 
 /** Epsilon */
-#define DOUBLE_EPSILON 1e-15
-#define SINGLE_EPSILON 1e-7f
+#define EPSILON_DOUBLE 1e-15
+#define EPSILON_SINGLE 1e-7f
 
 /** Inline type-safe functions */
 static inline int min_int(int a, int b) { return a < b ? a : b; }
@@ -64,4 +67,40 @@ static inline double max_double(double a, double b) { return a > b ? a : b; }
 #define MINMAX(x, a, b) CLAMP((x), MIN((a), (b)), MAX((a), (b)))
 #define MIDPOINT(a, b) (((a) + (b)) / 2)
 
-#endif /* NUMERIC_CONSTANTS_H */
+/**
+ * @brief Determine if two double-precision floating-point numbers are close
+ *        within a specified tolerance.
+ *
+ * @param a           The first floating-point number.
+ * @param b           The second floating-point number.
+ * @param significand The number of significant digits to consider (must be
+ *                    in the range 1 to 15 inclusive). This determines the
+ *                    absolute tolerance.
+ *
+ * @return            True if the numbers are close within the specified
+ *                    tolerance, false otherwise.
+ *
+ * @note The significand is clamped if it is out of range.
+ * @note EPSILON_DOUBLE affects relative tolerance.
+ */
+bool is_close_double(double a, double b, size_t significand);
+
+/**
+ * @brief Determine if two single-precision floating-point numbers are close
+ *        within a specified tolerance.
+ *
+ * @param a           The first floating-point number.
+ * @param b           The second floating-point number.
+ * @param significand The number of significant digits to consider (must be
+ *                    in the range 1 to 7 inclusive). This determines the
+ *                    absolute tolerance.
+ *
+ * @return            True if the numbers are close within the specified
+ *                    tolerance, false otherwise.
+ *
+ * @note The significand is clamped if it is out of range.
+ * @note EPSILON_SINGLE affects relative tolerance.
+ */
+bool is_close_float(float a, float b, size_t significand);
+
+#endif // NUMERIC_CONSTANT_H

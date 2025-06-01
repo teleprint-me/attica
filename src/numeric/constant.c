@@ -1,7 +1,7 @@
 /**
  * Copyright © 2023 Austin Berrio
  *
- * @file src/float_is_close.c
+ * @file src/numeric/constant.c
  *
  * @brief Compare floating-point numbers with a given tolerance in pure C
  *
@@ -10,8 +10,7 @@
  * true for the 32-bit implementation.
  */
 
-#include "numeric/constants.h"
-#include "numeric/float_is_close.h"
+#include "numeric/constant.h"
 
 #include <math.h>
 #include <stdlib.h>
@@ -51,7 +50,7 @@ static const double tolerance_table[16]
  * @note The significand is clamped if it is out of range.
  * @note DOUBLE_EPSILON affects relative tolerance.
  */
-bool double_is_close(double a, double b, size_t significand) {
+bool is_close_double(double a, double b, size_t significand) {
     if (a == b) {
         return true;
     }
@@ -63,7 +62,7 @@ bool double_is_close(double a, double b, size_t significand) {
     significand = CLAMP(significand, 1, 15);
 
     double absolute_tolerance = tolerance_table[significand];
-    double relative_tolerance = DOUBLE_EPSILON * fmax(fabs(a), fabs(b));
+    double relative_tolerance = EPSILON_DOUBLE * fmax(fabs(a), fabs(b));
     double difference = fabs(a - b);
 
     return difference <= fmax(relative_tolerance, absolute_tolerance);
@@ -85,7 +84,7 @@ bool double_is_close(double a, double b, size_t significand) {
  * @note The significand is clamped if it is out of range.
  * @note SINGLE_EPSILON affects relative tolerance.
  */
-bool float_is_close(float a, float b, size_t significand) {
+bool is_close_float(float a, float b, size_t significand) {
     if (a == b) {
         return true;
     }
@@ -97,7 +96,7 @@ bool float_is_close(float a, float b, size_t significand) {
     significand = CLAMP(significand, 1, 7);
 
     float absolute_tolerance = (float) tolerance_table[significand];
-    float relative_tolerance = ((float) SINGLE_EPSILON) * fmaxf(fabsf(a), fabsf(b));
+    float relative_tolerance = ((float) EPSILON_SINGLE) * fmaxf(fabsf(a), fabsf(b));
     float difference = fabsf(a - b);
 
     return difference <= fmaxf(relative_tolerance, absolute_tolerance);
