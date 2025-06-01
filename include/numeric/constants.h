@@ -61,5 +61,7 @@ static inline double max_double(double a, double b) { return a > b ? a : b; }
     )(a, b)
 
 #define CLAMP(x, lo, hi) MAX((lo), MIN((x), (hi)))
+#define MINMAX(x, a, b) CLAMP((x), MIN((a), (b)), MAX((a), (b)))
+#define MIDPOINT(a, b) (((a) + (b)) / 2)
 
 #endif /* NUMERIC_CONSTANTS_H */
