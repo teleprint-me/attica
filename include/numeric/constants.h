@@ -1,64 +1,82 @@
+/**
+ * Copyright © 2023 Austin Berrio
+ * @file include/numeric/constants.h
+ * @brief Common mathematical constants and generic math macros.
+ *
+ * @note This header uses GNU C extensions (__typeof__, statement expressions) for safe,
+ * single-evaluation MIN/MAX. If you need ANSI portability, provide your own simpler macros.
+ */
+
+#ifndef NUMERIC_CONSTANTS_H
+#define NUMERIC_CONSTANTS_H
+
+/** Mathematical Constants */
 
 #ifndef M_PI
-    #define M_PI 3.141592653589793f // circumference / diameter
+    #define M_PI 3.14159265358979323846f /* Circumference / diameter */
 #endif
 
 #ifndef PI
     #define PI M_PI
 #endif
 
-#ifndef SQRT_2_PI
-    #define SQRT_2_PI 0.7978845608028654f // sqrt(2 / pi)
-#endif
-
 #ifndef SQRT_2
-    #define SQRT_2 1.4142135623730951f // sqrt(2)
+    #define SQRT_2 1.41421356237309504880f /* sqrt(2) */
 #endif
 
-/**
- * @brief The smallest difference between two distinct double-precision
- *        floating-point numbers (optional).
- *
- * @note For 64-bit doubles with a 53-bit significand, this is approximately
- *       10**-15.
- */
+#ifndef SQRT_2_PI
+    #define SQRT_2_PI 0.79788456080286535588f /* sqrt(2/pi) */
+#endif
+
+/** Floating Point Epsilon */
+
 #ifndef DOUBLE_EPSILON
     #define DOUBLE_EPSILON 1e-15
 #endif
 
-/**
- * @brief The smallest difference between two distinct single-precision
- *        floating-point numbers (optional).
- *
- * @note For 32-bit floats with a 24-bit significand, this is approximately
- *       10**-7.
- */
 #ifndef SINGLE_EPSILON
-    #define SINGLE_EPSILON 1e-7
+    #define SINGLE_EPSILON 1e-7f
 #endif
 
-/**
- * @brief Get the minimum of two values.
- *
- * @note This macro compares two arguments and returns the smaller one.
- */
-#define MIN(a, b)                  ((a) < (b) ? (a) : (b))
+/** Type-Safe, Single-Eval Math Macros (GNU/Clang only) */
 
 /**
- * @brief Get the maximum of two values.
- *
- * @note This macro compares two arguments and returns the larger one.
+ * @note MIN/MAX/CLAMP use GNU C extensions:
+ *   - __typeof__ : Type deduction
+ *   - Statement expressions ({ ... })
+ * These macros are not standard C or MSVC compatible!
  */
-#define MAX(a, b)                  ((a) > (b) ? (a) : (b))
+#if defined(__GNUC__) || defined(__clang__)
+    #ifndef MIN
+        #define MIN(a, b) \
+            ({ \
+                __typeof__(a) _a = (a); \
+                __typeof__(b) _b = (b); \
+                _a < _b ? _a : _b; \
+            })
+    #endif
+    #ifndef MAX
+        #define MAX(a, b) \
+            ({ \
+                __typeof__(a) _a = (a); \
+                __typeof__(b) _b = (b); \
+                _a > _b ? _a : _b; \
+            })
+    #endif
+#else
+    /* Fallback: Classic C macros (may double-evaluate!) */
+    #ifndef MIN
+        #define MIN(a, b) ((a) < (b) ? (a) : (b))
+    #endif
+    #ifndef MAX
+        #define MAX(a, b) ((a) > (b) ? (a) : (b))
+    #endif
 
-/**
- * @brief Clamp a value to a specified range.
- *
- * @param value The input value to bind
- * @param lower The lower boundary
- * @param upper The upper boundary
- *
- * @note This macro ensures that a value stays within a given range by
- *       clamping it to the specified minimum and maximum values.
- */
-#define CLAMP(value, lower, upper) (FIC_MAX(lower, FIC_MIN(value, upper)))
+    /* Or: #warning "MIN, MAX, CLAMP macros use double-evaluation. Use with care!" */
+#endif
+
+#ifndef CLAMP
+    #define CLAMP(x, lo, hi) (MAX((lo), MIN((x), (hi))))
+#endif
+
+#endif /* NUMERIC_CONSTANTS_H */
