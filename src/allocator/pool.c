@@ -1,9 +1,11 @@
 /**
- * @file src/pool.c
+ * Copyright © 2023 Austin Berrio
+ *
+ * @file src/allocator/pool.c
  */
 
-#include "memory.h"
-#include "pool.h"
+#include "allocator/memory.h"
+#include "allocator/pool.h"
 
 #include <stdio.h>
 

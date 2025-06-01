@@ -1,9 +1,11 @@
 /**
- * @file include/stack.c
+ * Copyright © 2023 Austin Berrio
+ *
+ * @file src/allocator/stack.c
  */
 
-#include "memory.h"
-#include "stack.h"
+#include "allocator/memory.h"
+#include "allocator/stack.h"
 
 #include <stdlib.h>
 #include <stdio.h>

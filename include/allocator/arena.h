@@ -1,7 +1,7 @@
 /**
- * Copyright © 2025 Austin Berrio
+ * Copyright © 2023 Austin Berrio
  *
- * @file include/arena.h
+ * @file include/allocator/arena.h
  * @brief Header file for the Linear Arena memory allocator.
  *
  * This module provides a simple linear memory arena implementation that allows
@@ -11,8 +11,8 @@
  * the arena. The arena supports reallocating and checkpoints for memory management.
  */
 
-#ifndef LINEAR_ARENA_H
-#define LINEAR_ARENA_H
+#ifndef ALLOCATOR_ARENA_H
+#define ALLOCATOR_ARENA_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -155,4 +155,4 @@ size_t arena_remaining(const Arena* arena);
  */
 void arena_debug(const Arena* arena);
 
-#endif // LINEAR_ARENA_H
+#endif // ALLOCATOR_ARENA_H

@@ -1,7 +1,7 @@
 /**
  * Copyright © 2023 Austin Berrio
  *
- * @file include/memory.h
+ * @file include/allocator/memory.h
  * @brief Utility functions for memory alignment, padding, and allocation.
  *
  * Provides helper functions to:
@@ -11,8 +11,8 @@
  * - Allocate aligned memory blocks with posix_memalign
  */
 
-#ifndef MEMORY_H
-#define MEMORY_H
+#ifndef ALLOCATOR_MEMORY_H
+#define ALLOCATOR_MEMORY_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -120,4 +120,4 @@ void* memory_aligned_calloc(size_t n, size_t size, size_t alignment);
 
 /** @} */
 
-#endif // MEMORY_H
+#endif // ALLOCATOR_MEMORY_H

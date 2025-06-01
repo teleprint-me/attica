@@ -1,7 +1,7 @@
 /**
- * Copyright © 2025 Austin Berrio
+ * Copyright © 2023 Austin Berrio
  *
- * @file include/arena.c
+ * @file src/allocator/arena.c
  * @brief Source file for the Linear Arena memory allocator.
  *
  * This module provides a simple linear memory arena implementation that allows

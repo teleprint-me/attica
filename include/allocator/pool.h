@@ -1,9 +1,11 @@
 /**
- * @file include/pool.h
+ * Copyright © 2023 Austin Berrio
+ *
+ * @file include/allocator/pool.h
  */
 
-#ifndef LINEAR_POOL_H
-#define LINEAR_POOL_H
+#ifndef ALLOCATOR_POOL_H
+#define ALLOCATOR_POOL_H
 
 #include <stdint.h>
 #include <stddef.h>
@@ -35,4 +37,4 @@ bool pool_owns(const Pool* pool, const void* address); // Is ptr within pool buf
 void pool_dump_info(Pool* pool);
 void pool_dump_buffer(Pool* pool, size_t bytes);
 
-#endif // LINEAR_POOL_H
+#endif // ALLOCATOR_POOL_H

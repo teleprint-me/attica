@@ -1,9 +1,11 @@
 /**
- * @file include/stack.h
+ * Copyright © 2023 Austin Berrio
+ *
+ * @file include/allocator/stack.h
  */
 
-#ifndef LINEAR_STACK_H
-#define LINEAR_STACK_H
+#ifndef ALLOCATOR_STACK_H
+#define ALLOCATOR_STACK_H
 
 #include <stdint.h>
 #include <stddef.h>
@@ -37,4 +39,4 @@ void stack_dump_allocs(const Stack* stack);
 void stack_dump_info(const Stack* stack);
 void stack_dump(const Stack* stack);
 
-#endif // LINEAR_STACK_H
+#endif // ALLOCATOR_STACK_H

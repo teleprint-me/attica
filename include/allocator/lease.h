@@ -1,7 +1,7 @@
 /**
  * Copyright © 2023 Austin Berrio
  *
- * @file include/lease.h
+ * @file include/allocator/lease.h
  * @brief A dynamic runtime allocator for tracking memory address states.
  *
  * Each object assumes full ownership of its internal components.
@@ -22,8 +22,8 @@
  * with explicit control over lifetime and tracking of dynamic memory.
  */
 
-#ifndef LEASE_ALLOCATOR_H
-#define LEASE_ALLOCATOR_H
+#ifndef ALLOCATOR_LEASE_H
+#define ALLOCATOR_LEASE_H
 
 #include "hash_table.h"
 
@@ -397,4 +397,4 @@ void lease_debug_owner(LeaseOwner* owner);
 
 /** @} */
 
-#endif // LEASE_ALLOCATOR_H
+#endif // ALLOCATOR_LEASE_H
