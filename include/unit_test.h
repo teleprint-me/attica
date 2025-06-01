@@ -8,8 +8,8 @@
  * with flexible test logic and callback hooks.
  */
 
-#ifndef UNIT_TEST_H
-#define UNIT_TEST_H
+#ifndef TEST_UNIT_H
+#define TEST_UNIT_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -116,7 +116,7 @@ typedef int (*TestSuite)(void);
  * @param callback Optional callback function called after each test (may be NULL).
  * @return 0 if all tests pass, 1 if any fail, -1 on invalid input.
  */
-int run_unit_tests(TestContext* context, TestLogic logic, TestCallback callback);
+int test_unit_run(TestContext* context, TestLogic logic, TestCallback callback);
 
 /**
  * @brief Runs a named test suite function.
@@ -127,8 +127,8 @@ int run_unit_tests(TestContext* context, TestLogic logic, TestCallback callback)
  * @param suite Function pointer to the test suite to run.
  * @return 0 on success, non-zero on failure.
  */
-int run_test_suite(const char* suite_name, TestSuite suite);
+int test_suite_run(const char* suite_name, TestSuite suite);
 
 /** @} */
 
-#endif // UNIT_TEST_H
+#endif // TEST_UNIT_H

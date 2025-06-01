@@ -63,7 +63,7 @@ int test_utf8_byte_width_suite(void) {
         .test_cases = test_cases,
     };
 
-    return run_unit_tests(&context, test_utf8_byte_width, NULL);
+    return test_unit_run(&context, test_utf8_byte_width, NULL);
 }
 
 // --- UTF-8 Test Byte Validation ---
@@ -140,7 +140,7 @@ int test_utf8_byte_is_valid_suite(void) {
         .test_cases = test_cases,
     };
 
-    return run_unit_tests(&context, test_utf8_byte_is_valid, NULL);
+    return test_unit_run(&context, test_utf8_byte_is_valid, NULL);
 }
 
 // --- UTF-8 Test Byte Equality ---
@@ -194,7 +194,7 @@ int test_utf8_byte_is_equal_suite(void) {
         .test_cases = test_cases,
     };
 
-    return run_unit_tests(&context, test_utf8_byte_is_equal, NULL);
+    return test_unit_run(&context, test_utf8_byte_is_equal, NULL);
 }
 
 // --- UTF-8 Test Byte Range ---
@@ -242,7 +242,7 @@ int test_utf8_byte_range_suite(void) {
         .test_cases = test_cases,
     };
 
-    return run_unit_tests(&context, test_utf8_byte_range, NULL);
+    return test_unit_run(&context, test_utf8_byte_range, NULL);
 }
 
 // --- UTF-8 Test Iterator ---
@@ -267,7 +267,7 @@ int main(void) {
     int result = 0;
 
     for (size_t i = 0; i < total_suites; i++) {
-        result |= run_test_suite(test_suites[i].label, test_suites[i].suite);
+        result |= test_suite_run(test_suites[i].label, test_suites[i].suite);
     }
 
     return result;

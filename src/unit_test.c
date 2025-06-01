@@ -7,7 +7,7 @@
 #include "logger.h"
 #include "unit_test.h"
 
-int run_unit_tests(TestContext* context, TestLogic logic, TestCallback callback) {
+int test_unit_run(TestContext* context, TestLogic logic, TestCallback callback) {
     if (!context || !context->test_cases || !logic) {
         LOG_ERROR("Invalid parameters.");
         return -1;
@@ -41,7 +41,7 @@ int run_unit_tests(TestContext* context, TestLogic logic, TestCallback callback)
     return failures > 0 ? 1 : 0;
 }
 
-int run_test_suite(const char* suite_name, TestSuite suite) {
+int test_suite_run(const char* suite_name, TestSuite suite) {
     LOG_INFO("[RUN] %s", suite_name);
     int result = suite();
     if (result == 0) {

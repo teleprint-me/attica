@@ -136,7 +136,7 @@ int test_logger_level_suite(void) {
     };
 
     // Return test suite results
-    return run_unit_tests(&context, test_logger_level, NULL);
+    return test_unit_run(&context, test_logger_level, NULL);
     ;
 }
 
@@ -199,7 +199,7 @@ int test_logger_file_suite(void) {
         .test_cases = test_cases,
     };
 
-    return run_unit_tests(&context, test_logger_file, NULL);
+    return test_unit_run(&context, test_logger_file, NULL);
 }
 
 /**
@@ -263,7 +263,7 @@ int test_logger_global_suite(void) {
         .test_cases = test_cases,
     };
 
-    return run_unit_tests(&context, test_logger_global, NULL);
+    return test_unit_run(&context, test_logger_global, NULL);
 }
 
 /**
@@ -326,7 +326,7 @@ int test_logger_lazy_suite(void) {
         .test_cases = test_cases,
     };
 
-    return run_unit_tests(&context, test_logger_lazy, NULL);
+    return test_unit_run(&context, test_logger_lazy, NULL);
 }
 
 int main(void) {
@@ -340,7 +340,7 @@ int main(void) {
     int result = 0;
     size_t total = sizeof(suites) / sizeof(TestRegister);
     for (size_t i = 0; i < total; i++) {
-        result |= run_test_suite(suites[i].name, suites[i].test_suite);
+        result |= test_suite_run(suites[i].name, suites[i].test_suite);
     }
 
     return result;

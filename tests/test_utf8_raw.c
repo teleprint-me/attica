@@ -54,7 +54,7 @@ int test_utf8_raw_is_valid_suite(void) {
         .test_cases = test_cases,
     };
 
-    return run_unit_tests(&context, test_utf8_raw_is_valid, NULL);
+    return test_unit_run(&context, test_utf8_raw_is_valid, NULL);
 }
 
 int main(void) {
@@ -72,7 +72,7 @@ int main(void) {
     int result = 0;
 
     for (size_t i = 0; i < total_suites; i++) {
-        result |= run_test_suite(test_suites[i].label, test_suites[i].suite);
+        result |= test_suite_run(test_suites[i].label, test_suites[i].suite);
     }
 
     return result;
