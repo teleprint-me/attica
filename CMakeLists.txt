@@ -35,54 +35,36 @@ else()
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${COMMON_WARNING_FLAGS}")
 endif()
 
-# Setup submodule, module, and test names
-set(SUBMODULES logger)
-set(MODULES node linked_list) # Add more modules here as needed
-
 # Set the output directory for built binaries
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
-# Enable testing
+# Add library
+add_library(dsa SHARED
+    "src/logger.c"
+    "src/unit_test.c"
+    "src/lehmer.c"
+    "src/hash_table.c"
+    "src/memory.c"
+    "src/lease.c"
+    "src/utf8/byte.c"
+    "src/utf8/raw.c"
+)
+target_include_directories(dsa PUBLIC include)
+target_link_libraries(dsa PUBLIC m rt pthread pcre2-8)
+
 enable_testing()
+add_subdirectory(tests)
 
-# Add dependencies
-foreach(SUBMODULE IN LISTS SUBMODULES)
-    add_subdirectory(mods/${SUBMODULE})
-endforeach()
-
-# Collect all source files into lists
-foreach(MODULE IN LISTS MODULES)
-    list(APPEND LIB_HEADERS "include/${MODULE}.h")
-    list(APPEND LIB_SOURCES "src/${MODULE}.c")
-endforeach()
-
-# Add the library using the collected sources
-add_library(dsa ${LIB_SOURCES})
-
-set_target_properties(
-    dsa PROPERTIES
-    VERSION ${PROJECT_VERSION}
-    PUBLIC_HEADER "${LIB_HEADERS}"
+# Custom doc target for generating docs
+add_custom_target(doc
+    COMMAND doxygen ${CMAKE_SOURCE_DIR}/doxy.conf
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    COMMENT "Generating API documentation with Doxygen"
 )
 
-target_include_directories(dsa PUBLIC include)
-target_link_libraries(dsa PUBLIC logger)
-
-# Add and link test executables
-foreach(MODULE IN LISTS MODULES)
-    add_executable("test_${MODULE}" "tests/test_${MODULE}.c")
-    target_link_libraries("test_${MODULE}" PRIVATE dsa m)
-    set_target_properties("test_${MODULE}" PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-    )
-    add_test(NAME "test_${MODULE}" COMMAND "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_${MODULE}")
-endforeach()
-
-# Install rules for the library
-install(
-    TARGETS dsa
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib
-    PUBLIC_HEADER DESTINATION include
+# Custom clean target for removing generated files
+add_custom_target(clean_all
+    COMMAND ${CMAKE_COMMAND} -E rm -rf ${CMAKE_BINARY_DIR}/bin ${CMAKE_BINARY_DIR}/lib
+    COMMENT "Cleaning all generated files"
 )
