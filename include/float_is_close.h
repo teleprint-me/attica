@@ -1,7 +1,7 @@
 /**
- * Copyright © 2024 Austin Berrio
+ * Copyright © 2023 Austin Berrio
  *
- * @file float_is_close.h
+ * @file include/float_is_close.h
  *
  * @brief Compare floating-point numbers with a given tolerance in pure C
  *
