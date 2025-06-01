@@ -11,7 +11,14 @@ LehmerSeed lehmer_seed = {
 
 static inline void lehmer_modulo(void) {
     /// @important f(z) = (a * z) % m
-    lehmer_seed.i = (LEHMER_MULTIPLIER * lehmer_seed.i) % LEHMER_MODULUS;
+    const int64_t q = LEHMER_MODULUS / LEHMER_MULTIPLIER;
+    const int64_t r = LEHMER_MODULUS % LEHMER_MULTIPLIER;
+
+    int64_t hi = lehmer_seed.i / q;
+    int64_t lo = lehmer_seed.i % q;
+
+    int64_t t = LEHMER_MULTIPLIER * lo - r * hi;
+    lehmer_seed.i = (t > 0) ? t : t + LEHMER_MODULUS;
 }
 
 static inline void lehmer_normalize(void) {
