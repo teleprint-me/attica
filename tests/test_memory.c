@@ -3,9 +3,10 @@
  * @brief
  */
 
-#include "core/logger.h"
-#include "core/unit_test.h"
-#include "core/memory.h"
+#include "logger.h"
+#include "unit_test.h"
+
+#include "allocator/memory.h"
 
 typedef struct MemoryTestBitwiseOffset {
     uintptr_t x;
@@ -46,7 +47,7 @@ int test_memory_bitwise_offset_suite(void) {
         .test_cases = test_cases,
     };
 
-    return run_unit_tests(&context, test_memory_bitwise_offset, NULL);
+    return test_unit_run(&context, test_memory_bitwise_offset, NULL);
 }
 
 typedef struct MemoryTestPowerOfTwo {
@@ -71,7 +72,7 @@ int main(void) {
     int result = 0;
     size_t total = sizeof(suites) / sizeof(TestRegister);
     for (size_t i = 0; i < total; i++) {
-        result |= run_test_suite(suites[i].name, suites[i].test_suite);
+        result |= test_suite_run(suites[i].name, suites[i].test_suite);
     }
 
     return result;
