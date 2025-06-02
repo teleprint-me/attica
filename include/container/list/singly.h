@@ -11,7 +11,7 @@
 extern "C" {
 #endif // __cplusplus
 
-#include "node.h"
+#include "core/node.h"
 
 #include <stdbool.h> // For using bool type
 #include <stdint.h>
@@ -138,7 +138,7 @@ node_t* linked_list_find(
  * @param list Pointer to the linked list.
  * @return Data pointer from the removed node, or NULL if the list is empty.
  */
-void* linked_list_pop_last(LinkedList* list);
+void* linked_list_pop(LinkedList* list);
 
 /**
  * @brief Remove and return the first node in the list.
@@ -146,7 +146,7 @@ void* linked_list_pop_last(LinkedList* list);
  * @param list Pointer to the linked list.
  * @return Data pointer from the removed node, or NULL if the list is empty.
  */
-void* linked_list_pop_first(LinkedList* list);
+void* linked_list_pop_index(LinkedList* list);
 
 #ifdef __cplusplus
 }
