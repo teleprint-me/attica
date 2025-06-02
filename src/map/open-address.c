@@ -26,10 +26,10 @@
  * - Linear probing is used to handle collisions.
  */
 
-#include "allocator/memory.h"
+#include "core/memory.h"
 
-#include "logger.h"
-#include "hash_table.h"
+#include "core/logger.h"
+#include "map/open-address.h"
 
 #include <string.h>
 

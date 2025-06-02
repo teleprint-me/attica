@@ -14,8 +14,8 @@
  * @note Collision resolution: Uses linear probing.
  */
 
-#ifndef HASH_TABLE_H
-#define HASH_TABLE_H
+#ifndef MAP_OPEN_ADDRESS_H
+#define MAP_OPEN_ADDRESS_H
 
 #include <stdint.h>
 #include <pthread.h>
@@ -249,4 +249,4 @@ void* hash_address_search(HashTable* table, const void* key);
 
 /** @} */
 
-#endif // HASH_TABLE_H
+#endif // MAP_OPEN_ADDRESS_H
