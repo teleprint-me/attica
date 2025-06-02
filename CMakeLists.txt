@@ -47,7 +47,6 @@ add_library(dsa SHARED
 
     "src/test/unit.c"
 
-    # "src/allocator/memory.c"
     # "src/allocator/arena.c"
     # "src/allocator/pool.c"
     # "src/allocator/stack.c"
