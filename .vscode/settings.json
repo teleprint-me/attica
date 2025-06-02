@@ -55,6 +55,9 @@
     "stdalign.h": "c",
     "memory.h": "c",
     "random": "c",
-    "constant.h": "c"
+    "constant.h": "c",
+    "stdlib.h": "c",
+    "stddef.h": "c",
+    "open-address.h": "c"
   }
 }
