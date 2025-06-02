@@ -1,7 +1,7 @@
 # Root CMakeLists.txt
 
 cmake_minimum_required(VERSION 3.14)
-project(dsa VERSION 0.1.0 DESCRIPTION "ANSI C library for Data Structures and Algorithms")
+project(attica VERSION 0.1.0 DESCRIPTION "ANSI C library for Data Structures and Algorithms")
 
 # Set C standard rules
 set(CMAKE_C_STANDARD 17)
@@ -40,7 +40,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 # Add library
-add_library(dsa SHARED
+add_library(attica SHARED
     "src/core/logger.c"
     "src/core/memory.c"
     "src/core/node.c"
@@ -62,8 +62,8 @@ add_library(dsa SHARED
     # "src/utf8/byte.c"
     # "src/utf8/raw.c"
 )
-target_include_directories(dsa PUBLIC include)
-target_link_libraries(dsa PUBLIC m rt pthread pcre2-8)
+target_include_directories(attica PUBLIC include)
+target_link_libraries(attica PUBLIC m rt pthread pcre2-8)
 
 enable_testing()
 add_subdirectory(tests)
