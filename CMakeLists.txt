@@ -41,23 +41,27 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 # Add library
 add_library(dsa SHARED
-    "src/logger.c"
-    "src/unit_test.c"
-    "src/lehmer.c"
-    "src/hash_table.c"
+    "src/core/logger.c"
+    "src/core/memory.c"
+    "src/core/node.c"
 
-    "src/allocator/memory.c"
-    "src/allocator/arena.c"
-    "src/allocator/pool.c"
-    "src/allocator/stack.c"
-    "src/allocator/lease.c"
+    "src/test/unit.c"
 
-    "src/numeric/constant.c"
-    "src/numeric/type.c"
-    "src/numeric/activation.c"
+    # "src/allocator/memory.c"
+    # "src/allocator/arena.c"
+    # "src/allocator/pool.c"
+    # "src/allocator/stack.c"
+    # "src/allocator/lease.c"
 
-    "src/utf8/byte.c"
-    "src/utf8/raw.c"
+    # "src/numeric/constant.c"
+    # "src/numeric/lehmer.c"
+    # "src/numeric/type.c"
+    # "src/numeric/activation.c"
+
+    # "src/map/open-address.c"
+
+    # "src/utf8/byte.c"
+    # "src/utf8/raw.c"
 )
 target_include_directories(dsa PUBLIC include)
 target_link_libraries(dsa PUBLIC m rt pthread pcre2-8)

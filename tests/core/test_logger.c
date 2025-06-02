@@ -1,7 +1,7 @@
 /**
  * Copyright © 2023 Austin Berrio
  *
- * @file tests/test_logger.c
+ * @file tests/core/test_logger.c
  * @brief Automated unit tests for the thread-safe logger implementation.
  *
  * Build:
@@ -31,8 +31,9 @@
  *   - To check actual log file output, inspect 'temp.log' after manual test run.
  */
 
-#include "logger.h"
-#include "unit_test.h"
+#include "core/logger.h"
+
+#include "test/unit.h"
 
 #include <unistd.h>
 #include <fcntl.h>

@@ -1,14 +1,15 @@
 /**
  * Copyright © 2023 Austin Berrio
  *
- * @file tests/test_allocator_memory.c
+ * @file tests/core/memory.c
  * @brief
  */
 
-#include "logger.h"
-#include "unit_test.h"
+#include "core/logger.h"
+#include "core/memory.h"
 
-#include "allocator/memory.h"
+#include "test/unit.h"
+
 
 typedef struct MemoryTestBitwiseOffset {
     uintptr_t x;
