@@ -1,7 +1,7 @@
 /**
  * Copyright © 2023 Austin Berrio
  *
- * @file src/allocator/memory.c
+ * @file src/core/memory.c
  * @brief Utility functions for memory alignment, padding, and allocation.
  *
  * Provides helper functions to:
@@ -71,4 +71,31 @@ void* memory_aligned_calloc(size_t n, size_t size, size_t alignment) {
     }
 
     return NULL;
+}
+
+void* memory_aligned_realloc(void* ptr, size_t old_size, size_t new_size, size_t alignment) {
+    if (ptr == NULL) {
+        return memory_aligned_alloc(new_size, alignment);
+    }
+
+    if (new_size == 0) {
+        free(ptr);
+        return NULL;
+    }
+
+    if (!memory_is_power_of_two(alignment)) {
+        return NULL;
+    }
+
+    void* new_ptr = memory_aligned_alloc(new_size, alignment);
+    if (!new_ptr) {
+        return NULL;
+    }
+
+    // Copy only the smaller of the old or new sizes
+    size_t min_size = old_size < new_size ? old_size : new_size;
+    memcpy(new_ptr, ptr, min_size);
+
+    free(ptr);
+    return new_ptr;
 }

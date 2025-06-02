@@ -18,13 +18,14 @@
 extern "C" {
 #endif // __cplusplus
 
+#include <stdalign.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stddef.h>
 #include <stdlib.h>
-#include <stdalign.h>
-#include <malloc.h>
+
 #include <assert.h>
+#include <malloc.h>
 
 #ifndef alignof
     #define alignof _Alignof
@@ -126,7 +127,22 @@ void* memory_aligned_alloc(size_t size, size_t alignment);
  */
 void* memory_aligned_calloc(size_t n, size_t size, size_t alignment);
 
-// void* memory_aligned_realloc();
+/**
+ * @brief Reallocates aligned memory to a new size and alignment.
+ *
+ * This performs the equivalent of a realloc, but guarantees alignment.
+ * If the original pointer is NULL, it behaves like memory_aligned_alloc.
+ * If the new size is zero, it frees the memory and returns NULL.
+ *
+ * The original pointer must have been allocated with memory_aligned_alloc or memory_aligned_calloc.
+ *
+ * @param ptr Pointer to the memory block to reallocate.
+ * @param old_size Size of the original allocation in bytes.
+ * @param new_size New size in bytes.
+ * @param alignment Desired memory alignment (must be power of two).
+ * @return Pointer to newly allocated memory, or NULL on failure.
+ */
+void* memory_aligned_realloc(void* ptr, size_t old_size, size_t new_size, size_t alignment);
 
 /** @} */
 
