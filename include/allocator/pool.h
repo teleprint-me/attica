@@ -7,6 +7,10 @@
 #ifndef ALLOCATOR_POOL_H
 #define ALLOCATOR_POOL_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
+
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
@@ -36,5 +40,9 @@ bool pool_owns(const Pool* pool, const void* address); // Is ptr within pool buf
 
 void pool_dump_info(Pool* pool);
 void pool_dump_buffer(Pool* pool, size_t bytes);
+
+#ifdef __cplusplus
+}
+#endif // __cplusplus
 
 #endif // ALLOCATOR_POOL_H

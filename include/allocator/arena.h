@@ -14,6 +14,10 @@
 #ifndef ALLOCATOR_ARENA_H
 #define ALLOCATOR_ARENA_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
+
 #include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
@@ -154,5 +158,9 @@ size_t arena_remaining(const Arena* arena);
  * @param arena Pointer to the arena.
  */
 void arena_debug(const Arena* arena);
+
+#ifdef __cplusplus
+}
+#endif // __cplusplus
 
 #endif // ALLOCATOR_ARENA_H

@@ -25,6 +25,10 @@
 #ifndef ALLOCATOR_LEASE_H
 #define ALLOCATOR_LEASE_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
+
 #include "hash_table.h"
 
 #include <stddef.h>
@@ -396,5 +400,9 @@ void lease_debug_tenant(LeaseTenant* tenant);
 void lease_debug_owner(LeaseOwner* owner);
 
 /** @} */
+
+#ifdef __cplusplus
+}
+#endif // __cplusplus
 
 #endif // ALLOCATOR_LEASE_H

@@ -11,7 +11,7 @@
  * - Allocate aligned memory blocks with posix_memalign
  */
 
-#include "allocator/memory.h"
+#include "core/memory.h"
 
 #include <string.h>
 

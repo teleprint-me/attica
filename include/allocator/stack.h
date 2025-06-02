@@ -39,4 +39,8 @@ void stack_dump_allocs(const Stack* stack);
 void stack_dump_info(const Stack* stack);
 void stack_dump(const Stack* stack);
 
+#ifdef __cplusplus
+}
+#endif // __cplusplus
+
 #endif // ALLOCATOR_STACK_H
