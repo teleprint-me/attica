@@ -4,19 +4,20 @@
  * @file src/node.c
  */
 
-#include "node.h"
-#include "logger.h"
+#include "core/logger.h"
+#include "core/memory.h"
+#include "core/node.h"
 
 #include <stddef.h> // For NULL
 #include <stdlib.h> // For malloc and free
 
-node_t* node_create(void* data) {
+Node* node_create(void* data) {
     // Allocate memory for the new node
-    node_t* node = (node_t*) malloc(sizeof(node_t));
+    Node* node = (Node*) memory_aligned_alloc(sizeof(Node), alignof(Node));
 
     // Check if memory allocation was successful
     if (NULL == node) {
-        LOG_ERROR("Failed to allocate memory to new node_t.\n");
+        LOG_ERROR("Failed to allocate memory to new Node.\n");
         return NULL; // Return NULL if allocation fails
     }
 
@@ -27,7 +28,7 @@ node_t* node_create(void* data) {
     return node;
 }
 
-void node_free(node_t* node) {
+void node_free(Node* node) {
     if (NULL == node) {
         return; // Nothing to free
     }

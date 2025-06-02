@@ -20,17 +20,18 @@ extern "C" {
 typedef struct Node {
     void*        data; // Generic pointer to hold any type of data
     struct Node* next; // Pointer to the next node
-} node_t;
+    struct Node* prev; // Pointer to the previous node
+} Node;
 
 /**
  * @brief Function to create a new node.
  */
-node_t* node_create(void* data);
+Node* node_create(void* data);
 
 /**
  * @brief Function to free a node.
  */
-void node_free(node_t* node);
+void node_free(Node* node);
 
 #ifdef __cplusplus
 }

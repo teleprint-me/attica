@@ -1,23 +1,24 @@
 /**
  * Copyright © 2023 Austin Berrio
  *
- * @file include/logger.h
+ * @file include/core/logger.h
  * @brief A simple and lightweight thread-safe logger in pure C.
  *
  * Provides multi-level logging (DEBUG, INFO, WARN, ERROR) to console or files.
  * Designed for easy integration into C projects with thread safety via mutexes.
  */
 
-#ifndef LOGGER_H
-#define LOGGER_H
+#ifndef CORE_LOGGER_H
+#define CORE_LOGGER_H
 
-#include <errno.h>
-#include <pthread.h>
 #include <stdarg.h>
 #include <stdbool.h>
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
+
+#include <errno.h>
 #include <string.h>
+#include <pthread.h>
 
 /**
  * @brief Logging severity levels.
@@ -182,4 +183,4 @@ void logger_set_global(
     const char* file_path
 );
 
-#endif // LOGGER_H
+#endif // CORE_LOGGER_H

@@ -1,7 +1,7 @@
 /**
  * Copyright © 2023 Austin Berrio
  *
- * @file src/logger.c
+ * @file src/core/logger.c
  * @brief A simple and lightweight logger written in pure C
  *
  * `logger.c` provides a minimal logging library that allows you to log
@@ -10,7 +10,7 @@
  * easily integrated into existing C projects.
  */
 
-#include "logger.h"
+#include "core/logger.h"
 
 const char* LOG_TYPE_NAME[] = {"unknown", "stream", "file"};
 
