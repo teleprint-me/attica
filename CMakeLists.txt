@@ -75,6 +75,12 @@ add_custom_target(doc
     COMMENT "Generating API documentation with Doxygen"
 )
 
+add_custom_target(run_tests
+    COMMAND ${CMAKE_CTEST_COMMAND}
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    COMMENT "Running all tests"
+)
+
 # Custom clean target for removing generated files
 add_custom_target(clean_all
     COMMAND ${CMAKE_COMMAND} -E rm -rf ${CMAKE_BINARY_DIR}/bin ${CMAKE_BINARY_DIR}/lib

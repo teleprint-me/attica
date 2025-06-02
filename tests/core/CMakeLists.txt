@@ -8,7 +8,7 @@ set(TEST_UNITS
 )
 
 set(INPUT_DIR ${PROJECT_SOURCE_DIR}/tests/core)
-set(OUTPUT_DIR ${CMAKE_BINARY_DIR}/build/tests/core)
+set(OUTPUT_DIR ${CMAKE_BINARY_DIR}/tests/core)
 
 foreach(test IN LISTS TEST_UNITS)
     add_executable(${test} ${INPUT_DIR}/${test}.c)
