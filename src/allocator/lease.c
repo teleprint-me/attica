@@ -22,8 +22,9 @@
  * with explicit control over lifetime and tracking of dynamic memory.
  */
 
-#include "logger.h"
-#include "allocator/memory.h"
+#include "core/logger.h"
+#include "core/memory.h"
+
 #include "allocator/lease.h"
 
 #include <stdlib.h>

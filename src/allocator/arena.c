@@ -11,7 +11,8 @@
  * the arena. The arena supports reallocating and checkpoints for memory management.
  */
 
-#include "allocator/memory.h"
+#include "core/memory.h"
+
 #include "allocator/arena.h"
 
 #include <stdlib.h>

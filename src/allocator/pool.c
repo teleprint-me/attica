@@ -4,7 +4,8 @@
  * @file src/allocator/pool.c
  */
 
-#include "allocator/memory.h"
+#include "core/memory.h"
+
 #include "allocator/pool.h"
 
 #include <stdio.h>

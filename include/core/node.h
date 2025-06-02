@@ -1,7 +1,7 @@
 /**
  * Copyright © 2023 Austin Berrio
  *
- * @file include/node.h
+ * @file include/core/node.h
  */
 
 #ifndef DSA_NODE_H

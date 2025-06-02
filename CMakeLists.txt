@@ -47,12 +47,12 @@ add_library(dsa SHARED
 
     "src/test/unit.c"
 
-    # "src/map/open-address.c"
+    "src/map/open-address.c"
 
-    # "src/allocator/arena.c"
-    # "src/allocator/pool.c"
-    # "src/allocator/stack.c"
-    # "src/allocator/lease.c"
+    "src/allocator/arena.c"
+    "src/allocator/pool.c"
+    "src/allocator/stack.c"
+    "src/allocator/lease.c"
 
     # "src/numeric/constant.c"
     # "src/numeric/lehmer.c"

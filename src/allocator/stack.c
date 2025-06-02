@@ -4,7 +4,8 @@
  * @file src/allocator/stack.c
  */
 
-#include "allocator/memory.h"
+#include "core/memory.h"
+
 #include "allocator/stack.h"
 
 #include <stdlib.h>
