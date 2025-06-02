@@ -34,7 +34,16 @@ int test_memory_bitwise_offset(TestCase* test) {
 
 int test_memory_bitwise_offset_suite(void) {
     static MemoryTestBitwiseOffset cases[] = {
-
+        {0x00, 8, 0},        // aligned
+        {0x01, 8, 1},        // 1 byte offset
+        {0x07, 8, 7},        // just before alignment
+        {0x08, 8, 0},        // exactly aligned
+        {0x0F, 8, 7},        // offset again
+        {0x10, 8, 0},        // aligned
+        {0x11, 8, 1},        // test wrap
+        {0x1003, 8, 3},      // sample from your inline assert
+        {0x1234, 16, 4},     // not aligned to 16
+        {0x1234, 64, 52},    // edge case
     };
 
     size_t total_tests = sizeof(cases) / sizeof(MemoryTestBitwiseOffset);
