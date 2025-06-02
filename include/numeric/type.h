@@ -23,6 +23,9 @@
 extern "C" {
 #endif // __cplusplus
 
+#include "allocator/memory.h"
+#include "numeric/constant.h"
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdalign.h>
@@ -30,28 +33,6 @@ extern "C" {
 #include <math.h>
 #include <wchar.h>
 #include <string.h>
-
-#ifndef alignof
-    #define alignof _Alignof
-#endif
-
-// Common mathematical constants
-
-#ifndef M_PI
-    #define M_PI 3.141592653589793f // circumference / diameter
-#endif
-
-#ifndef PI
-    #define PI M_PI
-#endif
-
-#ifndef SQRT_2_PI
-    #define SQRT_2_PI 0.7978845608028654f // sqrt(2 / pi)
-#endif
-
-#ifndef SQRT_2
-    #define SQRT_2 1.4142135623730951f // sqrt(2)
-#endif
 
 // Safe type casting macros
 #define TYPE_CAST(ptr, type) ((type*) (ptr))
@@ -118,8 +99,7 @@ typedef struct DataType {
 // Static array of supported types
 static const DataType TYPES[TYPE_COUNT] = {
     [TYPE_FLOAT32] = {"float32", alignof(float), sizeof(float), TYPE_IS_SIGNED, TYPE_FLOAT32},
-    [TYPE_FLOAT16]
-    = {"float16", alignof(uint16_t), sizeof(uint16_t), TYPE_IS_UNSIGNED, TYPE_FLOAT16},
+    [TYPE_FLOAT16] = {"float16", alignof(uint16_t), sizeof(uint16_t), TYPE_IS_UNSIGNED, TYPE_FLOAT16},
     [TYPE_QUANT8] = {"qint8", alignof(Q8), sizeof(Q8), TYPE_NOT_APPLICABLE, TYPE_QUANT8},
     [TYPE_QUANT4] = {"qint4", alignof(Q4), sizeof(Q4), TYPE_NOT_APPLICABLE, TYPE_QUANT4},
     [TYPE_INT32] = {"int32", alignof(int32_t), sizeof(int32_t), TYPE_IS_SIGNED, TYPE_INT32},

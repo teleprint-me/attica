@@ -1,40 +1,87 @@
 /**
- * Copyright © 2023 Austin Berrio
+ * Copyright © 2024 Austin Berrio
  *
  * @file include/prime.h
+ *
+ * @note Will need Mersenne twister for enhanced statistical properties. Use
+ * Lehmer LCG PRNG for now since that's mostly implemented.
  */
 
-#ifndef DSA_PRIME_H
-#define DSA_PRIME_H
+#ifndef NUMERIC_PRIME_H
+#define NUMERIC_PRIME_H
 
+#include "lehmer.h"
+
+#include <stdbool.h>
 #include <stdint.h>
 
 /**
  * @brief Data structure representing the sampled prime numbers
  *
- * @param data The sampled data
- * @param size The number of data points
+ * @param data A pointer to the sampled data
+ * @param size The number of data points (must be greater than 0)
  */
 typedef struct PrimeSample {
-    int*     data; // The sampled data
+    int32_t* data; // The sampled data
     uint32_t size; // The number of data points
-} prime_sample_t;
+} PrimeSample;
+
+/**
+ * @brief Computes a^b mod m, where a, b, and m are integers
+ *
+ * This function computes the result of raising `a` to the power of `b`,
+ * then finds this value modulo `m`. The input values for `a`, `b`,
+ * and `m` should be non-negative integers.
+ *
+ * @param a Base integer (signed int)
+ * @param b Exponent (signed int)
+ * @param m Modulus (unsigned int)
+ * @return Computed result of a^b mod m
+ *
+ * @note This function assumes m > 0 and b >= 0. For a^0, the result is 1
+ * (with any base a). Negative exponents are not supported.
+ */
+int32_t prime_modular_exponent(int32_t a, int32_t b, uint32_t m);
+
+/**
+ * @brief Determine whether a given number is likely prime or not
+ *
+ * This function uses the Miller-Rabin primality test to check if an odd
+ * integer `n` with at least 5 digits is probably prime. The hyperparameter
+ * `k` determines the accuracy of the test (higher values increase
+ * confidence but decrease performance).
+ *
+ * @param n Odd integer to be tested for primality (must be > 2)
+ * @param k Hyperparameter that controls the number of iterations in
+ * the Miller-Rabin algorithm. Higher `k` values improve accuracy but
+ * decrease performance.
+ * @return true if n is likely prime, otherwise false.
+ *
+ * @note Typical values of `k` range from 5 to 50. A value of `k = 5`
+ * offers good performance and accuracy for smaller integers, while larger
+ * values of `k` (e.g., 20-50) are useful for very large integers or
+ * when high accuracy is needed.
+ *
+ * @ref Miller-Rabin Primality Test
+ * - https://rosettacode.org/wiki/Miller%E2%80%93Rabin_primality_test
+ */
+bool prime_miller_rabin(uint32_t n, uint16_t k);
 
 /**
  * @brief Create an array of prime numbers as sample data.
  *
  * @param size Number of prime numbers to generate.
- * @return Pointer to a dynamically allocated sample_data_t structure.
+ * @return Pointer to a dynamically allocated PrimeSample structure.
  *
  * @note It's cute <3
  */
-prime_sample_t* prime_sample_create(uint32_t size);
+PrimeSample* prime_sample_create(uint32_t size);
 
 /**
  * @brief Free the allocated sample data.
  *
- * @param samples Pointer to the sample_data_t structure.
+ * @param samples Pointer to the PrimeSample structure.
  */
-void prime_sample_free(prime_sample_t* samples);
+void prime_sample_free(PrimeSample* samples);
 
-#endif // DSA_PRIME_H
+#endif // NUMERIC_PRIME_H
