@@ -29,7 +29,7 @@
 extern "C" {
 #endif // __cplusplus
 
-#include "hash_table.h"
+#include "map/open-address.h"
 
 #include <stddef.h>
 #include <stdint.h>

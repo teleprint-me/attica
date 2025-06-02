@@ -47,6 +47,8 @@ add_library(dsa SHARED
 
     "src/test/unit.c"
 
+    # "src/map/open-address.c"
+
     # "src/allocator/arena.c"
     # "src/allocator/pool.c"
     # "src/allocator/stack.c"
@@ -56,8 +58,6 @@ add_library(dsa SHARED
     # "src/numeric/lehmer.c"
     # "src/numeric/type.c"
     # "src/numeric/activation.c"
-
-    # "src/map/open-address.c"
 
     # "src/utf8/byte.c"
     # "src/utf8/raw.c"
