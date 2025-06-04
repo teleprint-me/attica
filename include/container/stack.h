@@ -1,18 +1,27 @@
 /**
  * Copyright © 2023 Austin Berrio
  *
- * @file include/stack.h
+ * @file include/container/stack.h
  */
 
-#include "list/singly.h"
+#ifndef CONTAINER_STACK_H
+#define CONTAINER_STACK_H
 
-typedef struct Stack {
-    LinkedList* list; // Stack implemented as a linked list
-} Stack;
+#include "container/node.h"
 
-Stack* stack_create();
-void   stack_free(Stack* stack);
+#include <stddef.h>
+#include <stdint.h>
 
-void  stack_push(Stack* stack, void* data);
-void* stack_pop(Stack* stack);
-void* stack_peek(const Stack* stack);
+typedef struct ContainerStack {
+    uint32_t size;
+    ContainerNode* node;
+} ContainerStack;
+
+ContainerStack* container_stack_create(void);
+void container_stack_free(ContainerStack* stack);
+
+bool  container_stack_push(ContainerStack* stack, void* object);
+void* container_stack_pop(ContainerStack* stack);
+void* container_stack_peek(const ContainerStack* stack);
+
+#endif // CONTAINER_STACK_H
