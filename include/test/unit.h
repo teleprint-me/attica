@@ -11,6 +11,10 @@
 #ifndef TEST_UNIT_H
 #define TEST_UNIT_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
+
 #include <stddef.h>
 #include <stdint.h>
 
@@ -30,10 +34,12 @@
  * @param ... Arguments for the format string.
  */
 #define ASSERT(condition, format, ...) \
-    if (!(condition)) { \
-        LOG_ERROR(format, ##__VA_ARGS__); \
-        return 1; \
-    }
+    do { \
+        if (!(condition)) { \
+            LOG_ERROR(format, ##__VA_ARGS__); \
+            return 1; \
+        } \
+    } while (0)
 
 /** @} */
 
@@ -42,7 +48,12 @@
  * @{
  */
 
- /// Forward declare so we can use pointers to it
+/**
+ * @brief Structure representing a test case.
+ *
+ * This structure is used to define individual test cases,
+ * including setup, logic, and teardown hooks.
+ */
 typedef struct TestCase TestCase;
 
 /** @} */
@@ -52,23 +63,21 @@ typedef struct TestCase TestCase;
  * @{
  */
 
-/// Hook type for test setup/teardown
+/**
+ * @brief Hook type for test setup/teardown.
+ *
+ * Hooks are functions that are called before and after each test case.
+ * They are useful for setting up and cleaning up resources.
+ */
 typedef void (*TestHook)(TestCase* test);
 
 /**
- * @brief Pointer type for test logic functions.
+ * @brief Pointer type for test case functions.
  *
- * Functions implementing the test logic should take a pointer to a
+ * Functions implementing the logical test case should take a pointer to a
  * TestCase and return 0 for success, non-zero for failure.
  */
-typedef int (*TestLogic)(TestCase* test);
-
-/**
- * @brief Pointer type for optional test callbacks.
- *
- * Called after each test case runs; useful for cleanup or logging.
- */
-typedef void (*TestCallback)(TestCase* test);
+typedef int (*TestCallback)(TestCase* test);
 
 /**
  * @brief Pointer type for test suite functions.
@@ -97,20 +106,23 @@ typedef struct TestCase {
  * @brief Context for running a group of tests.
  */
 typedef struct TestContext {
-    size_t total_tests; /**< Total number of test cases in the context. */
-    const char* test_name; /**< Name or description of the test suite. */
-    TestCase* test_cases; /**< Array of test cases to run. */
-    TestHook setup_each;
-    TestHook teardown_each;
+    const char* name; /**< Name or description of the test suite. */
+
+    size_t total; /**< Total number of test cases in the context. */
+    TestCase* cases; /**< Array of test cases to run. */
+    TestCallback callback; /**< Function pointer to logical test case implementation. */
+
+    TestHook setup; /**< (Optional) Function pointer to test case setup. */
+    TestHook teardown; /**< (Optional) Function pointer to test case teardown. */
 } TestContext;
 
 /**
  * @brief Represents a named test suite.
  */
-typedef struct TestRegister {
+typedef struct TestRegistry {
     const char* name; /**< Name of the test suite. */
-    int (*test_suite)(void); /**< Pointer to the function that runs the suite. */
-} TestRegister;
+    TestSuite suite; /**< Pointer to the function that runs the suite. */
+} TestRegistry;
 
 /** @} */
 
@@ -127,23 +139,25 @@ typedef struct TestRegister {
  * Logs results and returns 0 if all tests pass, 1 otherwise.
  *
  * @param context Pointer to the TestContext describing the tests.
- * @param logic Function pointer to test logic implementation.
- * @param callback Optional callback function called after each test (may be NULL).
  * @return 0 if all tests pass, 1 if any fail, -1 on invalid input.
  */
-int test_unit_run(TestContext* context, TestLogic logic, TestCallback callback);
+int test_unit_run(TestContext* context);
 
 /**
  * @brief Runs a named test suite function.
  *
  * Logs start and completion status of the suite.
  *
- * @param suite_name Name of the test suite.
+ * @param name Name of the test suite.
  * @param suite Function pointer to the test suite to run.
  * @return 0 on success, non-zero on failure.
  */
-int test_suite_run(const char* suite_name, TestSuite suite);
+int test_suite_run(const char* name, TestSuite suite);
 
 /** @} */
+
+#ifdef __cplusplus
+}
+#endif // __cplusplus
 
 #endif // TEST_UNIT_H
