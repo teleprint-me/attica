@@ -14,11 +14,11 @@ extern "C" {
 /**
  * @brief A point on a stem at which a leaf or leaves are inserted
  *
- * @param data Generic pointer to hold any type of data
+ * @param object Generic pointer to hold any type of object
  * @param next Pointer to the next node
  */
 typedef struct Node {
-    void*        data; // Generic pointer to hold any type of data
+    void*        object; // Generic pointer to hold any type of object
     struct Node* next; // Pointer to the next node
     struct Node* prev; // Pointer to the previous node
 } Node;
@@ -26,7 +26,7 @@ typedef struct Node {
 /**
  * @brief Function to create a new node.
  */
-Node* node_create(void* data);
+Node* node_create(void* object);
 
 /**
  * @brief Function to free a node.

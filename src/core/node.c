@@ -11,7 +11,7 @@
 #include <stddef.h> // For NULL
 #include <stdlib.h> // For malloc and free
 
-Node* node_create(void* data) {
+Node* node_create(void* object) {
     // Allocate memory for the new node
     Node* node = (Node*) memory_aligned_alloc(sizeof(Node), alignof(Node));
 
@@ -21,10 +21,10 @@ Node* node_create(void* data) {
         return NULL; // Return NULL if allocation fails
     }
 
-    // Initialize the new node's data and next pointer
-    node->data = data;
+    // Initialize the new node's object and next pointer
+    node->object = object;
     node->next = NULL;
-
+    node->prev = NULL;
     return node;
 }
 
@@ -33,6 +33,6 @@ void node_free(Node* node) {
         return; // Nothing to free
     }
 
-    // Assume the caller is responsible for freeing the data if necessary.
+    // Assume the caller is responsible for freeing the object if necessary.
     free(node); // Free the node structure itself
 }
