@@ -1,4 +1,4 @@
-# Attica
+# Data Structures and Algorithms
 
 **Data Structures and Algorithms in Pure C**
 
@@ -10,8 +10,8 @@ structures, designed for real-world systems programming and experimentation.
 ### Clone
 
 ```sh
-git clone https://github.com/teleprint-me/attica.git attica
-cd attica
+git clone https://github.com/teleprint-me/dsa.c.git dsa
+cd dsa
 ```
 
 ### Build
@@ -40,7 +40,7 @@ _Note: All modules are evolving. See `tests/` for usage and examples._
 ### Add as submodule
 
 ```sh
-git submodule add https://github.com/teleprint-me/attica.git attica
+git submodule add https://github.com/teleprint-me/dsa.c.git dsa
 ```
 
 ### Add include
@@ -53,7 +53,7 @@ git submodule add https://github.com/teleprint-me/attica.git attica
 ### Sync updates
 
 ```sh
-git submodule update --remote attica
+git submodule update --remote dsa
 ```
 
 ## 📚 References
