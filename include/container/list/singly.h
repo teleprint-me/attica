@@ -23,7 +23,7 @@ extern "C" {
  * @param size Keeps track of the number of elements.
  */
 typedef struct LinkedList {
-    node_t*  head; // Pointer to the first node in the list
+    Node*  head; // Pointer to the first node in the list
     uint32_t size; // Keeps track of the number of elements
 } LinkedList;
 
@@ -128,7 +128,7 @@ bool linked_list_is_empty(const LinkedList* list);
  * @param compare A custom comparison function.
  * @return A pointer to the found node, or NULL if not found.
  */
-node_t* linked_list_find(
+Node* linked_list_find(
     const LinkedList* list, const void* data, linked_list_compare_t compare
 );
 
