@@ -18,7 +18,7 @@
  * @warning Not suitable for cryptographic purposes.
  */
 
-#include "lehmer.h"
+#include "numeric/lehmer.h"
 
 /**
  * Global State

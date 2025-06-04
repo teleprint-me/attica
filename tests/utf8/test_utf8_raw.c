@@ -4,8 +4,8 @@
  * @file tests/test_utf8_byte.c
  */
 
-#include "logger.h"
-#include "unit_test.h"
+#include "core/logger.h"
+#include "test/unit.h"
 #include "utf8/byte.h"
 #include "utf8/raw.h"
 

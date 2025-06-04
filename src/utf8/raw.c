@@ -5,7 +5,7 @@
  * @brief Mid-level API for handling raw UTF-8 pointer-to-char processing.
  */
 
-#include "logger.h"
+#include "core/logger.h"
 #include "utf8/byte.h"
 #include "utf8/raw.h"
 

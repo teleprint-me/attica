@@ -23,7 +23,7 @@
 extern "C" {
 #endif // __cplusplus
 
-#include "allocator/memory.h"
+#include "core/memory.h"
 #include "numeric/constant.h"
 
 #include <stdbool.h>

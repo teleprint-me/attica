@@ -5,7 +5,7 @@
  * @brief Low-level API for handling core UTF-8 codepoint pre-processing.
  */
 
-#include "logger.h"
+#include "core/logger.h"
 #include "utf8/byte.h"
 
 // --- UTF-8 Byte Operations ---

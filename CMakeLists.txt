@@ -56,13 +56,13 @@ add_library(dsa SHARED
     "src/container/node.c"
     "src/container/stack.c"
 
-    # "src/numeric/constant.c"
-    # "src/numeric/lehmer.c"
-    # "src/numeric/type.c"
-    # "src/numeric/activation.c"
+    "src/numeric/constant.c"
+    "src/numeric/lehmer.c"
+    "src/numeric/type.c"
+    "src/numeric/activation.c"
 
-    # "src/utf8/byte.c"
-    # "src/utf8/raw.c"
+    "src/utf8/byte.c"
+    "src/utf8/raw.c"
 )
 target_include_directories(dsa PUBLIC include)
 target_link_libraries(dsa PUBLIC m rt pthread pcre2-8)
