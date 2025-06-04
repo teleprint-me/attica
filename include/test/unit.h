@@ -38,35 +38,12 @@
 /** @} */
 
 /**
- * @name Structures
+ * @name Forward Declarations
  * @{
  */
 
-/**
- * @brief Represents a single test case.
- */
-typedef struct TestCase {
-    int8_t result; /**< Result of the test case (0 = success, 1 = failure). */
-    size_t index; /**< Index number of the test case (1-based). */
-    const void* unit; /**< Pointer to user-defined test data or state. */
-} TestCase;
-
-/**
- * @brief Context for running a group of tests.
- */
-typedef struct TestContext {
-    size_t total_tests; /**< Total number of test cases in the context. */
-    const char* test_name; /**< Name or description of the test suite. */
-    TestCase* test_cases; /**< Array of test cases to run. */
-} TestContext;
-
-/**
- * @brief Represents a named test suite.
- */
-typedef struct TestRegister {
-    const char* name; /**< Name of the test suite. */
-    int (*test_suite)(void); /**< Pointer to the function that runs the suite. */
-} TestRegister;
+ /// Forward declare so we can use pointers to it
+typedef struct TestCase TestCase;
 
 /** @} */
 
@@ -74,6 +51,9 @@ typedef struct TestRegister {
  * @name Function Pointer Types
  * @{
  */
+
+/// Hook type for test setup/teardown
+typedef void (*TestHook)(TestCase* test);
 
 /**
  * @brief Pointer type for test logic functions.
@@ -96,6 +76,41 @@ typedef void (*TestCallback)(TestCase* test);
  * Test suites run a series of tests and return 0 on success, non-zero otherwise.
  */
 typedef int (*TestSuite)(void);
+
+/** @} */
+
+/**
+ * @name Structures
+ * @{
+ */
+
+/**
+ * @brief Represents a single test case.
+ */
+typedef struct TestCase {
+    int8_t result; /**< Result of the test case (0 = success, 1 = failure). */
+    size_t index; /**< Index number of the test case (1-based). */
+    const void* unit; /**< Pointer to user-defined test data or state. */
+} TestCase;
+
+/**
+ * @brief Context for running a group of tests.
+ */
+typedef struct TestContext {
+    size_t total_tests; /**< Total number of test cases in the context. */
+    const char* test_name; /**< Name or description of the test suite. */
+    TestCase* test_cases; /**< Array of test cases to run. */
+    TestHook setup_each;
+    TestHook teardown_each;
+} TestContext;
+
+/**
+ * @brief Represents a named test suite.
+ */
+typedef struct TestRegister {
+    const char* name; /**< Name of the test suite. */
+    int (*test_suite)(void); /**< Pointer to the function that runs the suite. */
+} TestRegister;
 
 /** @} */
 

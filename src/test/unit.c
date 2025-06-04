@@ -1,7 +1,7 @@
 /**
  * Copyright © 2023 Austin Berrio
  *
- * @file src/unit_test.c
+ * @file src/test/unit.c
  */
 
 #include "core/logger.h"
@@ -21,7 +21,9 @@ int test_unit_run(TestContext* context, TestLogic logic, TestCallback callback) 
         TestCase* test_case = &context->test_cases[i];
         test_case->index = i + 1;
 
+        if (context->setup_each) context->setup_each(test_case);
         int result = logic(test_case);
+        if (context->teardown_each) context->teardown_each(test_case);
 
         if (result != 0) {
             failures++;
