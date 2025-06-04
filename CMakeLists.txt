@@ -55,6 +55,8 @@ add_library(dsa SHARED
 
     "src/container/node.c"
     "src/container/stack.c"
+    # "src/container/queue.c"
+    # "src/container/list.c"
 
     "src/numeric/constant.c"
     "src/numeric/lehmer.c"

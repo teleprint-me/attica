@@ -4,8 +4,9 @@
  * @file src/linked_list.c
  */
 
-#include "logger.h"
-#include "list/singly.h"
+#include "core/logger.h"
+#include "container/node.h"
+#include "container/list.h"
 
 #include <stdlib.h> // For malloc, free
 
@@ -17,11 +18,11 @@ int linked_list_numeric_compare(const void* a, const void* b) {
     return (n_a > n_b) - (n_a < n_b);
 }
 
-LinkedList* linked_list_create(void) {
+ContainerList* linked_list_create(void) {
     // Allocate memory for the linked list
-    LinkedList* list = (LinkedList*) malloc(sizeof(LinkedList));
+    ContainerList* list = (ContainerList*) malloc(sizeof(ContainerList));
     if (NULL == list) {
-        LOG_ERROR("Failed to allocate memory to LinkedList\n");
+        LOG_ERROR("Failed to allocate memory to ContainerList\n");
         return NULL;
     }
 
@@ -32,16 +33,16 @@ LinkedList* linked_list_create(void) {
     return list;
 }
 
-void linked_list_free(LinkedList* list, void (*callback)(void*)) {
+void linked_list_free(ContainerList* list, void (*callback)(void*)) {
     if (NULL == list) {
         return;
     }
 
-    node_t* current = list->head;
+    ContainerNode* current = list->head;
     while (NULL != current) {
-        node_t* next = current->next;
+        ContainerNode* next = current->next;
         if (callback) {
-            callback(current->data);
+            callback(current->object);
         }
         free(current);
         current = next;
@@ -50,14 +51,14 @@ void linked_list_free(LinkedList* list, void (*callback)(void*)) {
     free(list);
 }
 
-void linked_list_append(LinkedList* list, void* data) {
+void linked_list_append(ContainerList* list, void* object) {
     if (NULL == list) {
         LOG_ERROR("List is NULL.\n");
         return;
     }
 
     // Create a new node
-    node_t* node = node_create(data);
+    ContainerNode* node = container_node_create(object);
     if (NULL == node) {
         LOG_ERROR("Failed to create node.\n");
         return;
@@ -68,7 +69,7 @@ void linked_list_append(LinkedList* list, void* data) {
         list->head = node;
     } else {
         // Traverse to the end of the list
-        node_t* current = list->head;
+        ContainerNode* current = list->head;
         while (NULL != current->next) {
             current = current->next;
         }
@@ -79,14 +80,14 @@ void linked_list_append(LinkedList* list, void* data) {
     list->size++;
 }
 
-void linked_list_prepend(LinkedList* list, void* data) {
+void linked_list_prepend(ContainerList* list, void* object) {
     if (NULL == list) {
         LOG_ERROR("List is NULL.\n");
         return;
     }
 
     // Create a new node
-    node_t* node = node_create(data);
+    ContainerNode* node = container_node_create(object);
     if (NULL == node) {
         LOG_ERROR("Failed to create node.\n");
         return;
@@ -100,7 +101,7 @@ void linked_list_prepend(LinkedList* list, void* data) {
     list->size++;
 }
 
-void linked_list_insert(LinkedList* list, void* data, uint32_t index) {
+void linked_list_insert(ContainerList* list, void* object, uint32_t index) {
     // Handle null list case
     if (NULL == list) {
         LOG_ERROR("List is NULL.\n");
@@ -114,7 +115,7 @@ void linked_list_insert(LinkedList* list, void* data, uint32_t index) {
     }
 
     // Create a new node
-    node_t* node = node_create(data);
+    ContainerNode* node = container_node_create(object);
     if (NULL == node) {
         LOG_ERROR("Failed to create node.\n");
         return;
@@ -125,7 +126,7 @@ void linked_list_insert(LinkedList* list, void* data, uint32_t index) {
         node->next = list->head;
         list->head = node;
     } else {
-        node_t* current = list->head;
+        ContainerNode* current = list->head;
 
         for (uint32_t i = 1; i < index && NULL != current->next; ++i) {
             current = current->next;
@@ -145,7 +146,7 @@ void linked_list_insert(LinkedList* list, void* data, uint32_t index) {
 }
 
 void linked_list_remove(
-    LinkedList* list, void* data, linked_list_compare_t compare
+    ContainerList* list, void* object, linked_list_compare_t compare
 ) {
     // Ensure the list is valid
     if (NULL == list || NULL == list->head) {
@@ -153,12 +154,12 @@ void linked_list_remove(
         return;
     }
 
-    node_t* current  = list->head;
-    node_t* previous = NULL;
+    ContainerNode* current  = list->head;
+    ContainerNode* previous = NULL;
 
     // Traverse the list to find the matching node
     while (NULL != current) {
-        if (0 == compare(data, current->data)) {
+        if (0 == compare(object, current->object)) {
             // Found the matching node to remove
             if (NULL == previous) {
                 // Removing the head node
@@ -180,22 +181,22 @@ void linked_list_remove(
         current  = current->next;
     }
 
-    // If we reached here, the data was not found
+    // If we reached here, the object was not found
     LOG_ERROR("Data not found in the list.\n");
 }
 
-uint32_t linked_list_size(const LinkedList* list) {
+uint32_t linked_list_size(const ContainerList* list) {
     return list->size;
 }
 
-bool linked_list_is_empty(const LinkedList* list) {
+bool linked_list_is_empty(const ContainerList* list) {
     return 0 == list->size;
 }
 
-node_t* linked_list_find(
-    const LinkedList* list, const void* data, linked_list_compare_t compare
+ContainerNode* linked_list_find(
+    const ContainerList* list, const void* object, linked_list_compare_t compare
 );
 
-void* linked_list_pop_last(LinkedList* list);
+void* linked_list_pop_last(ContainerList* list);
 
-void* linked_list_pop_first(LinkedList* list);
+void* linked_list_pop_first(ContainerList* list);

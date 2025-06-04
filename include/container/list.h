@@ -1,7 +1,7 @@
 /**
  * Copyright © 2023 Austin Berrio
  *
- * @file include/linked_list.h
+ * @file include/container/list.h
  */
 
 #ifndef DSA_LINKED_LIST_H
@@ -11,7 +11,7 @@
 extern "C" {
 #endif // __cplusplus
 
-#include "core/node.h"
+#include "container/node.h"
 
 #include <stdbool.h> // For using bool type
 #include <stdint.h>
@@ -22,10 +22,11 @@ extern "C" {
  * @param head Pointer to the first node in the list.
  * @param size Keeps track of the number of elements.
  */
-typedef struct LinkedList {
-    Node*  head; // Pointer to the first node in the list
+typedef struct ContainerList {
+    ContainerNode*  head; // Pointer to the first node in the list
+    ContainerNode*  tail;
     uint32_t size; // Keeps track of the number of elements
-} LinkedList;
+} ContainerList;
 
 /**
  * @brief Comparison function type for linked list operations.
@@ -51,7 +52,7 @@ int linked_list_numeric_compare(const void* a, const void* b);
  *
  * @return A pointer to the newly created linked list.
  */
-LinkedList* linked_list_create(void);
+ContainerList* linked_list_create(void);
 
 /**
  * @brief Free a linked list, all its nodes, and optionally its associated data
@@ -67,7 +68,7 @@ LinkedList* linked_list_create(void);
  * - If a callback function is provided, call it with the corresponding data
  *   pointer from each node before freeing its memory
  */
-void linked_list_free(LinkedList* list, void (*callback)(void*));
+void linked_list_free(ContainerList* list, void (*callback)(void*));
 
 /**
  * @brief Add a node to the end of a list.
@@ -75,7 +76,7 @@ void linked_list_free(LinkedList* list, void (*callback)(void*));
  * @param list Pointer to the linked list.
  * @param data Pointer to the data to be stored in the new node.
  */
-void linked_list_append(LinkedList* list, void* data);
+void linked_list_append(ContainerList* list, void* data);
 
 /**
  * @brief Add a node to the beginning of a list.
@@ -83,7 +84,7 @@ void linked_list_append(LinkedList* list, void* data);
  * @param list Pointer to the linked list.
  * @param data Pointer to the data to be stored in the new node.
  */
-void linked_list_prepend(LinkedList* list, void* data);
+void linked_list_prepend(ContainerList* list, void* data);
 
 /**
  * @brief Insert a node at a given index in the list.
@@ -92,7 +93,7 @@ void linked_list_prepend(LinkedList* list, void* data);
  * @param data Pointer to the data to be stored in the new node.
  * @param index Position where the new node will be inserted.
  */
-void linked_list_insert(LinkedList* list, void* data, uint32_t index);
+void linked_list_insert(ContainerList* list, void* data, uint32_t index);
 
 /**
  * @brief Remove the first node with matching data.
@@ -101,7 +102,7 @@ void linked_list_insert(LinkedList* list, void* data, uint32_t index);
  * @param data Pointer to the data to be matched for removal.
  */
 void linked_list_remove(
-    LinkedList* list, void* data, linked_list_compare_t compare
+    ContainerList* list, void* data, linked_list_compare_t compare
 );
 
 /**
@@ -110,7 +111,7 @@ void linked_list_remove(
  * @param list Pointer to the linked list.
  * @return The number of nodes in the list.
  */
-uint32_t linked_list_size(const LinkedList* list);
+uint32_t linked_list_size(const ContainerList* list);
 
 /**
  * @brief Check if the list is empty.
@@ -118,7 +119,7 @@ uint32_t linked_list_size(const LinkedList* list);
  * @param list Pointer to the linked list.
  * @return True if the list is empty, false otherwise.
  */
-bool linked_list_is_empty(const LinkedList* list);
+bool linked_list_is_empty(const ContainerList* list);
 
 /**
  * @brief Find the first node containing the matching data.
@@ -128,8 +129,8 @@ bool linked_list_is_empty(const LinkedList* list);
  * @param compare A custom comparison function.
  * @return A pointer to the found node, or NULL if not found.
  */
-Node* linked_list_find(
-    const LinkedList* list, const void* data, linked_list_compare_t compare
+ContainerNode* linked_list_find(
+    const ContainerList* list, const void* data, linked_list_compare_t compare
 );
 
 /**
@@ -138,7 +139,7 @@ Node* linked_list_find(
  * @param list Pointer to the linked list.
  * @return Data pointer from the removed node, or NULL if the list is empty.
  */
-void* linked_list_pop(LinkedList* list);
+void* linked_list_pop(ContainerList* list);
 
 /**
  * @brief Remove and return the first node in the list.
@@ -146,7 +147,7 @@ void* linked_list_pop(LinkedList* list);
  * @param list Pointer to the linked list.
  * @return Data pointer from the removed node, or NULL if the list is empty.
  */
-void* linked_list_pop_index(LinkedList* list);
+void* linked_list_pop_index(ContainerList* list);
 
 #ifdef __cplusplus
 }
