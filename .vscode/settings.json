@@ -58,6 +58,7 @@
     "constant.h": "c",
     "stdlib.h": "c",
     "stddef.h": "c",
-    "open-address.h": "c"
+    "open-address.h": "c",
+    "singly.h": "c"
   }
 }
