@@ -1,23 +1,24 @@
 /**
  * Copyright © 2023 Austin Berrio
  *
- * @file src/node.c
+ * @file src/container/node.c
  */
 
 #include "core/logger.h"
 #include "core/memory.h"
-#include "core/node.h"
+
+#include "container/node.h"
 
 #include <stddef.h> // For NULL
 #include <stdlib.h> // For malloc and free
 
-Node* node_create(void* object) {
+ContainerNode* container_node_create(void* object) {
     // Allocate memory for the new node
-    Node* node = (Node*) memory_aligned_alloc(sizeof(Node), alignof(Node));
+    ContainerNode* node = (ContainerNode*) memory_aligned_alloc(sizeof(ContainerNode), alignof(ContainerNode));
 
     // Check if memory allocation was successful
     if (NULL == node) {
-        LOG_ERROR("Failed to allocate memory to new Node.\n");
+        LOG_ERROR("Failed to allocate memory to new ContainerNode.\n");
         return NULL; // Return NULL if allocation fails
     }
 
@@ -28,7 +29,7 @@ Node* node_create(void* object) {
     return node;
 }
 
-void node_free(Node* node) {
+void container_node_free(ContainerNode* node) {
     if (NULL == node) {
         return; // Nothing to free
     }
