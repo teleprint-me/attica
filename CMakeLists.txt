@@ -43,7 +43,6 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 add_library(attica SHARED
     "src/core/logger.c"
     "src/core/memory.c"
-    "src/core/node.c"
 
     "src/test/unit.c"
 
@@ -53,6 +52,9 @@ add_library(attica SHARED
     "src/allocator/pool.c"
     "src/allocator/stack.c"
     "src/allocator/lease.c"
+
+    "src/container/node.c"
+    "src/container/stack.c"
 
     # "src/numeric/constant.c"
     # "src/numeric/lehmer.c"

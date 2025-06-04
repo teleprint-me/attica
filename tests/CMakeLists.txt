@@ -3,6 +3,7 @@
 # Define test modules
 set(TEST_MODULES
     "core"
+    "container"
 )
 
 # Set input and output directories

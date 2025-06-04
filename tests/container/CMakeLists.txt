@@ -2,12 +2,11 @@
 
 # Define test units
 set(TEST_UNITS
-    "test_logger"
-    "test_memory"
+    "test_node"
 )
 
-set(INPUT_DIR ${PROJECT_SOURCE_DIR}/tests/core)
-set(OUTPUT_DIR ${CMAKE_BINARY_DIR}/tests/core)
+set(INPUT_DIR ${PROJECT_SOURCE_DIR}/tests/container)
+set(OUTPUT_DIR ${CMAKE_BINARY_DIR}/tests/container)
 
 foreach(test IN LISTS TEST_UNITS)
     add_executable(${test} ${INPUT_DIR}/${test}.c)
