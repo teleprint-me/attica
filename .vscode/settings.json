@@ -44,21 +44,5 @@
     "editor.tabSize": 4,
     "editor.formatOnSave": false,
     "editor.insertSpaces": true
-  },
-  "files.associations": {
-    "logger.h": "c",
-    "generator": "c",
-    "cstdint": "c",
-    "stacktrace": "c",
-    "stdio.h": "c",
-    "stdbool.h": "c",
-    "stdalign.h": "c",
-    "memory.h": "c",
-    "random": "c",
-    "constant.h": "c",
-    "stdlib.h": "c",
-    "stddef.h": "c",
-    "open-address.h": "c",
-    "singly.h": "c"
   }
 }
