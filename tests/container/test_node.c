@@ -38,13 +38,14 @@ int test_container_node_create_suite(void) {
     ContainerNode* nc = container_node_create(&c);
 
     na->next = nb;
-    nb->next = nc;
     nb->prev = na;
+    nb->next = nc;
+    nc->prev = nb;
 
-    static TestContainerNode cases[] = {
-        {.node = na, .expected = a},
-        {.node = nb, .expected = b},
-        {.node = nc, .expected = c},
+    TestContainerNode cases[] = {
+        { .node = na, .expected = a },
+        { .node = nb, .expected = b },
+        { .node = nc, .expected = c },
     };
 
     size_t total_tests = sizeof(cases) / sizeof(TestContainerNode);
@@ -60,7 +61,13 @@ int test_container_node_create_suite(void) {
         .test_cases = test_cases,
     };
 
-    return test_unit_run(&context, test_container_node_create, NULL);
+    int result = test_unit_run(&context, test_container_node_create, NULL);
+
+    container_node_free(nc);
+    container_node_free(nb);
+    container_node_free(na);
+
+    return result;
 }
 
 int main(void) {

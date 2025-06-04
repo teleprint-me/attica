@@ -1,7 +1,7 @@
 /**
  * Copyright © 2023 Austin Berrio
  *
- * @file include/unit_test.h
+ * @file include/test/unit.h
  * @brief Minimal customizable unit testing framework for C.
  *
  * Provides structures and functions to define, run, and manage unit tests
