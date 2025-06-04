@@ -44,5 +44,12 @@
     "editor.tabSize": 4,
     "editor.formatOnSave": false,
     "editor.insertSpaces": true
+  },
+  "files.associations": {
+    "bitset": "c",
+    "chrono": "c",
+    "text_encoding": "c",
+    "typeindex": "c",
+    "typeinfo": "c"
   }
 }
