@@ -15,13 +15,13 @@ typedef struct TestContainerNode {
 int test_group_node_setup(TestUnit* unit) {
     TestContainerNode* data = (TestContainerNode*) unit->data;
     data->node = container_node_create(&data->value);
-    ASSERT(data->node, "");
+    ASSERT(data->node, "Failed to setup node");
     return 0;
 }
 
 int test_group_node_teardown(TestUnit* unit) {
     TestContainerNode* data = (TestContainerNode*) unit->data;
-    ASSERT(data->node, "");
+    ASSERT(data->node, "Failed to reference node");
     container_node_free(data->node);
     return 0;
 }
@@ -54,7 +54,7 @@ int test_suite_container_node(void) {
     }
 
     TestGroup group = {
-        .name = "Test Node Group",
+        .name = "Container Node",
         .count = count,
         .units = units,
         .run = test_group_container_node,
@@ -67,7 +67,7 @@ int test_suite_container_node(void) {
 
 int main(void) {
     TestSuite suites[] = {
-        {"Test Node Suite", test_suite_container_node},
+        {"Container Node", test_suite_container_node},
     };
 
     int result = 0;
