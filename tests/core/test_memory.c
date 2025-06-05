@@ -56,7 +56,7 @@ int test_suite_bitwise_offset(void) {
     }
 
     TestGroup group = {
-        .name = "[TestGroup] Memory Bitwise Offset",
+        .name = "Memory Bitwise Offset",
         .count = count,
         .units = units,
         .run = test_group_bitwise_offset,
@@ -109,7 +109,7 @@ int test_suite_power_of_two(void) {
     }
 
     TestGroup group = {
-        .name = "[TestGroup] Memory Power of Two",
+        .name = "Memory Power of Two",
         .count = count,
         .units = units,
         .run = test_group_power_of_two,
@@ -164,7 +164,7 @@ int test_suite_is_aligned(void) {
     }
 
     TestGroup group = {
-        .name = "[TestGroup] Memory Is Aligned",
+        .name = "Memory Is Aligned",
         .count = count,
         .units = units,
         .run = test_group_is_aligned,
@@ -175,9 +175,9 @@ int test_suite_is_aligned(void) {
 
 int main(void) {
     TestSuite suites[] = {
-        {"[TestSuite] Memory Bitwise Offset", test_suite_bitwise_offset},
-        {"[TestSuite] Memory Power of Two", test_suite_power_of_two},
-        {"[TestSuite] Memory Is Aligned", test_suite_is_aligned},
+        {"Memory Bitwise Offset", test_suite_bitwise_offset},
+        {"Memory Power of Two", test_suite_power_of_two},
+        {"Memory Is Aligned", test_suite_is_aligned},
     };
 
     int result = 0;

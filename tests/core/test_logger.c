@@ -134,7 +134,7 @@ int test_suite_log_level(void) {
     }
 
     TestGroup group = {
-        .name = "Test Log Level Group",
+        .name = "Log Level",
         .count = count,
         .units = units,
         .run = test_group_log_level,
@@ -197,7 +197,7 @@ int test_suite_log_file(void) {
     }
 
     TestGroup group = {
-        .name = "Test Log File Group",
+        .name = "Log File",
         .count = count,
         .units = units,
         .run = test_group_log_file,
@@ -261,7 +261,7 @@ int test_suite_global_logger(void) {
     }
 
     TestGroup group = {
-        .name = "Test Global Logger Group",
+        .name = "Global Logger",
         .count = count,
         .units = units,
         .run = test_group_global_logger,
@@ -324,7 +324,7 @@ int test_logger_lazy_suite(void) {
     }
 
     TestGroup group = {
-        .name = "Test Lazy Logger Group",
+        .name = "Lazy Logger",
         .count = count,
         .units = units,
         .run = test_group_lazy_logger,
@@ -335,10 +335,10 @@ int test_logger_lazy_suite(void) {
 
 int main(void) {
     TestSuite suites[] = {
-        {"Test Log Level Suite", test_suite_log_level},
-        {"Test Log File Suite", test_suite_log_file},
-        {"Test Global Logger Suite", test_suite_global_logger},
-        {"Test Lazy Logger Suite", test_logger_lazy_suite},
+        {"Log Level", test_suite_log_level},
+        {"Log File", test_suite_log_file},
+        {"Global Logger", test_suite_global_logger},
+        {"Lazy Logger", test_logger_lazy_suite},
     };
 
     int result = 0;
