@@ -12,62 +12,64 @@ typedef struct TestContainerNode {
     ContainerNode* node;
 } TestContainerNode;
 
-void test_node_setup(TestCase* test) {
-    TestContainerNode* unit = (TestContainerNode*) test->unit;
-    unit->node = container_node_create(&unit->value);
+void test_node_setup(TestUnit* unit) {
+    TestContainerNode* params = (TestContainerNode*) unit->params;
+    params->node = container_node_create(&params->value);
 }
 
-void test_node_teardown(TestCase* test) {
-    TestContainerNode* unit = (TestContainerNode*) test->unit;
-    container_node_free(unit->node);
+void test_node_teardown(TestUnit* unit) {
+    TestContainerNode* params = (TestContainerNode*) unit->params;
+    container_node_free(params->node);
 }
 
-int test_container_node(TestCase* test) {
-    TestContainerNode* unit = (TestContainerNode*) test->unit;
-    int result = *(int*) unit->node->object;
+int test_container_node(TestUnit* unit) {
+    TestContainerNode* params = (TestContainerNode*) unit->params;
+    int result = *(int*) params->node->object;
 
     ASSERT(
-        result == unit->expected, "[TestContainerNode] expected %d, got %d", unit->expected, result
+        result == params->expected,
+        "[TestContainerNode] expected %d, got %d",
+        params->expected,
+        result
     );
 
     return 0;
 }
 
 int test_container_node_suite(void) {
-    TestContainerNode cases[] = {
+    TestContainerNode params[] = {
         {.value = 5, .expected = 5},
         {.value = 3, .expected = 3},
         {.value = 7, .expected = 7},
     };
 
-    size_t total_tests = sizeof(cases) / sizeof(TestContainerNode);
-    TestCase test_cases[total_tests];
-    for (size_t i = 0; i < (total_tests); i++) {
-        (test_cases)[i].unit = &(cases)[i];
+    size_t count = sizeof(params) / sizeof(TestContainerNode);
+    TestUnit units[count];
+    for (size_t i = 0; i < (count); i++) {
+        (units)[i].params = &(params)[i];
     }
 
-    TestContext context = {
-        .total_tests = total_tests,
-        .test_name = "Test Node",
-        .test_cases = test_cases,
-        .setup_each = test_node_setup,
-        .teardown_each = test_node_teardown,
+    TestGroup group = {
+        .name = "Test Node Group",
+        .count = count,
+        .units = units,
+        .run = test_container_node,
+        .before = test_node_setup,
+        .after = test_node_teardown,
     };
 
-    int result = test_unit_run(&context, test_container_node, NULL);
-
-    return result;
+    return test_group_run(&group);
 }
 
 int main(void) {
-    static TestRegister suites[] = {
-        {"Container Node", test_container_node_suite},
+    TestSuite suites[] = {
+        {"Test Node Suite", test_container_node_suite},
     };
 
     int result = 0;
-    size_t total = sizeof(suites) / sizeof(TestRegister);
+    size_t total = sizeof(suites) / sizeof(TestSuite);
     for (size_t i = 0; i < total; i++) {
-        result |= test_suite_run(suites[i].name, suites[i].test_suite);
+        result |= test_suite_run(&suites[i]);
     }
 
     return result;
