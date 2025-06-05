@@ -12,17 +12,21 @@ typedef struct TestContainerNode {
     ContainerNode* node;
 } TestContainerNode;
 
-void test_node_setup(TestUnit* unit) {
+int test_group_node_setup(TestUnit* unit) {
     TestContainerNode* data = (TestContainerNode*) unit->data;
     data->node = container_node_create(&data->value);
+    ASSERT(data->node, "");
+    return 0;
 }
 
-void test_node_teardown(TestUnit* unit) {
+int test_group_node_teardown(TestUnit* unit) {
     TestContainerNode* data = (TestContainerNode*) unit->data;
+    ASSERT(data->node, "");
     container_node_free(data->node);
+    return 0;
 }
 
-int test_container_node(TestUnit* unit) {
+int test_group_container_node(TestUnit* unit) {
     TestContainerNode* data = (TestContainerNode*) unit->data;
     int result = *(int*) data->node->object;
 
@@ -36,7 +40,7 @@ int test_container_node(TestUnit* unit) {
     return 0;
 }
 
-int test_container_node_suite(void) {
+int test_suite_container_node(void) {
     TestContainerNode data[] = {
         {.value = 5, .expected = 5},
         {.value = 3, .expected = 3},
@@ -53,9 +57,9 @@ int test_container_node_suite(void) {
         .name = "Test Node Group",
         .count = count,
         .units = units,
-        .run = test_container_node,
-        .before = test_node_setup,
-        .after = test_node_teardown,
+        .run = test_group_container_node,
+        .before = test_group_node_setup,
+        .after = test_group_node_teardown,
     };
 
     return test_group_run(&group);
@@ -63,7 +67,7 @@ int test_container_node_suite(void) {
 
 int main(void) {
     TestSuite suites[] = {
-        {"Test Node Suite", test_container_node_suite},
+        {"Test Node Suite", test_suite_container_node},
     };
 
     int result = 0;
