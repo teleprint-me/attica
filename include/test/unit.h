@@ -91,7 +91,7 @@ typedef int (*TestFunction)(void);
 typedef struct TestUnit {
     int8_t result; /**< Result of the test unit (0 = success, 1 = failure). */
     size_t index; /**< Index number of the test unit (1-based). */
-    const void* params; /**< User-defined parameters. */
+    const void* data; /**< User-defined parameters. */
 } TestUnit;
 
 /**
