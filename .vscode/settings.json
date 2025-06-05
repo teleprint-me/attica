@@ -52,6 +52,7 @@
     "typeindex": "c",
     "typeinfo": "c",
     "flat_map": "c",
-    "format": "c"
+    "format": "c",
+    "functional": "c"
   }
 }
