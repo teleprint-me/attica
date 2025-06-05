@@ -14,20 +14,21 @@
 #include "core/memory.h"
 #include "test/unit.h"
 
-typedef struct TestBitwiseOffset {
+typedef struct TestMemoryBitwiseOffset {
     uintptr_t x;
     uintptr_t y;
     uintptr_t expected; // output
-} TestBitwiseOffset;
+} TestMemoryBitwiseOffset;
 
-int test_group_bitwise_offset(TestUnit* unit) {
-    TestBitwiseOffset* data = (TestBitwiseOffset*) unit->data;
+int test_group_memory_bitwise_offset(TestUnit* unit) {
+    TestMemoryBitwiseOffset* data = (TestMemoryBitwiseOffset*) unit->data;
 
     uintptr_t result = memory_bitwise_offset(data->x, data->y);
 
     ASSERT(
         result == data->expected,
-        "[TestBitwiseOffset] expected=%p, got=%p",
+        "[TestMemoryBitwiseOffset] index=%zu, expected=%p, got=%p",
+        unit->index,
         data->expected,
         result
     );
@@ -35,8 +36,8 @@ int test_group_bitwise_offset(TestUnit* unit) {
     return 0;
 }
 
-int test_suite_bitwise_offset(void) {
-    TestBitwiseOffset data[] = {
+int test_suite_memory_bitwise_offset(void) {
+    TestMemoryBitwiseOffset data[] = {
         {0x00, 8, 0}, // aligned
         {0x01, 8, 1}, // 1 byte offset
         {0x07, 8, 7}, // just before alignment
@@ -49,35 +50,36 @@ int test_suite_bitwise_offset(void) {
         {0x1234, 64, 52}, // edge case
     };
 
-    size_t count = sizeof(data) / sizeof(TestBitwiseOffset);
+    size_t count = sizeof(data) / sizeof(TestMemoryBitwiseOffset);
     TestUnit units[count];
     for (size_t i = 0; i < count; i++) {
         units[i].data = &data[i];
     }
 
     TestGroup group = {
-        .name = "Memory Bitwise Offset",
+        .name = "memory_bitwise_offset",
         .count = count,
         .units = units,
-        .run = test_group_bitwise_offset,
+        .run = test_group_memory_bitwise_offset,
     };
 
     return test_group_run(&group);
 }
 
-typedef struct TestPowerOfTwo {
+typedef struct TestMemoryIsPowerOfTwo {
     uintptr_t x;
     bool expected;
-} TestPowerOfTwo;
+} TestMemoryIsPowerOfTwo;
 
-int test_group_power_of_two(TestUnit* unit) {
-    TestPowerOfTwo* data = (TestPowerOfTwo*) unit->data;
+int test_group_memory_is_power_of_two(TestUnit* unit) {
+    TestMemoryIsPowerOfTwo* data = (TestMemoryIsPowerOfTwo*) unit->data;
 
     bool result = memory_is_power_of_two(data->x);
 
     ASSERT(
         result == data->expected,
-        "[TestPowerOfTwo] input=%zu expected=%d, got=%d",
+        "[TestMemoryIsPowerOfTwo] index=%zu, input=%zu, expected=%d, got=%d",
+        unit->index,
         data->x,
         data->expected,
         result
@@ -86,8 +88,8 @@ int test_group_power_of_two(TestUnit* unit) {
     return 0;
 }
 
-int test_suite_power_of_two(void) {
-    TestPowerOfTwo data[] = {
+int test_suite_memory_is_power_of_two(void) {
+    TestMemoryIsPowerOfTwo data[] = {
         {0, false}, // edge case: zero
         {1, true}, // 2^0
         {2, true}, // 2^1
@@ -102,36 +104,37 @@ int test_suite_power_of_two(void) {
         {UINTPTR_MAX, false}, // very large non-power-of-two
     };
 
-    size_t count = sizeof(data) / sizeof(TestPowerOfTwo);
+    size_t count = sizeof(data) / sizeof(TestMemoryIsPowerOfTwo);
     TestUnit units[count];
     for (size_t i = 0; i < count; i++) {
         units[i].data = &data[i];
     }
 
     TestGroup group = {
-        .name = "Memory Power of Two",
+        .name = "memory_is_power_of_two",
         .count = count,
         .units = units,
-        .run = test_group_power_of_two,
+        .run = test_group_memory_is_power_of_two,
     };
 
     return test_group_run(&group);
 }
 
-typedef struct TestIsAligned {
+typedef struct TestMemoryIsAligned {
     uintptr_t x;
     uintptr_t alignment;
     bool expected;
-} TestIsAligned;
+} TestMemoryIsAligned;
 
-int test_group_is_aligned(TestUnit* unit) {
-    TestIsAligned* data = (TestIsAligned*) unit->data;
+int test_group_memory_is_aligned(TestUnit* unit) {
+    TestMemoryIsAligned* data = (TestMemoryIsAligned*) unit->data;
 
     bool result = memory_is_aligned(data->x, data->alignment);
 
     ASSERT(
         result == data->expected,
-        "[TestIsAligned] input=%p align=%zu expected=%d got=%d",
+        "[TestMemoryIsAligned] index=%zu, input=%p align=%zu expected=%d got=%d",
+        unit->index,
         (void*)data->x,
         data->alignment,
         data->expected,
@@ -141,8 +144,8 @@ int test_group_is_aligned(TestUnit* unit) {
     return 0;
 }
 
-int test_suite_is_aligned(void) {
-    TestIsAligned data[] = {
+int test_suite_memory_is_aligned(void) {
+    TestMemoryIsAligned data[] = {
         {0x00, 8, true},
         {0x08, 8, true},
         {0x09, 8, false},
@@ -157,17 +160,17 @@ int test_suite_is_aligned(void) {
         {0x1001, 4096, false},
     };
 
-    size_t count = sizeof(data) / sizeof(TestIsAligned);
+    size_t count = sizeof(data) / sizeof(TestMemoryIsAligned);
     TestUnit units[count];
     for (size_t i = 0; i < count; i++) {
         units[i].data = &data[i];
     }
 
     TestGroup group = {
-        .name = "Memory Is Aligned",
+        .name = "memory_is_aligned",
         .count = count,
         .units = units,
-        .run = test_group_is_aligned,
+        .run = test_group_memory_is_aligned,
     };
 
     return test_group_run(&group);
@@ -175,9 +178,9 @@ int test_suite_is_aligned(void) {
 
 int main(void) {
     TestSuite suites[] = {
-        {"Memory Bitwise Offset", test_suite_bitwise_offset},
-        {"Memory Power of Two", test_suite_power_of_two},
-        {"Memory Is Aligned", test_suite_is_aligned},
+        {"memory_bitwise_offset", test_suite_memory_bitwise_offset},
+        {"memory_is_power_of_two", test_suite_memory_is_power_of_two},
+        {"memory_is_aligned", test_suite_memory_is_aligned},
     };
 
     int result = 0;
