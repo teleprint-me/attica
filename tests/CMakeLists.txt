@@ -4,6 +4,7 @@
 set(TEST_MODULES
     "core"
     "container"
+    "utf8"
 )
 
 # Set input and output directories

@@ -1,48 +1,50 @@
 /**
  * Copyright © 2023 Austin Berrio
  *
- * @file tests/test_utf8_byte.c
+ * @file tests/utf8/test_utf8_byte.c
  */
 
 #include "core/logger.h"
 #include "test/unit.h"
 #include "utf8/byte.h"
 
-// --- UTF-8 Test Byte Width ---
+/**
+ * UTF8 Byte Width
+ */
 
-typedef struct UTF8TestByteWidth {
+typedef struct TestUTF8ByteWidth {
     const char* label;
     const uint8_t* bytes;
     const int8_t expected;
-} UTF8TestByteWidth;
+} TestUTF8ByteWidth;
 
-int test_utf8_byte_width(TestCase* test) {
-    UTF8TestByteWidth* unit = (UTF8TestByteWidth*) test->unit;
-    int8_t actual = utf8_byte_width(unit->bytes);
+int test_group_utf8_byte_width(TestUnit* unit) {
+    TestUTF8ByteWidth* data = (TestUTF8ByteWidth*) unit->data;
+    int8_t actual = utf8_byte_width(data->bytes);
 
     // Check if the actual length is greater than 0
     ASSERT(
         actual > 0,
-        "Invalid UTF-8 leading byte in test case %zu (unit: '%s')",
-        test->index,
-        unit->bytes
+        "[TestUTF8ByteWidth] Invalid lead byte: unit=%zu, data='%s'",
+        unit->index,
+        data->bytes
     );
 
     // Check if the actual length matches the expected length
     ASSERT(
-        actual == unit->expected,
-        "Invalid UTF-8 byte length in test case %zu (unit: '%s', expected: %d, got: %d)",
-        test->index,
-        unit->bytes,
-        unit->expected,
+        actual == data->expected,
+        "[TestUTF8ByteWidth] Invalid byte length: unit=%zu, data='%s', expected=%d, got=%d",
+        unit->index,
+        data->bytes,
+        data->expected,
         actual
     );
 
     return 0; // Success
 }
 
-int test_utf8_byte_width_suite(void) {
-    static UTF8TestByteWidth units[] = {
+int test_suite_utf8_byte_width(void) {
+    TestUTF8ByteWidth data[] = {
         {"Empty", (const uint8_t*) "", 1},
         {"ASCII NULL", (const uint8_t*) "\0", 1},
         {"ASCII a", (const uint8_t*) "a", 1},
@@ -52,58 +54,60 @@ int test_utf8_byte_width_suite(void) {
         {"4-byte 😀", (const uint8_t*) "\U0001F600", 4},
     };
 
-    size_t total_tests = sizeof(units) / sizeof(UTF8TestByteWidth);
-    TestCase test_cases[total_tests];
-
-    for (size_t i = 0; i < total_tests; i++) {
-        test_cases[i].unit = &units[i];
+    size_t count = sizeof(data) / sizeof(TestUTF8ByteWidth);
+    TestUnit units[count];
+    for (size_t i = 0; i < count; i++) {
+        units[i].data = &data[i];
     }
 
-    TestContext context = {
-        .total_tests = total_tests,
-        .test_name = "UTF-8 Byte Width",
-        .test_cases = test_cases,
+    TestGroup group = {
+        .name = "utf8_byte_width",
+        .count = count,
+        .units = units,
+        .run = test_group_utf8_byte_width,
     };
 
-    return test_unit_run(&context, test_utf8_byte_width, NULL);
+    return test_group_run(&group);
 }
 
-// --- UTF-8 Test Byte Validation ---
+/**
+ * UTF8 Byte Is Valid
+ */
 
-typedef struct UTF8TestByteIsValid {
+typedef struct TestUTF8ByteIsValid {
     const char* label;
     const uint8_t* bytes;
     const bool expected;
-} UTF8TestByteIsValid;
+} TestUTF8ByteIsValid;
 
-int test_utf8_byte_is_valid(TestCase* test) {
-    UTF8TestByteIsValid* unit = (UTF8TestByteIsValid*) test->unit;
+int test_group_utf8_byte_is_valid(TestUnit* unit) {
+    TestUTF8ByteIsValid* data = (TestUTF8ByteIsValid*) unit->data;
 
-    int8_t width = utf8_byte_width(unit->bytes);
+    int8_t width = utf8_byte_width(data->bytes);
     if (-1 == width) {
         ASSERT(
-            false == unit->expected, // if this is set to false, this is silent
-            "Expected invalid sequence but got valid: test case %zu (input: '%0x')",
-            test->index,
-            *unit->bytes
+            false == data->expected, // if this is set to false, this is silent
+            "[TestUTF8ByteIsValid] Expected invalid sequence but got valid: unit=%zu, input='%0x'",
+            unit->index,
+            *data->bytes
         );
     }
 
-    bool actual = utf8_byte_is_valid(unit->bytes);
+    bool actual = utf8_byte_is_valid(data->bytes);
     ASSERT(
-        actual == unit->expected, // this fails when false == unit->expected
-        "Test case %zu (input: '%0x') failed: expected %s, got %s",
-        test->index,
-        *unit->bytes,
-        unit->expected ? "true" : "false",
+        actual == data->expected, // this fails when false == data->expected
+        "[TestUTF8ByteIsValid] unit=%zu, input='%0x', expected='%s', got='%s'",
+        unit->index,
+        *data->bytes,
+        data->expected ? "true" : "false",
         actual ? "true" : "false"
     );
 
     return 0;
 }
 
-int test_utf8_byte_is_valid_suite(void) {
-    static UTF8TestByteIsValid units[] = {
+int test_suite_utf8_byte_is_valid(void) {
+    TestUTF8ByteIsValid data[] = {
         {"Valid Empty", (uint8_t*) "", true},
         {"Valid NULL", (uint8_t*) "\x00", true},
         {"Valid /", (uint8_t*) "/", true},
@@ -129,48 +133,50 @@ int test_utf8_byte_is_valid_suite(void) {
         {"Surrogate D800", (uint8_t*) "\xED\xA0\x80", false},
     };
 
-    size_t total_tests = sizeof(units) / sizeof(UTF8TestByteIsValid);
-    TestCase test_cases[total_tests];
-
-    for (size_t i = 0; i < total_tests; i++) {
-        test_cases[i].unit = &units[i];
+    size_t count = sizeof(data) / sizeof(TestUTF8ByteIsValid);
+    TestUnit units[count];
+    for (size_t i = 0; i < count; i++) {
+        units[i].data = &data[i];
     }
 
-    TestContext context = {
-        .total_tests = total_tests,
-        .test_name = "UTF-8 Byte Validity",
-        .test_cases = test_cases,
+    TestGroup group = {
+        .name = "utf8_byte_is_valid",
+        .count = count,
+        .units = units,
+        .run = test_group_utf8_byte_is_valid,
     };
 
-    return test_unit_run(&context, test_utf8_byte_is_valid, NULL);
+    return test_group_run(&group);
 }
 
-// --- UTF-8 Test Byte Equality ---
+/**
+ * UTF8 Byte Is Equal
+ */
 
-typedef struct UTF8TestByteIsEqual {
+typedef struct TestUTF8ByteIsEqual {
     const char* label;
     const uint8_t* a;
     const uint8_t* b;
     bool expected;
-} UTF8TestByteIsEqual;
+} TestUTF8ByteIsEqual;
 
-int test_utf8_byte_is_equal(TestCase* test) {
-    UTF8TestByteIsEqual* unit = (UTF8TestByteIsEqual*) test->unit;
-    bool result = utf8_byte_is_equal(unit->a, unit->b);
+int test_group_utf8_byte_is_equal(TestUnit* unit) {
+    TestUTF8ByteIsEqual* data = (TestUTF8ByteIsEqual*) unit->data;
+    bool result = utf8_byte_is_equal(data->a, data->b);
 
     ASSERT(
-        result == unit->expected,
-        "[%s] expected %s, got %s",
-        unit->label,
-        unit->expected ? "true" : "false",
+        result == data->expected,
+        "[TestUTF8ByteIsEqual] [%s] expected='%s', got='%s'",
+        data->label,
+        data->expected ? "true" : "false",
         result ? "true" : "false"
     );
 
     return 0;
 }
 
-int test_utf8_byte_is_equal_suite(void) {
-    static UTF8TestByteIsEqual units[] = {
+int test_suite_utf8_byte_is_equal(void) {
+    TestUTF8ByteIsEqual data[] = {
         {"Equal ASCII", (uint8_t*) "A", (uint8_t*) "A", true},
         {"Unequal ASCII", (uint8_t*) "A", (uint8_t*) "B", false},
         {"Equal 2-byte (¢)", (uint8_t*) "\xC2\xA2", (uint8_t*) "\xC2\xA2", true},
@@ -183,46 +189,53 @@ int test_utf8_byte_is_equal_suite(void) {
         {"Both invalid", (uint8_t*) "\xED\xA0\x80", (uint8_t*) "\xC0", false},
     };
 
-    size_t total_tests = sizeof(units) / sizeof(UTF8TestByteIsEqual);
-    TestCase test_cases[total_tests];
-
-    for (size_t i = 0; i < total_tests; i++) {
-        test_cases[i].unit = &units[i];
+    size_t count = sizeof(data) / sizeof(TestUTF8ByteIsEqual);
+    TestUnit units[count];
+    for (size_t i = 0; i < count; i++) {
+        units[i].data = &data[i];
     }
 
-    TestContext context = {
-        .total_tests = total_tests,
-        .test_name = "UTF-8 Byte Equality",
-        .test_cases = test_cases,
+    TestGroup group = {
+        .name = "utf8_byte_is_equal",
+        .count = count,
+        .units = units,
+        .run = test_group_utf8_byte_is_equal,
     };
 
-    return test_unit_run(&context, test_utf8_byte_is_equal, NULL);
+    return test_group_run(&group);
 }
 
-// --- UTF-8 Test Byte Range ---
+/**
+ * UTF8 Byte Range
+ */
 
-typedef struct UTF8TestByteRange {
+typedef struct TestUTF8ByteRange {
     const char* label;
     const uint8_t* start;
     const uint8_t* end;
     ptrdiff_t expected;
-} UTF8TestByteRange;
+} TestUTF8ByteRange;
 
-int test_utf8_byte_range(TestCase* test) {
-    UTF8TestByteRange* unit = (UTF8TestByteRange*) test->unit;
-    ptrdiff_t actual = utf8_byte_range(unit->start, unit->end);
+int test_group_utf8_byte_range(TestUnit* unit) {
+    TestUTF8ByteRange* data = (TestUTF8ByteRange*) unit->data;
+    ptrdiff_t actual = utf8_byte_range(data->start, data->end);
 
     ASSERT(
-        actual == unit->expected, "[%s] expected %td, got %td", unit->label, unit->expected, actual
+        actual == data->expected,
+        "[TestUTF8ByteRange] [%s] expected=%td, got=%td",
+        data->label,
+        data->expected,
+        actual
     );
 
     return 0;
 }
 
-int test_utf8_byte_range_suite(void) {
+int test_suite_utf8_byte_range(void) {
     // 'h','e','l','l','o' (5 bytes), ¢ (2 bytes), € (3 bytes)
     static const uint8_t bytes[] = "hello¢€";
-    static UTF8TestByteRange units[] = {
+
+    TestUTF8ByteRange data[] = {
         {"ASCII h → o", &bytes[0], &bytes[5], 5},
         {"¢ span", &bytes[5], &bytes[7], 2},
         {"€ span", &bytes[7], &bytes[10], 3},
@@ -231,46 +244,40 @@ int test_utf8_byte_range_suite(void) {
         {"NULL end", &bytes[0], NULL, -1},
     };
 
-    size_t total_tests = sizeof(units) / sizeof(UTF8TestByteRange);
-    TestCase test_cases[total_tests];
-
-    for (size_t i = 0; i < total_tests; i++) {
-        test_cases[i].unit = &units[i];
+    size_t count = sizeof(data) / sizeof(TestUTF8ByteRange);
+    TestUnit units[count];
+    for (size_t i = 0; i < count; i++) {
+        units[i].data = &data[i];
     }
 
-    TestContext context = {
-        .total_tests = total_tests,
-        .test_name = "UTF-8 Byte Range",
-        .test_cases = test_cases,
+    TestGroup group = {
+        .name = "utf8_byte_range",
+        .count = count,
+        .units = units,
+        .run = test_group_utf8_byte_range,
     };
 
-    return test_unit_run(&context, test_utf8_byte_range, NULL);
+    return test_group_run(&group);
 }
 
-// --- UTF-8 Test Iterator ---
+/**
+ * UTF-8 Test Iterator
+ */
 
 /// @todo
 
 int main(void) {
-    typedef struct UTF8TestSuite {
-        const char* label;
-        int (*suite)(void);
-    } UTF8TestSuite;
-
-    static UTF8TestSuite test_suites[] = {
-        {"UTF-8 Byte Width", test_utf8_byte_width_suite},
-        {"UTF-8 Byte Validity", test_utf8_byte_is_valid_suite},
-        {"UTF-8 Byte Equality", test_utf8_byte_is_equal_suite},
-        {"UTF-8 Byte Range", test_utf8_byte_range_suite},
+    TestSuite suites[] = {
+        {"utf8_byte_width", test_suite_utf8_byte_width},
+        {"utf8_byte_is_valid", test_suite_utf8_byte_is_valid},
+        {"utf8_byte_is_equal", test_suite_utf8_byte_is_equal},
+        {"utf8_byte_range", test_suite_utf8_byte_range},
     };
 
-    size_t total_suites = sizeof(test_suites) / sizeof(UTF8TestSuite);
-
+    size_t count = sizeof(suites) / sizeof(TestSuite);
     int result = 0;
-
-    for (size_t i = 0; i < total_suites; i++) {
-        result |= test_suite_run(test_suites[i].label, test_suites[i].suite);
+    for (size_t i = 0; i < count; i++) {
+        result |= test_suite_run(&suites[i]);
     }
-
     return result;
 }

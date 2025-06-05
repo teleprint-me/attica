@@ -1,7 +1,7 @@
 /**
  * Copyright © 2023 Austin Berrio
  *
- * @file tests/test_utf8_byte.c
+ * @file tests/utf8/test_utf8_raw.c
  */
 
 #include "core/logger.h"
@@ -11,28 +11,31 @@
 
 // --- UTF-8 Test Raw Validation ---
 
-typedef struct UTF8TestRawIsValid {
+typedef struct TestUTF8RawIsValid {
     const char* label;
     const char* string;
     const bool expected;
-} UTF8TestRawIsValid;
+} TestUTF8RawIsValid;
 
-int test_utf8_raw_is_valid(TestCase* test) {
-    UTF8TestRawIsValid* unit = (UTF8TestRawIsValid*) test->unit;
-    bool actual = utf8_raw_is_valid(unit->string);
+int test_group_utf8_raw_is_valid(TestUnit* unit) {
+    TestUTF8RawIsValid* data = (TestUTF8RawIsValid*) unit->data;
+
+    bool actual = utf8_raw_is_valid(data->string);
+
     ASSERT(
-        actual == unit->expected, // this fails when false == unit->expected
-        "Test case %zu (input: '%0x') failed: expected %s, got %s",
-        test->index,
-        unit->string,
-        unit->expected ? "true" : "false",
+        actual == data->expected, // this fails when false == data->expected
+        "[TestUTF8RawIsValid] unit=%zu, input='%0x', expected='%s', got='%s'",
+        unit->index,
+        data->string,
+        data->expected ? "true" : "false",
         actual ? "true" : "false"
     );
+
     return 0;
 }
 
-int test_utf8_raw_is_valid_suite(void) {
-    static UTF8TestRawIsValid units[] = {
+int test_suite_utf8_raw_is_valid(void) {
+    static TestUTF8RawIsValid data[] = {
         {"ASCII A", (char*) "\x41", true},
         {"Greeting", (char*) "Hello, world!", true},
         {"Greek", (char*) "Γεια σου κόσμο!", true},
@@ -43,39 +46,31 @@ int test_utf8_raw_is_valid_suite(void) {
         {"Mixed", (char*) "\x41 \nこんにちは、世界！", true},
     };
 
-    size_t total_tests = sizeof(units) / sizeof(UTF8TestRawIsValid);
-    TestCase test_cases[total_tests];
-
-    for (size_t i = 0; i < total_tests; i++) {
-        test_cases[i].unit = &units[i];
+    size_t count = sizeof(data) / sizeof(TestUTF8RawIsValid);
+    TestUnit units[count];
+    for (size_t i = 0; i < count; i++) {
+        units[i].data = &data[i];
     }
 
-    TestContext context = {
-        .total_tests = total_tests,
-        .test_name = "UTF-8 Raw Validity",
-        .test_cases = test_cases,
+    TestGroup group = {
+        .name = "utf8_raw_is_valid",
+        .count = count,
+        .units = units,
+        .run = test_group_utf8_raw_is_valid,
     };
 
-    return test_unit_run(&context, test_utf8_raw_is_valid, NULL);
+    return test_group_run(&group);
 }
 
 int main(void) {
-    typedef struct UTF8TestSuite {
-        const char* label;
-        int (*suite)(void);
-    } UTF8TestSuite;
-
-    static UTF8TestSuite test_suites[] = {
-        {"UTF-8 Raw Validity", test_utf8_raw_is_valid_suite},
+    TestSuite suites[] = {
+        {"utf8_raw_is_valid", test_suite_utf8_raw_is_valid},
     };
 
-    size_t total_suites = sizeof(test_suites) / sizeof(UTF8TestSuite);
-
+    size_t count = sizeof(suites) / sizeof(TestSuite);
     int result = 0;
-
-    for (size_t i = 0; i < total_suites; i++) {
-        result |= test_suite_run(test_suites[i].label, test_suites[i].suite);
+    for (size_t i = 0; i < count; i++) {
+        result |= test_suite_run(&suites[i]);
     }
-
     return result;
 }
