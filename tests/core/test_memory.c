@@ -7,85 +7,112 @@
 
 #include "core/logger.h"
 #include "core/memory.h"
-
 #include "test/unit.h"
 
-
-typedef struct MemoryTestBitwiseOffset {
+typedef struct TestBitwiseOffset {
     uintptr_t x;
     uintptr_t y;
     uintptr_t expected; // output
-} MemoryTestBitwiseOffset;
+} TestBitwiseOffset;
 
-int test_memory_bitwise_offset(TestCase* test) {
-    MemoryTestBitwiseOffset* unit = (MemoryTestBitwiseOffset*) test->unit;
+int test_group_bitwise_offset(TestUnit* unit) {
+    TestBitwiseOffset* data = (TestBitwiseOffset*) unit->data;
 
-    uintptr_t result = memory_bitwise_offset(unit->x, unit->y);
+    uintptr_t result = memory_bitwise_offset(data->x, data->y);
 
     ASSERT(
-        result == unit->expected,
-        "[MemoryTestBitwiseOffset] expected=%p, got=%p",
-        unit->expected,
+        result == data->expected,
+        "[TestBitwiseOffset] expected=%p, got=%p",
+        data->expected,
         result
     );
 
     return 0;
 }
 
-int test_memory_bitwise_offset_suite(void) {
-    static MemoryTestBitwiseOffset cases[] = {
-        {0x00, 8, 0},        // aligned
-        {0x01, 8, 1},        // 1 byte offset
-        {0x07, 8, 7},        // just before alignment
-        {0x08, 8, 0},        // exactly aligned
-        {0x0F, 8, 7},        // offset again
-        {0x10, 8, 0},        // aligned
-        {0x11, 8, 1},        // test wrap
-        {0x1003, 8, 3},      // sample from your inline assert
-        {0x1234, 16, 4},     // not aligned to 16
-        {0x1234, 64, 52},    // edge case
+int test_suite_bitwise_offset(void) {
+    TestBitwiseOffset data[] = {
+        {0x00, 8, 0}, // aligned
+        {0x01, 8, 1}, // 1 byte offset
+        {0x07, 8, 7}, // just before alignment
+        {0x08, 8, 0}, // exactly aligned
+        {0x0F, 8, 7}, // offset again
+        {0x10, 8, 0}, // aligned
+        {0x11, 8, 1}, // unit wrap
+        {0x1003, 8, 3}, // sample from your inline assert
+        {0x1234, 16, 4}, // not aligned to 16
+        {0x1234, 64, 52}, // edge case
     };
 
-    size_t total_tests = sizeof(cases) / sizeof(MemoryTestBitwiseOffset);
-
-    TestCase test_cases[total_tests];
-    for (size_t i = 0; i < total_tests; i++) {
-        test_cases[i].unit = &cases[i];
+    size_t count = sizeof(data) / sizeof(TestBitwiseOffset);
+    TestUnit units[count];
+    for (size_t i = 0; i < count; i++) {
+        units[i].data = &data[i];
     }
 
-    TestContext context = {
-        .total_tests = total_tests,
-        .test_name = "Memory Test Bitwise Offest",
-        .test_cases = test_cases,
+    TestGroup group = {
+        .name = "[TestGroup] Memory Bitwise Offset",
+        .count = count,
+        .units = units,
+        .run = test_group_bitwise_offset,
     };
 
-    return test_unit_run(&context, test_memory_bitwise_offset, NULL);
+    return test_group_run(&group);
 }
 
-typedef struct MemoryTestPowerOfTwo {
+typedef struct TestPowerOfTwo {
     uintptr_t x;
     bool expected;
-} MemoryTestPowerOfTwo;
+} TestPowerOfTwo;
 
-void test_memory_alignment(void) {
-    assert(memory_is_power_of_two(8));
-    assert(!memory_is_power_of_two(7));
-    // uintptr_t x = 0x1003;
-    // assert(memory_align_up(x, 8) == 0x1008);
-    assert(memory_bitwise_offset(0x1003, 8) == 3);
-    // ...more edge cases
+int test_group_power_of_two(TestUnit* unit) {
+    TestPowerOfTwo* data = (TestPowerOfTwo*) unit->data;
+
+    bool result = memory_is_power_of_two(data->x);
+
+    ASSERT(
+        result == data->expected,
+        "[TestPowerOfTwo] input=%zu expected=%d, got=%d",
+        data->x,
+        data->expected,
+        result
+    );
+
+    return 0;
+}
+
+int test_suite_power_of_two(void) {
+    TestPowerOfTwo data[] = {
+        {8, true},
+        {7, false},
+    };
+
+    size_t count = sizeof(data) / sizeof(TestPowerOfTwo);
+    TestUnit units[count];
+    for (size_t i = 0; i < count; i++) {
+        units[i].data = &data[i];
+    }
+
+    TestGroup group = {
+        .name = "[TestGroup] Memory Power of Two",
+        .count = count,
+        .units = units,
+        .run = test_group_power_of_two,
+    };
+
+    return test_group_run(&group);
 }
 
 int main(void) {
-    static TestRegister suites[] = {
-        {"Memory Bitwise Offset", test_memory_bitwise_offset_suite},
+    TestSuite suites[] = {
+        {"[TestSuite] Memory Bitwise Offset", test_suite_bitwise_offset},
+        {"[TestSuite] Memory Power of Two", test_suite_power_of_two},
     };
 
     int result = 0;
-    size_t total = sizeof(suites) / sizeof(TestRegister);
-    for (size_t i = 0; i < total; i++) {
-        result |= test_suite_run(suites[i].name, suites[i].test_suite);
+    size_t count = sizeof(suites) / sizeof(TestSuite);
+    for (size_t i = 0; i < count; i++) {
+        result |= test_suite_run(&suites[i]);
     }
-
     return result;
 }
