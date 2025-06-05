@@ -37,7 +37,6 @@
  */
 
 #include "core/logger.h"
-
 #include "test/unit.h"
 
 #include <unistd.h>
@@ -247,7 +246,7 @@ int test_group_global_logger(TestUnit* unit) {
 }
 
 int test_suite_global_logger(void) {
-    static TestGlobalLogger data[] = {
+    TestGlobalLogger data[] = {
         {LOG_LEVEL_WARN, LOG_LEVEL_INFO, "This message should not appear", false},
         {LOG_LEVEL_WARN, LOG_LEVEL_WARN, "Global logger warning", true},
         {LOG_LEVEL_WARN, LOG_LEVEL_ERROR, "Global logger error", true},
@@ -312,7 +311,7 @@ int test_group_lazy_logger(TestUnit* unit) {
 }
 
 int test_logger_lazy_suite(void) {
-    static TestLazyLogger data[] = {
+    TestLazyLogger data[] = {
         {LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG, "Lazy logger debug", true},
         {LOG_LEVEL_DEBUG, LOG_LEVEL_ERROR, "Lazy logger error", true},
         {LOG_LEVEL_INFO, LOG_LEVEL_DEBUG, "This should not log", false},
