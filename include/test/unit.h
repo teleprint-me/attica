@@ -19,6 +19,37 @@ extern "C" {
 #include <stdint.h>
 
 /**
+ * @name Forward Declarations
+ * @{
+ */
+
+/**
+ * @brief Structure representing a test unit.
+ *
+ * This structure is used to define individual unit tests,
+ * including before, run, and after hooks.
+ */
+typedef struct TestUnit TestUnit;
+
+/**
+ * @brief Structure representing a test group.
+ *
+ * This structure is used to group multiple unit tests together,
+ * allowing for easy execution and management.
+ */
+typedef struct TestGroup TestGroup;
+
+/**
+ * @brief Structure representing a test suite.
+ *
+ * This structure is used to manage a collection of test groups,
+ * allowing for easy execution.
+ */
+typedef struct TestSuite TestSuite;
+
+/** @} */
+
+/**
  * @name Macros
  * @{
  */
@@ -44,22 +75,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name Forward Declarations
- * @{
- */
-
-/**
- * @brief Structure representing a unit test.
- *
- * This structure is used to define individual unit tests,
- * including before, run, and after hooks.
- */
-typedef struct TestUnit TestUnit;
-
-/** @} */
-
-/**
- * @name Function Pointer Types
+ * @name Function Pointers
  * @{
  */
 
@@ -117,7 +133,7 @@ typedef struct TestSuite {
 /** @} */
 
 /**
- * @name Unit Test Functions
+ * @name Public Functions
  * @{
  */
 
