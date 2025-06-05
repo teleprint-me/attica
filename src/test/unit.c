@@ -7,49 +7,56 @@
 #include "core/logger.h"
 #include "test/unit.h"
 
-int test_unit_run(TestContext* context) {
-    if (!context || !context->callback || !context->cases || context->total == 0) {
-        LOG_ERROR("Invalid parameters.");
+int test_group_run(TestGroup* group) {
+    if (!group || !group->name || !group->units || group->count == 0 || !group->run) {
+        LOG_ERROR("Invalid TestGroup parameters.");
         return -1;
     }
 
-    LOG_INFO("[RUN] %s: Number of tests: %zu", context->name, context->total);
+    LOG_INFO("[RUN] %s: Number of tests: %zu", group->name, group->count);
 
     size_t failures = 0;
+    for (size_t i = 0; i < group->count; i++) {
+        int result = 0;
 
-    for (size_t i = 0; i < context->total; i++) {
-        TestCase* test_case = &context->cases[i];
-        test_case->index = i + 1;
+        TestUnit* unit = &group->units[i];
+        unit->index = i + 1;
 
-        if (context->setup) {
-            context->setup(test_case);
+        if (group->before) {
+            result |= group->before(unit);
         }
 
-        int result = context->callback(test_case);
+        result |= group->run(unit);
 
-        if (context->teardown) {
-            context->teardown(test_case);
+        if (group->after) {
+            result |= group->after(unit);
         }
 
         if (result != 0) {
             failures++;
-            LOG_ERROR("[FAIL] %s: Test case %zu failed.", context->name, test_case->index);
+            LOG_ERROR("[FAIL] %s: Test case %zu failed.", group->name, unit->index);
         }
     }
 
-    size_t passed = context->total - failures;
-    LOG_INFO("[RESULT] %s: %zu/%zu tests passed", context->name, passed, context->total);
+    size_t passed = group->count - failures;
+    LOG_INFO("[RESULT] %s: %zu/%zu tests passed", group->name, passed, group->count);
 
     return failures > 0 ? 1 : 0;
 }
 
-int test_suite_run(const char* name, TestSuite suite) {
-    LOG_INFO("[RUN] %s", name);
-    int result = suite();
+int test_suite_run(TestSuite* suite) {
+    if (!suite || !suite->name || !suite->run) {
+        LOG_ERROR("Invalid TestSuite parameters.");
+        return -1;
+    }
+
+    LOG_INFO("[RUN] %s", suite->name);
+
+    int result = suite->run();
     if (result == 0) {
-        LOG_INFO("[PASS] %s", name);
+        LOG_INFO("[PASS] %s", suite->name);
     } else {
-        LOG_ERROR("[FAIL] %s", name);
+        LOG_ERROR("[FAIL] %s", suite->name);
     }
     return result;
 }
