@@ -8,8 +8,8 @@
  * Designed for easy integration into C projects with thread safety via mutexes.
  */
 
-#ifndef CORE_LOGGER_H
-#define CORE_LOGGER_H
+#ifndef DSA_LOGGER_H
+#define DSA_LOGGER_H
 
 #include <stdarg.h>
 #include <stdbool.h>
@@ -152,7 +152,7 @@ bool logger_message(Logger* logger, LogLevel log_level, const char* format, ...)
 #define LOG_DEBUG(format, ...) LOG(&logger_global, LOG_LEVEL_DEBUG, format, ##__VA_ARGS__)
 #define LOG_INFO(format, ...) LOG(&logger_global, LOG_LEVEL_INFO, format, ##__VA_ARGS__)
 #define LOG_WARN(format, ...) LOG(&logger_global, LOG_LEVEL_WARN, format, ##__VA_ARGS__)
-#define LOG_WARNING LOG_WARN // Keep it simple, smartass
+#define LOG_WARNING LOG_WARN // Keep it simple, smart-ass
 #define LOG_ERROR(format, ...) LOG(&logger_global, LOG_LEVEL_ERROR, format, ##__VA_ARGS__)
 
 /** @} */
@@ -183,4 +183,4 @@ void logger_set_global(
     const char* file_path
 );
 
-#endif // CORE_LOGGER_H
+#endif // DSA_LOGGER_H

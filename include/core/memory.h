@@ -11,8 +11,8 @@
  * - Allocate aligned memory blocks with posix_memalign
  */
 
-#ifndef CORE_MEMORY_H
-#define CORE_MEMORY_H
+#ifndef DSA_MEMORY_H
+#define DSA_MEMORY_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -150,4 +150,4 @@ void* memory_aligned_realloc(void* ptr, size_t old_size, size_t new_size, size_t
 }
 #endif // __cplusplus
 
-#endif // CORE_MEMORY_H
+#endif // DSA_MEMORY_H
