@@ -3,6 +3,11 @@
  *
  * @file tests/core/memory.c
  * @brief
+ *
+ * Manual Build:
+ *   gcc -o test_memory \
+ *     -I./include -lpthread \
+ *     src/core/logger.c src/core/memory.c src/test/unit.c tests/core/test_memory.c
  */
 
 #include "core/logger.h"
@@ -83,8 +88,18 @@ int test_group_power_of_two(TestUnit* unit) {
 
 int test_suite_power_of_two(void) {
     TestPowerOfTwo data[] = {
-        {8, true},
-        {7, false},
+        {0, false}, // edge case: zero
+        {1, true}, // 2^0
+        {2, true}, // 2^1
+        {3, false}, // in-between
+        {4, true}, // 2^2
+        {7, false}, // just before 2^3
+        {8, true}, // 2^3
+        {15, false}, // just before 2^4
+        {16, true}, // 2^4
+        {1024, true}, // big
+        {1023, false}, // just before big
+        {UINTPTR_MAX, false}, // very large non-power-of-two
     };
 
     size_t count = sizeof(data) / sizeof(TestPowerOfTwo);
@@ -103,10 +118,66 @@ int test_suite_power_of_two(void) {
     return test_group_run(&group);
 }
 
+typedef struct TestIsAligned {
+    uintptr_t x;
+    uintptr_t alignment;
+    bool expected;
+} TestIsAligned;
+
+int test_group_is_aligned(TestUnit* unit) {
+    TestIsAligned* data = (TestIsAligned*) unit->data;
+
+    bool result = memory_is_aligned(data->x, data->alignment);
+
+    ASSERT(
+        result == data->expected,
+        "[TestIsAligned] input=%p align=%zu expected=%d got=%d",
+        (void*)data->x,
+        data->alignment,
+        data->expected,
+        result
+    );
+
+    return 0;
+}
+
+int test_suite_is_aligned(void) {
+    TestIsAligned data[] = {
+        {0x00, 8, true},
+        {0x08, 8, true},
+        {0x09, 8, false},
+        {0x10, 8, true},
+        {0x11, 8, false},
+        {0x20, 16, true},
+        {0x23, 16, false},
+        {0x40, 64, true},
+        {0x41, 64, false},
+        {0xFF, 1, true}, // all addresses aligned to 1
+        {0x1000, 4096, true},
+        {0x1001, 4096, false},
+    };
+
+    size_t count = sizeof(data) / sizeof(TestIsAligned);
+    TestUnit units[count];
+    for (size_t i = 0; i < count; i++) {
+        units[i].data = &data[i];
+    }
+
+    TestGroup group = {
+        .name = "[TestGroup] Memory Is Aligned",
+        .count = count,
+        .units = units,
+        .run = test_group_is_aligned,
+    };
+
+    return test_group_run(&group);
+}
+
 int main(void) {
     TestSuite suites[] = {
         {"[TestSuite] Memory Bitwise Offset", test_suite_bitwise_offset},
         {"[TestSuite] Memory Power of Two", test_suite_power_of_two},
+        {"[TestSuite] Memory Is Aligned", test_suite_is_aligned},
     };
 
     int result = 0;
