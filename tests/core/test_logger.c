@@ -335,10 +335,10 @@ int test_logger_lazy_suite(void) {
 
 int main(void) {
     TestSuite suites[] = {
-        {"Log Level Suite", test_suite_log_level},
-        {"Log File Suite", test_suite_log_file},
-        {"Global Logger Suite", test_suite_global_logger},
-        {"Lazy Logger Suite", test_logger_lazy_suite},
+        {"Test Log Level Suite", test_suite_log_level},
+        {"Test Log File Suite", test_suite_log_file},
+        {"Test Global Logger Suite", test_suite_global_logger},
+        {"Test Lazy Logger Suite", test_logger_lazy_suite},
     };
 
     int result = 0;
