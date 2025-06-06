@@ -22,6 +22,8 @@ extern "C" {
  * @brief Generic doubly-linked node for container data structures.
  *
  * The index field is optional and may be ignored or managed by the integrator.
+ * 
+ * @note Users own the object and are responsible for cleanup.
  */
 typedef struct ContainerNode {
     size_t index; /**< (Optional) Index of the node in the container. */
