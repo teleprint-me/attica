@@ -35,7 +35,7 @@ void container_queue_enqueue(ContainerQueue* queue, void* data);
 void* container_queue_dequeue(ContainerQueue* queue);
 
 /**
- * @brief View the front element without removing it.
+ * @brief View the last enqueued element without removing it.
  */
 void* container_queue_peek(const ContainerQueue* queue);
 
