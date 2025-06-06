@@ -9,39 +9,35 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif // __cplusplus
+#endif
 
 #include <stddef.h>
 
 /**
- * @name Node Structures
+ * @name Container Structures
  * @{
  */
 
 /**
- * @brief A point on a stem at which a leaf or leaves are inserted
+ * @brief Generic doubly-linked node for container data structures.
  *
- * @param object Generic pointer to hold any type of object
- * @param next Pointer to the next node
- * @param prev Pointer to the previous node
+ * The index field is optional and may be ignored or managed by the integrator.
  */
 typedef struct ContainerNode {
-    void* object; // Generic pointer to hold any type of object
-    struct ContainerNode* next; // Pointer to the next node
-    struct ContainerNode* prev; // Pointer to the previous node
+    size_t index; /**< (Optional) Index of the node in the container. */
+    void* object; /**< Pointer to user data. */
+    struct ContainerNode* next; /**< Next node in the container. */
+    struct ContainerNode* prev; /**< Previous node in the container. */
 } ContainerNode;
 
 /**
- * @brief A simple, common, container data structure.
- * 
- * @param size The number of elements in the container.
- * @param node Pointer to the first node in the container.
- * 
- * @note This structure may be substituted with other container types as needed.
+ * @brief Basic container header for collections.
+ *
+ * May be used for linked lists, queues, stacks, etc.
  */
 typedef struct Container {
-    size_t size;
-    ContainerNode* node;
+    size_t size; /**< Number of elements. */
+    ContainerNode* node; /**< Head node (may be NULL). */
 } Container;
 
 /**
@@ -49,17 +45,21 @@ typedef struct Container {
  */
 
 /**
- * @name Node Functions
- * @{
+ * @name Container Functions
  */
 
 /**
- * @brief Function to create a new node.
+ * @brief Allocates and initializes a new node with the given object pointer.
+ *
+ * @param object Pointer to user data to store in the node.
+ * @return Pointer to new node, or NULL on failure.
  */
 ContainerNode* container_node_create(void* object);
 
 /**
- * @brief Function to free a node.
+ * @brief Frees a node. Does not free the contained object.
+ *
+ * @param node Pointer to the node to free.
  */
 void container_node_free(ContainerNode* node);
 
@@ -69,6 +69,6 @@ void container_node_free(ContainerNode* node);
 
 #ifdef __cplusplus
 }
-#endif // __cplusplus
+#endif
 
 #endif // DSA_CONTAINER_NODE_H
