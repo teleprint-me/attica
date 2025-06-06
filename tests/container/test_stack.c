@@ -89,7 +89,7 @@ int test_suite_each_container_stack(void) {
 
 /**
  * Test stack as a shared group.
- * 
+ *
  * Note: This group shares a single stack instance across all tests to
  * simulate real-world batch usage and validate LIFO sequence. Do not
  * assume tests are independent!
@@ -106,8 +106,7 @@ int test_group_stack_setup(TestGroup* group) {
         d->stack = stack;
     }
 
-    // Optionally, pre-populate with initial values
-    // If you want each test to pop in order, push all test values here
+    // Pre-populate with initial values
     for (size_t i = 0; i < group->count; i++) {
         TestContainerStack* d = (TestContainerStack*) group->units[i].data;
         container_stack_push(stack, &d->value);
@@ -146,9 +145,9 @@ int test_group_all_container_stack(TestUnit* unit) {
 
 int test_suite_all_container_stack(void) {
     TestContainerStack data[] = {
-        {.value = 1, .expected = 1},
+        {.value = 1, .expected = 42},
         {.value = -2, .expected = -2},
-        {.value = 42, .expected = 42},
+        {.value = 42, .expected = 1},
     };
 
     size_t count = sizeof(data) / sizeof(TestContainerStack);
