@@ -8,8 +8,8 @@
  * with flexible test logic and callback hooks.
  */
 
-#ifndef TEST_UNIT_H
-#define TEST_UNIT_H
+#ifndef DSA_TEST_UNIT_H
+#define DSA_TEST_UNIT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -165,4 +165,4 @@ int test_suite_run(TestSuite* suite);
 }
 #endif // __cplusplus
 
-#endif // TEST_UNIT_H
+#endif // DSA_TEST_UNIT_H
