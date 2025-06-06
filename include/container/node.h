@@ -11,6 +11,8 @@
 extern "C" {
 #endif // __cplusplus
 
+#include <stddef.h>
+
 /**
  * @name Node Structures
  * @{
@@ -28,6 +30,19 @@ typedef struct ContainerNode {
     struct ContainerNode* next; // Pointer to the next node
     struct ContainerNode* prev; // Pointer to the previous node
 } ContainerNode;
+
+/**
+ * @brief A simple, common, container data structure.
+ * 
+ * @param size The number of elements in the container.
+ * @param node Pointer to the first node in the container.
+ * 
+ * @note This structure may be substituted with other container types as needed.
+ */
+typedef struct Container {
+    size_t size;
+    ContainerNode* node;
+} Container;
 
 /**
  * @}
