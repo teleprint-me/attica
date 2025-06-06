@@ -59,6 +59,7 @@
     "string_view": "c",
     "ranges": "c",
     "span": "c",
-    "memory.h": "c"
+    "memory.h": "c",
+    "node.h": "c"
   }
 }
