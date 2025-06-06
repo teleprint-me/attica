@@ -10,6 +10,7 @@
  * easily integrated into existing C projects.
  */
 
+#include "core/memory.h"
 #include "core/logger.h"
 
 const char* LOG_TYPE_NAME[] = {"unknown", "stream", "file"};
@@ -94,7 +95,7 @@ bool logger_set_file_path_and_stream(Logger* logger, const char* file_path) {
  */
 Logger* logger_new(LogType log_type) {
     // Allocate memory for the logger instance
-    Logger* logger = (Logger*) malloc(sizeof(Logger));
+    Logger* logger = (Logger*) memory_aligned_alloc(sizeof(Logger), alignof(Logger));
 
     // Check if memory allocation was successful
     if (NULL == logger) {
@@ -108,7 +109,7 @@ Logger* logger_new(LogType log_type) {
     // Set logger type and name
     if (!logger_set_type_and_name(logger, log_type)) {
         fprintf(stderr, "Failed to initialize logger with type: %d\n", log_type);
-        free(logger); // Clean up allocated memory to avoid memory leaks
+        memory_aligned_free(logger); // Clean up allocated memory to avoid memory leaks
         return NULL;
     }
 
@@ -119,7 +120,7 @@ Logger* logger_new(LogType log_type) {
     int error_code = pthread_mutex_init(&logger->thread_lock, NULL);
     if (0 != error_code) {
         fprintf(stderr, "Failed to initialize mutex with error: %d\n", error_code);
-        free(logger); // Clean up allocated memory to avoid memory leaks
+        memory_aligned_free(logger); // Clean up allocated memory to avoid memory leaks
         return NULL;
     }
 
@@ -190,7 +191,7 @@ bool logger_free(Logger* logger) {
     }
 
     // Close the log file if it's a file logger
-    if (LOG_TYPE_FILE == logger->log_type && NULL != logger->file_stream) {
+    if (logger->file_stream && LOG_TYPE_FILE == logger->log_type) {
         if (fclose(logger->file_stream) != 0) {
             fprintf(stderr, "Failed to close log file: %s\n", logger->file_path);
             return false; // return false to prevent dangling pointers
@@ -205,7 +206,7 @@ bool logger_free(Logger* logger) {
     }
 
     // Free memory for the logger instance
-    free(logger);
+    memory_aligned_free(logger);
     return true;
 }
 
