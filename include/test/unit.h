@@ -80,19 +80,27 @@ typedef struct TestSuite TestSuite;
  */
 
 /**
- * @brief Pointer type for group test functions.
+ * @brief Function pointer for individual unit tests.
  *
- * Functions implementing a logical unit test should take a pointer to a
- * TestUnit and return 0 for success, non-zero for failure.
+ * Functions implementing a logical unit test should take a pointer to a TestUnitHook
+ * and return 0 for success, non-zero for failure.
  */
-typedef int (*TestHook)(TestUnit* unit);
+typedef int (*TestUnitHook)(TestUnit* unit);
+
+/**
+ * @brief Function pointer for group-level setup/teardown hooks.
+ *
+ * Called before or after all unit tests in the group, with the group as context.
+ * Returns 0 on success, non-zero on failure.
+ */
+typedef int (*TestGroupHook)(TestGroup* group);
 
 /**
  * @brief Pointer type for suite test functions.
  *
  * Test suites run a series of tests and return 0 on success, non-zero otherwise.
  */
-typedef int (*TestFunction)(void);
+typedef int (*TestSuiteHook)(void);
 
 /** @} */
 
@@ -114,12 +122,14 @@ typedef struct TestUnit {
  * @brief Context for running a group of tests.
  */
 typedef struct TestGroup {
-    const char* name; /**< Name of the unit test group. */
-    size_t count; /**< Number of unit tests in the group. */
-    TestUnit* units; /**< Array of unit tests to run. */
-    TestHook run; /**<  Hook for running unit tests. */
-    TestHook before; /**< (Optional) Hook to execute before unit tests. */
-    TestHook after; /**< (Optional) Hook to execute after unit tests. */
+    const char* name; /**< Group name. */
+    size_t count; /**< Number of unit tests. */
+    TestUnit* units; /**< Array of unit tests. */
+    TestUnitHook run; /**< Hook to run a single test. */
+    TestUnitHook before_each; /**< Hook to run before each test. */
+    TestUnitHook after_each; /**< Hook to run after each test. */
+    TestGroupHook before_all; /**< Hook to run before all tests. */
+    TestGroupHook after_all; /**< Hook to run after all tests. */
 } TestGroup;
 
 /**
@@ -127,7 +137,7 @@ typedef struct TestGroup {
  */
 typedef struct TestSuite {
     const char* name; /**< Name of the test suite. */
-    TestFunction run; /**< Function to run the test suite. */
+    TestSuiteHook run; /**< Function to run the test suite. */
 } TestSuite;
 
 /** @} */
@@ -140,7 +150,7 @@ typedef struct TestSuite {
 /**
  * @brief Runs a group of unit tests.
  *
- * Executes the provided TestHook function on each TestUnit.
+ * Executes the provided TestUnitHook function on each TestUnit.
  * Optionally invokes a callback before and or after each test.
  * Logs results and returns 0 if all tests pass, 1 otherwise.
  *
