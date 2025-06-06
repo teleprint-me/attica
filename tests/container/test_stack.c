@@ -12,18 +12,45 @@ typedef struct TestContainerStack {
     ContainerStack* stack;
 } TestContainerStack;
 
-int test_stack_setup(TestUnit* unit) {
+int test_unit_stack_setup(TestUnit* unit) {
     TestContainerStack* d = (TestContainerStack*)unit->data;
     d->stack = container_stack_create();
-    ASSERT(container_stack_push(d->stack, &(d->value)), "Failed to push value: %d", d);
-    ASSERT(d->stack != NULL, "Failed to create stack");
+    ASSERT(NULL != d->stack, "Failed to create stack");
     return 0;
 }
 
-int test_stack_teardown(TestUnit* unit) {
+int test_unit_stack_teardown(TestUnit* unit) {
     TestContainerStack* d = (TestContainerStack*)unit->data;
     ASSERT(d->stack, "Stack is not initialized");
     container_stack_free(d->stack);
+    d->stack = NULL;
+    return 0;
+}
+
+int test_group_stack_setup(TestGroup* group) {
+    // Allocate a single shared stack
+    ContainerStack *stack = container_stack_create();
+    ASSERT(stack != NULL, "Failed to create stack");
+
+    // Attach it to each test unit's data for easy access
+    for (size_t i = 0; i < group->count; i++) {
+        TestContainerStack* d = (TestContainerStack*)group->units[i].data;
+        d->stack = stack;
+    }
+
+    // Optionally, pre-populate with initial values
+    // If you want each test to pop in order, push all test values here
+    for (size_t i = 0; i < group->count; i++) {
+        TestContainerStack* d = (TestContainerStack*)group->units[i].data;
+        container_stack_push(stack, &d->value);
+    }
+    return 0;
+}
+
+int test_group_stack_teardown(TestGroup* group) {
+    // Only need to free once
+    TestContainerStack* first = (TestContainerStack*)group->units[0].data;
+    container_stack_free(first->stack);
     return 0;
 }
 
@@ -66,8 +93,10 @@ int test_suite_container_stack(void) {
         .count = count,
         .units = units,
         .run = test_group_container_stack,
-        .before = test_stack_setup,
-        .after = test_stack_teardown,
+        .before_each = NULL,
+        .after_each = NULL,
+        .before_all = test_group_stack_setup,
+        .after_all = test_group_stack_teardown,
     };
 
     return test_group_run(&group);
