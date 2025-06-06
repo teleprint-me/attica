@@ -75,5 +75,5 @@ git submodule update --remote dsa
 
 ## 🪪 License
 
-This project is licensed under the **AGPL License**. See the [LICENSE](LICENSE)
+This project is licensed under the **LGPL License**. See the [LICENSE](LICENSE)
 file for details.
