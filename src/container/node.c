@@ -28,5 +28,5 @@ void container_node_free(ContainerNode* node) {
     if (NULL == node) {
         return;
     }
-    free(node);
+    memory_aligned_free(node);
 }

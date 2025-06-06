@@ -144,6 +144,15 @@ void* memory_aligned_calloc(size_t n, size_t size, size_t alignment);
  */
 void* memory_aligned_realloc(void* ptr, size_t old_size, size_t new_size, size_t alignment);
 
+/**
+ * @brief Frees aligned memory.
+ *
+ * This function is equivalent to free, but works with aligned memory.
+ * 
+ * @param ptr Pointer to the memory block.
+ */
+void memory_aligned_free(void* ptr);
+
 /** @} */
 
 #ifdef __cplusplus

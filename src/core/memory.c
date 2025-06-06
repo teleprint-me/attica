@@ -99,3 +99,9 @@ void* memory_aligned_realloc(void* ptr, size_t old_size, size_t new_size, size_t
     free(ptr);
     return new_ptr;
 }
+
+void memory_aligned_free(void* ptr) {
+    if (ptr) {
+        free(ptr);
+    }
+}
