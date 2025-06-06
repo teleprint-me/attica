@@ -3,6 +3,7 @@
 # Define test units
 set(TEST_UNITS
     "test_node"
+    "test_stack"
 )
 
 set(INPUT_DIR ${PROJECT_SOURCE_DIR}/tests/container)
