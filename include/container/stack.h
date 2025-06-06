@@ -4,8 +4,8 @@
  * @file include/container/stack.h
  */
 
-#ifndef CONTAINER_STACK_H
-#define CONTAINER_STACK_H
+#ifndef DSA_CONTAINER_STACK_H
+#define DSA_CONTAINER_STACK_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -17,10 +17,7 @@ extern "C" {
 #include <stdint.h>
 #include <stddef.h>
 
-typedef struct ContainerStack {
-    uint32_t size;
-    ContainerNode* node;
-} ContainerStack;
+typedef Container ContainerStack;
 
 ContainerStack* container_stack_create(void);
 void container_stack_free(ContainerStack* stack);
@@ -33,4 +30,4 @@ void* container_stack_peek(const ContainerStack* stack);
 }
 #endif // __cplusplus
 
-#endif // CONTAINER_STACK_H
+#endif // DSA_CONTAINER_STACK_H
