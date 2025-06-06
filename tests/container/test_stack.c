@@ -16,14 +16,14 @@ typedef struct TestContainerStack {
  * Test stack as individual units.
  */
 
-int test_unit_stack_setup(TestUnit* unit) {
+int test_unit_before_each_stack_setup(TestUnit* unit) {
     TestContainerStack* d = (TestContainerStack*) unit->data;
     d->stack = container_stack_create();
     ASSERT(NULL != d->stack, "Failed to create stack");
     return 0;
 }
 
-int test_unit_stack_teardown(TestUnit* unit) {
+int test_unit_after_each_stack_teardown(TestUnit* unit) {
     TestContainerStack* d = (TestContainerStack*) unit->data;
     ASSERT(d->stack, "Stack is not initialized");
     container_stack_free(d->stack);
@@ -31,7 +31,7 @@ int test_unit_stack_teardown(TestUnit* unit) {
     return 0;
 }
 
-int test_group_each_container_stack(TestUnit* unit) {
+int test_unit_run_each_container_stack(TestUnit* unit) {
     TestContainerStack* d = (TestContainerStack*) unit->data;
 
     // Push
@@ -62,7 +62,7 @@ int test_group_each_container_stack(TestUnit* unit) {
     return 0;
 }
 
-int test_suite_each_container_stack(void) {
+int test_suite_run_each_container_stack(void) {
     TestContainerStack data[] = {
         {.value = 1, .expected = 1, .stack = NULL},
         {.value = 2, .expected = 2, .stack = NULL},
@@ -79,9 +79,9 @@ int test_suite_each_container_stack(void) {
         .name = "Container Stack Each",
         .count = count,
         .units = units,
-        .run = test_group_each_container_stack,
-        .before_each = test_unit_stack_setup,
-        .after_each = test_unit_stack_teardown,
+        .run = test_unit_run_each_container_stack,
+        .before_each = test_unit_before_each_stack_setup,
+        .after_each = test_unit_after_each_stack_teardown,
     };
 
     return test_group_run(&group);
@@ -95,7 +95,7 @@ int test_suite_each_container_stack(void) {
  * assume tests are independent!
  */
 
-int test_group_stack_setup(TestGroup* group) {
+int test_group_before_all_stack_setup(TestGroup* group) {
     // Allocate a single shared stack
     ContainerStack* stack = container_stack_create();
     ASSERT(stack != NULL, "Failed to create stack");
@@ -114,14 +114,14 @@ int test_group_stack_setup(TestGroup* group) {
     return 0;
 }
 
-int test_group_stack_teardown(TestGroup* group) {
+int test_group_after_all_stack_teardown(TestGroup* group) {
     // Only need to free once
     TestContainerStack* first = (TestContainerStack*) group->units[0].data;
     container_stack_free(first->stack);
     return 0;
 }
 
-int test_group_all_container_stack(TestUnit* unit) {
+int test_group_run_all_container_stack(TestUnit* unit) {
     TestContainerStack* d = (TestContainerStack*) unit->data;
 
     int* peeked = (int*) container_stack_peek(d->stack);
@@ -143,11 +143,11 @@ int test_group_all_container_stack(TestUnit* unit) {
     return 0;
 }
 
-int test_suite_all_container_stack(void) {
+int test_suite_run_all_container_stack(void) {
     TestContainerStack data[] = {
-        {.value = 1, .expected = 42},
-        {.value = -2, .expected = -2},
-        {.value = 42, .expected = 1},
+        {.value = 1, .expected = 42}, // Last In, First Out (LIFO)
+        {.value = -2, .expected = -2}, // Center value is the same
+        {.value = 42, .expected = 1}, // First value out is last in
     };
 
     size_t count = sizeof(data) / sizeof(TestContainerStack);
@@ -160,9 +160,9 @@ int test_suite_all_container_stack(void) {
         .name = "Container Stack All",
         .count = count,
         .units = units,
-        .run = test_group_all_container_stack,
-        .before_all = test_group_stack_setup,
-        .after_all = test_group_stack_teardown,
+        .run = test_group_run_all_container_stack,
+        .before_all = test_group_before_all_stack_setup,
+        .after_all = test_group_after_all_stack_teardown,
     };
 
     return test_group_run(&group);
@@ -170,8 +170,8 @@ int test_suite_all_container_stack(void) {
 
 int main(void) {
     TestSuite suites[] = {
-        {"Container Stack Each", test_suite_each_container_stack},
-        {"Container Stack All", test_suite_all_container_stack}, // <-- FIXED NAME
+        {"Container Stack Each", test_suite_run_each_container_stack},
+        {"Container Stack All", test_suite_run_all_container_stack},
     };
 
     int result = 0;
