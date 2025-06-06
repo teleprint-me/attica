@@ -58,8 +58,8 @@ int test_suite_container_node(void) {
         .count = count,
         .units = units,
         .run = test_group_container_node,
-        .before = test_group_node_setup,
-        .after = test_group_node_teardown,
+        .before_each = test_group_node_setup,
+        .after_each = test_group_node_teardown,
     };
 
     return test_group_run(&group);
