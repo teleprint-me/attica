@@ -60,6 +60,7 @@
     "ranges": "c",
     "span": "c",
     "memory.h": "c",
-    "node.h": "c"
+    "node.h": "c",
+    "logger.h": "c"
   }
 }
