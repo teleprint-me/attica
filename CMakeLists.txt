@@ -73,7 +73,7 @@ enable_testing()
 add_subdirectory(tests)
 
 # Custom doc target for generating docs
-add_custom_target(doc
+add_custom_target(run_doxy
     COMMAND doxygen ${CMAKE_SOURCE_DIR}/doxy.conf
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     COMMENT "Generating API documentation with Doxygen"
