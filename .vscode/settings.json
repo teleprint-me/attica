@@ -1,5 +1,6 @@
 {
   "window.zoomLevel": 0,
+  "extensions.ignoreRecommendations": false,
   "editor.defaultFormatter": null,
   "editor.stickyTabStops": true,
   "editor.tabCompletion": "on",
