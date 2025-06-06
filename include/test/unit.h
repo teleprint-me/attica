@@ -96,7 +96,7 @@ typedef int (*TestUnitHook)(TestUnit* unit);
 typedef int (*TestGroupHook)(TestGroup* group);
 
 /**
- * @brief Pointer type for suite test functions.
+ * @brief Function pointer for suite-level test functions.
  *
  * Test suites run a series of tests and return 0 on success, non-zero otherwise.
  */
