@@ -310,7 +310,7 @@ int test_group_lazy_logger(TestUnit* unit) {
     return 0;
 }
 
-int test_logger_lazy_suite(void) {
+int test_suite_logger_lazy(void) {
     TestLazyLogger data[] = {
         {LOG_LEVEL_DEBUG, LOG_LEVEL_DEBUG, "Lazy logger debug", true},
         {LOG_LEVEL_DEBUG, LOG_LEVEL_ERROR, "Lazy logger error", true},
@@ -338,7 +338,7 @@ int main(void) {
         {"Log Level", test_suite_log_level},
         {"Log File", test_suite_log_file},
         {"Global Logger", test_suite_global_logger},
-        {"Lazy Logger", test_logger_lazy_suite},
+        {"Lazy Logger", test_suite_logger_lazy},
     };
 
     int result = 0;
