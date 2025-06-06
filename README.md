@@ -1,9 +1,7 @@
-# Data Structures and Algorithms
+# Data Structures and Algorithms written in pure C
 
-**Data Structures and Algorithms in Pure C**
-
-A collection of portable C libraries for foundational algorithms and data
-structures, designed for real-world systems programming and experimentation.
+A portable collection of foundational C libraries for algorithms and data
+structures, built for systems programming and real-world experimentation.
 
 ## 🗃️ Dependencies
 
@@ -16,7 +14,7 @@ structures, designed for real-world systems programming and experimentation.
 > **Note:**
 >
 > - POSIX compliance required.
-> - **Officially supported on Arch Linux.** 
+> - **Officially supported on Arch Linux.**
 >   _Other Linux distros may work, but are not guaranteed._
 > - Windows users: Use WSL for full compatibility.
 > - Mac OS X and BSD are _not_ supported at this time.
