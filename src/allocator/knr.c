@@ -6,6 +6,7 @@
  */
 
 #include "core/memory.h"
+#include "core/logger.h"
 #include "allocator/knr.h"
 
 #include <stdint.h>
@@ -17,6 +18,8 @@
  * Heap Configuration
  */
 
+// Fixed array of 65536 units, each 16 bytes, for a total of 1 MB.
+// Each allocation also needs at least one header unit.
 static max_align_t buffer[HEAP_WORDS];
 
 /**
@@ -121,7 +124,11 @@ static FreeList* allocator_freelist_heap_bump(size_t nunits) {
  */
 void* allocator_freelist_malloc(size_t size) {
     uintptr_t payload_size = memory_aligned_size(size, MEMORY_ALIGNMENT);
-    size_t nunits = (payload_size + HEADER_SIZE - 1) / HEADER_SIZE + 1;
+    size_t nunits = (size + HEADER_SIZE - 1) / HEADER_SIZE + 1;
+
+    LOG_DEBUG("size=%zu", size);
+    LOG_DEBUG("payload_size=%zu", payload_size);
+    LOG_DEBUG("nunits=%zu", nunits);
 
     if (NULL == freelist) {
         allocator_freelist_init();
@@ -165,6 +172,21 @@ void allocator_freelist_free(void* ptr) {
         return;
     }
     allocator_freelist_insert(ptr);
+}
+
+/**
+ * @brief Returns the maximum 'size' parameter for which 
+ *        allocator_freelist_malloc(size) will succeed.
+ */
+size_t allocator_freelist_max_alloc(void) {
+    size_t units = HEAP_WORDS;
+    if (units <= 1) return 0;
+    // Each allocation needs at least one header unit
+    size_t max_payload_units = units - 1;
+    size_t max_payload_bytes = max_payload_units * sizeof(FreeList);
+    // But this must be alignment-safe: round down to nearest multiple of MEMORY_ALIGNMENT
+    max_payload_bytes = max_payload_bytes - (max_payload_bytes % MEMORY_ALIGNMENT);
+    return max_payload_bytes;
 }
 
 /**

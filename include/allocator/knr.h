@@ -14,8 +14,8 @@
  * Heap Configuration
  */
 
-#define HEAP_BYTES (1024 * 1024)
-#define HEAP_WORDS (HEAP_BYTES / MEMORY_ALIGNMENT)
+#define HEAP_BYTES (1024 * 1024) // 1048576 bytes
+#define HEAP_WORDS (HEAP_BYTES / MEMORY_ALIGNMENT) // 65536 units (if 16-byte alignment)
 
 /**
  * Heap Definition
@@ -47,6 +47,7 @@ typedef union FreeList {
 
 void* allocator_freelist_malloc(size_t size);
 void allocator_freelist_free(void* ptr);
+size_t allocator_freelist_max_alloc(void);
 void allocator_freelist_dump(void);
 
 #endif // DSA_ALLOCATOR_KNR_H
