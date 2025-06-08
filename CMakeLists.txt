@@ -41,8 +41,8 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 # Add library
 add_library(dsa SHARED
-    "src/core/logger.c"
     "src/core/memory.c"
+    "src/core/logger.c"
 
     "src/test/unit.c"
 
