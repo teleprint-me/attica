@@ -6,7 +6,6 @@
  */
 
 #include "core/memory.h"
-#include "core/logger.h"
 #include "allocator/knr.h"
 
 #include <stdint.h>
@@ -126,10 +125,7 @@ void* allocator_freelist_malloc(size_t size) {
     uintptr_t payload_size = memory_aligned_size(size, MEMORY_ALIGNMENT);
     size_t nunits = (payload_size + HEADER_SIZE - 1) / HEADER_SIZE + 1;
 
-    LOG_DEBUG("size=%zu", size);
-    LOG_DEBUG("payload_size=%zu", payload_size);
-    LOG_DEBUG("nunits=%zu", nunits);
-
+    /// @warning Hard limit: never allocate more than arena can hold
     if (nunits > HEAP_WORDS) {
         return NULL;
     }
