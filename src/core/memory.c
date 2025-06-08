@@ -21,7 +21,7 @@ uintptr_t memory_bitwise_offset(uintptr_t x, uintptr_t y) {
 }
 
 bool memory_is_power_of_two(uintptr_t x) {
-    return x != 0 && memory_bitwise_offset(x, x) == 0;
+    return (x != 0) && ((x & (x - 1)) == 0);
 }
 
 bool memory_is_aligned(uintptr_t x, uintptr_t alignment) {

@@ -32,9 +32,9 @@ extern "C" {
 #endif
 
 /**
- * @brief Default memory alignment (8 bytes).
+ * @brief Default memory alignment.
  */
-#define MEMORY_ALIGNMENT (sizeof(max_align_t))
+#define MEMORY_ALIGNMENT (alignof(max_align_t))
 
 /**
  * @name Alignment Utilities
