@@ -31,16 +31,9 @@ typedef struct Heap {
  * FreeList Block
  */
 
-typedef union FreeList FreeList; /** Forward declaration for Node */
-
-typedef struct Node {
-    FreeList* next; /* next block if on free list */
+typedef struct FreeList {
+    struct FreeList* next; /* next block if on free list */
     size_t size; /* size of this block */
-} Node;
-
-typedef union FreeList {
-    Node node; /** block header */
-    size_t alignment; /* force alignment of blocks */
 } FreeList;
 
 #define HEADER_SIZE sizeof(FreeList)

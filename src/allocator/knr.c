@@ -44,23 +44,23 @@ static FreeList* freelist = NULL; /* start of free list (head) */
  */
 
 static void allocator_freelist_init(void) {
-    base.node.next = &base;
-    base.node.size = 0;
+    base.next = &base;
+    base.size = 0;
     freelist = &base;
 }
 
 static bool coalesce_adjacent_neighbor(FreeList* a, FreeList* b) {
-    return a + a->node.size == b;
+    return a + a->size == b;
 }
 
 static void merge_with_upper_neighbor(FreeList* a, FreeList* b) {
-    a->node.size += b->node.next->node.size;
-    a->node.next = b->node.next->node.next;
+    a->size += b->next->size;
+    a->next = b->next->next;
 }
 
 static void merge_with_lower_neighbor(FreeList* a, FreeList* b) {
-    a->node.size += b->node.size;
-    a->node.next = b->node.next;
+    a->size += b->size;
+    a->next = b->next;
 }
 
 /**
@@ -71,27 +71,27 @@ static void allocator_freelist_insert(void* ptr) {
     FreeList* current = freelist;
 
     // Find insert point
-    while (!(block > current && block < current->node.next)) {
+    while (!(block > current && block < current->next)) {
         // Special case: At the start or end of circular list
-        if (((current >= current->node.next) && (block > current)) || block < current->node.next) {
+        if (((current >= current->next) && (block > current)) || block < current->next) {
             break;
         }
         // Update the current pointer
-        current = current->node.next;
+        current = current->next;
     }
 
     // Try to merge with upper neighbor
-    if (coalesce_adjacent_neighbor(block, current->node.next)) {
+    if (coalesce_adjacent_neighbor(block, current->next)) {
         merge_with_upper_neighbor(block, current);
     } else {
-        block->node.next = current->node.next;
+        block->next = current->next;
     }
 
     // Try to merge with lower neighbor
     if (coalesce_adjacent_neighbor(current, block)) {
         merge_with_lower_neighbor(current, block);
     } else {
-        current->node.next = block;
+        current->next = block;
     }
 
     // Update the free list
@@ -108,7 +108,7 @@ static FreeList* allocator_freelist_heap_bump(size_t nunits) {
     }
 
     FreeList* block = (FreeList*) heap.current;
-    block->node.size = nunits;
+    block->size = nunits;
     heap.current += nbytes;
 
     allocator_freelist_insert(block + 1);
@@ -135,18 +135,18 @@ void* allocator_freelist_malloc(size_t size) {
     }
 
     FreeList* previous = freelist;
-    FreeList* current = freelist->node.next;
+    FreeList* current = freelist->next;
 
     while (true) {
-        if (current->node.size >= nunits) {
-            if (current->node.size == nunits) {
+        if (current->size >= nunits) {
+            if (current->size == nunits) {
                 // Exact fit
-                previous->node.next = current->node.next;
+                previous->next = current->next;
             } else {
                 // Allocate tail end
-                FreeList* alloc = current + current->node.size - nunits;
-                alloc->node.size = nunits;
-                current->node.size -= nunits;
+                FreeList* alloc = current + current->size - nunits;
+                alloc->size = nunits;
+                current->size -= nunits;
                 current = alloc;
             }
             freelist = previous;
@@ -160,7 +160,7 @@ void* allocator_freelist_malloc(size_t size) {
         }
 
         previous = current;
-        current = current->node.next;
+        current = current->next;
     }
 }
 
@@ -199,9 +199,9 @@ void allocator_freelist_dump(void) {
         printf(
             "  Block at %p, size: %zu (%zu bytes)\n",
             (void*) current,
-            current->node.size,
-            current->node.size * sizeof(FreeList)
+            current->size,
+            current->size * sizeof(FreeList)
         );
-        current = current->node.next;
+        current = current->next;
     } while (current != freelist);
 }
