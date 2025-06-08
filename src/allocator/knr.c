@@ -19,7 +19,7 @@
 
 #define HEAP_BYTES (1024 * 1024)
 #define HEAP_WORDS (HEAP_BYTES / MEMORY_ALIGNMENT)
-static uintptr_t buffer[HEAP_WORDS];
+static max_align_t buffer[HEAP_WORDS];
 
 /**
  * Heap Definition
@@ -32,9 +32,9 @@ typedef struct Heap {
 } Heap;
 
 static Heap heap = {
-    .base = buffer,
-    .end = buffer + sizeof(buffer),
-    .current = buffer,
+    .base = (uintptr_t) buffer,
+    .end = (uintptr_t) buffer + sizeof(buffer),
+    .current = (uintptr_t) buffer,
 };
 
 /**
@@ -96,7 +96,7 @@ static void allocator_freelist_insert(void* ptr) {
     // Find insert point
     while (!(block > current && block < current->node.next)) {
         // Special case: At the start or end of circular list
-        if (current >= current->node.next && block > current || block < current->node.next) {
+        if (((current >= current->node.next) && (block > current)) || block < current->node.next) {
             break;
         }
         // Update the current pointer
