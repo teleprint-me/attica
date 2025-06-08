@@ -34,7 +34,7 @@ extern "C" {
 /**
  * @brief Default memory alignment (8 bytes).
  */
-#define MEMORY_ALIGNMENT 8
+#define MEMORY_ALIGNMENT (sizeof(max_align_t))
 
 /**
  * @name Alignment Utilities
