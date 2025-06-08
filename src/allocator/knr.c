@@ -17,43 +17,17 @@
  * Heap Configuration
  */
 
-#define HEAP_BYTES (1024 * 1024)
-#define HEAP_WORDS (HEAP_BYTES / MEMORY_ALIGNMENT)
 static max_align_t buffer[HEAP_WORDS];
 
 /**
  * Heap Definition
  */
 
-typedef struct Heap {
-    uintptr_t base; /** Base of the heap */
-    uintptr_t end; /** End of the heap */
-    uintptr_t current; /** Current position in the heap */
-} Heap;
-
 static Heap heap = {
     .base = (uintptr_t) buffer,
     .end = (uintptr_t) buffer + sizeof(buffer),
     .current = (uintptr_t) buffer,
 };
-
-/**
- * FreeList Block
- */
-
-typedef union FreeList FreeList; /** Forward declaration for Node */
-
-typedef struct Node {
-    FreeList* next; /* next block if on free list */
-    size_t size; /* size of this block */
-} Node;
-
-typedef union FreeList {
-    Node node; /** block header */
-    size_t alignment; /* force alignment of blocks */
-} FreeList;
-
-#define HEADER_SIZE sizeof(FreeList)
 
 /**
  * Global Freelist Sentinel
@@ -200,7 +174,12 @@ void allocator_freelist_dump(void) {
     FreeList* current = freelist;
     printf("FreeList:\n");
     do {
-        printf("  Block at %p, size: %zu\n", (void*) current, current->node.size);
+        printf(
+            "  Block at %p, size: %zu (%zu bytes)\n",
+            (void*) current,
+            current->node.size,
+            current->node.size * sizeof(FreeList)
+        );
         current = current->node.next;
     } while (current != freelist);
 }
