@@ -10,6 +10,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 /**
  * Configuration
@@ -54,12 +55,18 @@ typedef union FreeList {
  * Global Freelist Sentinel
  */
 
-static FreeList base; /** sentinel value */
+static FreeList base = {0}; /** sentinel value */
 static FreeList* freelist = NULL; /* start of free list (head) */
 
 /**
  * Private Functions
  */
+
+static void allocator_freelist_init(void) {
+    base.node.next = &base;
+    base.node.size = 0;
+    freelist = &base;
+}
 
 static bool coalesce_adjacent_neighbor(FreeList* a, FreeList* b) {
     return a + a->node.size == b;
@@ -139,11 +146,8 @@ void* allocator_freelist_malloc(size_t size) {
     FreeList* previous = NULL;
     size_t nunits = (size + sizeof(FreeList) - 1) / sizeof(FreeList) + 1;
 
-    // Init freelist if needed
     if (NULL == freelist) {
-        base.node.next = &base;
-        base.node.size = 0;
-        freelist = &base;
+        allocator_freelist_init();
     }
 
     previous = freelist;
@@ -183,4 +187,16 @@ void allocator_freelist_free(void* ptr) {
         return;
     }
     allocator_freelist_insert(ptr);
+}
+
+/**
+ * @brief Dump the contents of the freelist to the console
+ */
+void allocator_freelist_dump(void) {
+    FreeList* current = freelist;
+    printf("FreeList:\n");
+    do {
+        printf("  Block at %p, size: %zu\n", (void*) current, current->node.size);
+        current = current->node.next;
+    } while (current != freelist);
 }
