@@ -124,11 +124,15 @@ static FreeList* allocator_freelist_heap_bump(size_t nunits) {
  */
 void* allocator_freelist_malloc(size_t size) {
     uintptr_t payload_size = memory_aligned_size(size, MEMORY_ALIGNMENT);
-    size_t nunits = (size + HEADER_SIZE - 1) / HEADER_SIZE + 1;
+    size_t nunits = (payload_size + HEADER_SIZE - 1) / HEADER_SIZE + 1;
 
     LOG_DEBUG("size=%zu", size);
     LOG_DEBUG("payload_size=%zu", payload_size);
     LOG_DEBUG("nunits=%zu", nunits);
+
+    if (nunits > HEAP_WORDS) {
+        return NULL;
+    }
 
     if (NULL == freelist) {
         allocator_freelist_init();
