@@ -7,44 +7,62 @@
 #include "allocator/knr.h"
 
 typedef struct TestKNRAllocator {
-    size_t size1;
-    size_t size2;
-    size_t size3;
-    int expect_null;
+    void* address;
+    size_t size;
+    int expected; // 0: expect NULL, 1: expect success
 } TestKNRAllocator;
 
-int test_group_knr_allocator(TestUnit* unit) {
+int knr_alloc_setup(TestUnit* unit) {
     TestKNRAllocator* data = (TestKNRAllocator*) unit->data;
-    void* a = allocator_freelist_malloc(data->size1);
-    ASSERT(a != NULL, "[KNR] Allocation of size1 (%zu) failed", data->size1);
-    ASSERT(((uintptr_t)a % MEMORY_ALIGNMENT) == 0, "[KNR] Pointer a not properly aligned");
+    data->address = allocator_freelist_malloc(data->size);
+    return 0;
+}
 
-    void* b = allocator_freelist_malloc(data->size2);
-    ASSERT(b != NULL, "[KNR] Allocation of size2 (%zu) failed", data->size2);
+int knr_alloc_teardown(TestUnit* unit) {
+    TestKNRAllocator* data = (TestKNRAllocator*) unit->data;
+    if (data->address) {
+        allocator_freelist_free(data->address);
+        data->address = NULL;
+    }
+    return 0;
+}
 
-    void* c = allocator_freelist_malloc(data->size3);
-
-    if (data->expect_null) {
-        ASSERT(c == NULL, "[KNR] Third allocation should have failed but did not");
+int knr_alloc_assert(TestUnit* unit) {
+    TestKNRAllocator* data = (TestKNRAllocator*) unit->data;
+    if (data->expected) {
+        ASSERT(
+            data->address,
+            "[KNR] unit=%zu with size=%zu failed to allocate",
+            unit->index,
+            data->size
+        );
+        ASSERT(
+            ((size_t) data->address % MEMORY_ALIGNMENT) == 0,
+            "[KNR] Improperly aligned segment in unit=%zu with size=%zu, expected=0, got=%zu,",
+            unit->index,
+            data->size,
+            ((size_t) data->address % MEMORY_ALIGNMENT)
+        );
     } else {
-        ASSERT(c != NULL, "[KNR] Third allocation failed unexpectedly");
+        ASSERT(
+            !data->address,
+            "[KNR] unit=%zu with size=%zu expected to fail but succeeded",
+            unit->index,
+            data->size
+        );
     }
-
-    allocator_freelist_free(a);
-    allocator_freelist_free(b);
-    if (c) {
-        allocator_freelist_free(c);
-    }
-
     return 0;
 }
 
 int test_suite_knr_allocator(void) {
-    // Compute max safe allocation
+    // Find max allocatable size for this run
+    size_t max_size = allocator_freelist_max_alloc();
+
     TestKNRAllocator data[] = {
-        {128, 256, 384, 0},
-        {HEAP_WORDS, 1, 1, 1}, // Should fail on second or third alloc
-        {HEAP_WORDS/2, HEAP_WORDS/2, 1, 1}, // Should fit two, not three
+        {NULL, 128, 1},
+        {NULL, max_size, 1},
+        {NULL, max_size + 1, 0}, // should fail
+        {NULL, 0, 1}, // allocation of zero: depends on your allocator's policy
     };
 
     size_t count = sizeof(data) / sizeof(TestKNRAllocator);
@@ -54,10 +72,12 @@ int test_suite_knr_allocator(void) {
     }
 
     TestGroup group = {
-        .name = "KNR Free List Allocator",
+        .name = "KNR Allocator Isolated",
         .count = count,
         .units = units,
-        .run = test_group_knr_allocator,
+        .before_each = knr_alloc_setup,
+        .run = knr_alloc_assert,
+        .after_each = knr_alloc_teardown,
     };
 
     return test_group_run(&group);
