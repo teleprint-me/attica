@@ -6,6 +6,7 @@
  */
 
 #include "core/memory.h"
+#include "allocator/knr.h"
 
 #include <stdint.h>
 #include <stddef.h>
@@ -13,11 +14,12 @@
 #include <stdio.h>
 
 /**
- * Configuration
+ * Heap Configuration
  */
 
-#define HEAP_WORDS (1024 * 1024 / sizeof(size_t)) /** Heap size in words */
-static size_t buffer[HEAP_WORDS]; /** Heap buffer */
+#define HEAP_BYTES (1024 * 1024)
+#define HEAP_WORDS (HEAP_BYTES / MEMORY_ALIGNMENT)
+static uintptr_t buffer[HEAP_WORDS];
 
 /**
  * Heap Definition
@@ -30,13 +32,13 @@ typedef struct Heap {
 } Heap;
 
 static Heap heap = {
-    .base = (uintptr_t) buffer,
-    .end = (uintptr_t) buffer + sizeof(buffer),
-    .current = (uintptr_t) buffer,
+    .base = buffer,
+    .end = buffer + sizeof(buffer),
+    .current = buffer,
 };
 
 /**
- * Block FreeList
+ * FreeList Block
  */
 
 typedef union FreeList FreeList; /** Forward declaration for Node */
@@ -50,6 +52,8 @@ typedef union FreeList {
     Node node; /** block header */
     size_t alignment; /* force alignment of blocks */
 } FreeList;
+
+#define HEADER_SIZE sizeof(FreeList)
 
 /**
  * Global Freelist Sentinel
@@ -121,7 +125,7 @@ static void allocator_freelist_insert(void* ptr) {
  * @brief Allocate raw memory from heap
  */
 static FreeList* allocator_freelist_heap_bump(size_t nunits) {
-    size_t nbytes = nunits * sizeof(FreeList);
+    size_t nbytes = nunits * HEADER_SIZE;
     if (heap.current + nbytes > heap.end) {
         return NULL;
     }
@@ -142,16 +146,16 @@ static FreeList* allocator_freelist_heap_bump(size_t nunits) {
  * @brief Allocate memory block
  */
 void* allocator_freelist_malloc(size_t size) {
-    FreeList* current = NULL;
-    FreeList* previous = NULL;
-    size_t nunits = (size + sizeof(FreeList) - 1) / sizeof(FreeList) + 1;
+    uintptr_t payload_size = memory_aligned_size(size, MEMORY_ALIGNMENT);
+    size_t nunits = (payload_size + HEADER_SIZE - 1) / HEADER_SIZE + 1;
 
     if (NULL == freelist) {
         allocator_freelist_init();
     }
 
-    previous = freelist;
-    current = previous->node.next;
+    FreeList* previous = freelist;
+    FreeList* current = freelist->node.next;
+
     while (true) {
         if (current->node.size >= nunits) {
             if (current->node.size == nunits) {
@@ -168,7 +172,7 @@ void* allocator_freelist_malloc(size_t size) {
             return (void*) (current + 1);
         }
 
-        if (current == freelist) { // possible infinite loop?
+        if (current == freelist) {
             if (NULL == allocator_freelist_heap_bump(nunits)) {
                 return NULL; // Out of memory
             }
