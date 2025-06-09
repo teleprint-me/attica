@@ -3,10 +3,14 @@
  * @brief K&R-style allocator using a static memory arena.
  * @ref K&R C - 8.7: A Storage Allocator
  * @ref https://stackoverflow.com/q/13159564/15147156
+ * @ref https://stackoverflow.com/q/1119134/15147156
  */
 
 #include "core/memory.h"
 #include "allocator/knr.h"
+
+#include <sys/mman.h>
+#include <unistd.h>
 
 #include <stdint.h>
 #include <stddef.h>
@@ -14,22 +18,10 @@
 #include <stdio.h>
 
 /**
- * Heap Configuration
+ * Maximum amount of RAM to allocate (in bytes)
  */
 
-// Fixed array of 65536 units, each 16 bytes, for a total of 1 MB.
-// Each allocation also needs at least one header unit.
-static max_align_t buffer[HEAP_WORDS];
-
-/**
- * Heap Definition
- */
-
-static Heap heap = {
-    .base = (uintptr_t) buffer,
-    .end = (uintptr_t) buffer + sizeof(buffer),
-    .current = (uintptr_t) buffer,
-};
+static size_t MAX_RAM = 0;
 
 /**
  * Global Freelist Sentinel
@@ -42,10 +34,25 @@ static FreeList* freelist = NULL; /* start of free list (head) */
  * Private Functions
  */
 
+static size_t system_max_ram(void) {
+    int64_t pages = sysconf(_SC_PHYS_PAGES);
+    int64_t page_size = sysconf(_SC_PAGE_SIZE);
+    if (pages <= 0 || page_size <= 0) {
+        return (size_t) 1 << 32; // fallback to 4GB if unknown
+    }
+
+    return (size_t) pages * (size_t) page_size;
+}
+
 static void allocator_freelist_init(void) {
-    base.next = &base;
-    base.size = 0;
-    freelist = &base;
+    if (0 == MAX_RAM) {
+        MAX_RAM = system_max_ram();
+    }
+
+    if (NULL == freelist) {
+        base.next = &base;
+        freelist = &base;
+    }
 }
 
 static bool coalesce_adjacent_neighbor(FreeList* a, FreeList* b) {
@@ -102,14 +109,20 @@ static void allocator_freelist_insert(void* ptr) {
  */
 static FreeList* allocator_freelist_heap_bump(size_t nunits) {
     size_t nbytes = nunits * HEADER_SIZE;
-    if (heap.current + nbytes > heap.end) {
+    size_t page_size = (size_t) sysconf(_SC_PAGESIZE);
+
+    // Round up to page size
+    if (0 != nbytes % page_size) {
+        nbytes += page_size - (nbytes % page_size);
+    }
+
+    void* address = mmap(NULL, nbytes, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    if (MAP_FAILED == address) {
         return NULL;
     }
 
-    FreeList* block = (FreeList*) heap.current;
-    block->size = nunits;
-    heap.current += nbytes;
-
+    FreeList* block = (FreeList*) address;
+    block->size = nbytes / HEADER_SIZE;
     allocator_freelist_insert(block + 1);
     return freelist;
 }
@@ -122,17 +135,13 @@ static FreeList* allocator_freelist_heap_bump(size_t nunits) {
  * @brief Allocate memory block
  */
 void* allocator_freelist_malloc(size_t size) {
-    uintptr_t payload_size = memory_aligned_size(size, MEMORY_ALIGNMENT);
-    size_t nunits = (payload_size + HEADER_SIZE - 1) / HEADER_SIZE + 1;
-
-    /// @warning Hard limit: never allocate more than arena can hold
-    if (nunits > HEAP_WORDS) {
+    allocator_freelist_init();
+    if (size == 0 || size > MAX_RAM / 2) {
         return NULL;
     }
 
-    if (NULL == freelist) {
-        allocator_freelist_init();
-    }
+    uintptr_t payload_size = memory_aligned_size(size, MEMORY_ALIGNMENT);
+    size_t nunits = (payload_size + HEADER_SIZE - 1) / HEADER_SIZE + 1;
 
     FreeList* previous = freelist;
     FreeList* current = freelist->next;
@@ -172,21 +181,6 @@ void allocator_freelist_free(void* ptr) {
         return;
     }
     allocator_freelist_insert(ptr);
-}
-
-/**
- * @brief Returns the maximum 'size' parameter for which 
- *        allocator_freelist_malloc(size) will succeed.
- */
-size_t allocator_freelist_max_alloc(void) {
-    size_t units = HEAP_WORDS;
-    if (units <= 1) return 0;
-    // Each allocation needs at least one header unit
-    size_t max_payload_units = units - 1;
-    size_t max_payload_bytes = max_payload_units * sizeof(FreeList);
-    // But this must be alignment-safe: round down to nearest multiple of MEMORY_ALIGNMENT
-    max_payload_bytes = max_payload_bytes - (max_payload_bytes % MEMORY_ALIGNMENT);
-    return max_payload_bytes;
 }
 
 /**

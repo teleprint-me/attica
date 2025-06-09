@@ -6,10 +6,20 @@
 
 #include "allocator/knr.h"
 
+#define ONE_MB (1024 * 1024)
+#define TEN_MB (10 * ONE_MB)
+#define HUNDRED_MB (100 * ONE_MB)
+
+typedef enum TestKNRAllocatorState {
+    KNR_EXPECT_ALLOCATED, // Expect a valid pointer (non-NULL)
+    KNR_EXPECT_UNALLOCATED, // Expect NULL
+    KNR_EXPECT_UNDEFINED // Either is allowed; just record result (policy-defined)
+} TestKNRAllocatorState;
+
 typedef struct TestKNRAllocator {
     void* address;
     size_t size;
-    int expected; // 0: expect NULL, 1: expect success
+    TestKNRAllocatorState state;
 } TestKNRAllocator;
 
 int knr_alloc_setup(TestUnit* unit) {
@@ -29,40 +39,51 @@ int knr_alloc_teardown(TestUnit* unit) {
 
 int knr_alloc_assert(TestUnit* unit) {
     TestKNRAllocator* data = (TestKNRAllocator*) unit->data;
-    if (data->expected) {
-        ASSERT(
-            data->address,
-            "[KNR] unit=%zu with size=%zu failed to allocate",
-            unit->index,
-            data->size
-        );
-        ASSERT(
-            ((size_t) data->address % MEMORY_ALIGNMENT) == 0,
-            "[KNR] Improperly aligned segment in unit=%zu with size=%zu, expected=0, got=%zu,",
-            unit->index,
-            data->size,
-            ((size_t) data->address % MEMORY_ALIGNMENT)
-        );
-    } else {
-        ASSERT(
-            !data->address,
-            "[KNR] unit=%zu with size=%zu expected to fail but succeeded",
-            unit->index,
-            data->size
-        );
+    switch (data->state) {
+        case KNR_EXPECT_ALLOCATED:
+            ASSERT(
+                data->address,
+                "[KNR] unit=%zu with size=%zu: expected allocation, got NULL",
+                unit->index,
+                data->size
+            );
+            ASSERT(
+                ((size_t) data->address % MEMORY_ALIGNMENT) == 0,
+                "[KNR] unit=%zu with size=%zu: allocation not aligned",
+                unit->index,
+                data->size
+            );
+            break;
+        case KNR_EXPECT_UNALLOCATED:
+            ASSERT(
+                !data->address,
+                "[KNR] unit=%zu with size=%zu: expected NULL, got allocation",
+                unit->index,
+                data->size
+            );
+            break;
+        case KNR_EXPECT_UNDEFINED:
+            LOG_WARNING(
+                "[KNR] unit=%zu with size=%zu: undefined behavior, got %p",
+                unit->index,
+                data->size,
+                data->address
+            );
+            break;
+        default:
+            ASSERT(0, "[KNR] Unknown test state for unit=%zu", unit->index);
     }
     return 0;
 }
 
 int test_suite_knr_allocator(void) {
-    // Find max allocatable size for this run
-    size_t max_size = allocator_freelist_max_alloc();
-
     TestKNRAllocator data[] = {
-        {NULL, 128, 1},
-        {NULL, max_size, 1},
-        {NULL, max_size + 1, 0}, // should fail
-        {NULL, 0, 1}, // allocation of zero: depends on your allocator's policy
+        {NULL, 128, KNR_EXPECT_ALLOCATED},
+        {NULL, ONE_MB, KNR_EXPECT_ALLOCATED},
+        {NULL, TEN_MB, KNR_EXPECT_ALLOCATED},
+        {NULL, HUNDRED_MB, KNR_EXPECT_ALLOCATED},
+        {NULL, (size_t)-1, KNR_EXPECT_UNALLOCATED}, // absurd size, should fail
+        {NULL, 0, KNR_EXPECT_UNALLOCATED}, // allocation of zero (policy: returns valid ptr)
     };
 
     size_t count = sizeof(data) / sizeof(TestKNRAllocator);
