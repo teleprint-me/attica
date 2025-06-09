@@ -65,6 +65,7 @@
     "logger.h": "c",
     "list": "c",
     "stddef.h": "c",
-    "stdint.h": "c"
+    "stdint.h": "c",
+    "unistd.h": "c"
   }
 }
