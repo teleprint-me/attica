@@ -34,14 +34,30 @@ static FreeList* freelist = NULL; /* start of free list (head) */
  * Private Functions
  */
 
+/**
+ * @brief Returns the maximum allocatable memory based on system physical RAM,
+ *        minus a fixed 1 GiB reserve to avoid exhausting system resources.
+ *        Fallbacks to 4 GiB if RAM cannot be determined.
+ */
 static size_t system_max_ram(void) {
     int64_t pages = sysconf(_SC_PHYS_PAGES);
     int64_t page_size = sysconf(_SC_PAGE_SIZE);
+
+    size_t max_ram;
     if (pages <= 0 || page_size <= 0) {
-        return (size_t) 1 << 32; // fallback to 4GB if unknown
+        max_ram = DSA_FALLBACK_MAX_RAM;
+    } else {
+        max_ram = (size_t) pages * (size_t) page_size;
     }
 
-    return (size_t) pages * (size_t) page_size;
+    // Never allow to allocate more than (fallback - reserve), but always at least 16 MiB.
+    if (max_ram > DSA_RAM_RESERVE) {
+        max_ram -= DSA_RAM_RESERVE;
+    } else {
+        max_ram = 16 * 1024 * 1024; // fallback minimum, 16 MiB
+    }
+
+    return max_ram;
 }
 
 static void allocator_freelist_init(void) {
@@ -136,7 +152,7 @@ static FreeList* allocator_freelist_heap_bump(size_t nunits) {
  */
 void* allocator_freelist_malloc(size_t size) {
     allocator_freelist_init();
-    if (size == 0 || size > MAX_RAM / 2) {
+    if (size == 0 || size > MAX_RAM) {
         return NULL;
     }
 

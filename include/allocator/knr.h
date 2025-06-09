@@ -11,6 +11,14 @@
 
 #include <stddef.h>
 
+#ifndef DSA_FALLBACK_MAX_RAM
+    #define DSA_FALLBACK_MAX_RAM ((size_t) 1 << 32) // 4 GiB
+#endif
+
+#ifndef DSA_RAM_RESERVE
+    #define DSA_RAM_RESERVE ((size_t) 1 << 30) // 1 GiB
+#endif
+
 /**
  * FreeList Block
  */
