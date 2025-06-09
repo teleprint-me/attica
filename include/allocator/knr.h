@@ -2,8 +2,9 @@
  * @file include/allocator/knr.h
  * @brief K&R-style allocator using a static memory arena.
  * @ref K&R C - 8.7: A Storage Allocator
- * @ref https://stackoverflow.com/q/13159564/15147156
- * @ref https://stackoverflow.com/q/1119134/15147156
+ * @ref https://stackoverflow.com/q/13159564
+ * @ref https://stackoverflow.com/q/1119134
+ * @ref https://stackoverflow.com/q/2513505
  */
 
 #ifndef DSA_ALLOCATOR_KNR_H
