@@ -11,9 +11,9 @@
 #define HUNDRED_MB (100 * ONE_MB)
 
 typedef enum TestKNRAllocatorState {
-    KNR_EXPECT_ALLOCATED, // Expect a valid pointer (non-NULL)
+    KNR_EXPECT_ALLOCATED, // Expect address
     KNR_EXPECT_UNALLOCATED, // Expect NULL
-    KNR_EXPECT_UNDEFINED // Either is allowed; just record result (policy-defined)
+    KNR_EXPECT_UNDEFINED // Record result (policy-defined)
 } TestKNRAllocatorState;
 
 typedef struct TestKNRAllocator {
@@ -82,8 +82,8 @@ int test_suite_knr_allocator(void) {
         {NULL, ONE_MB, KNR_EXPECT_ALLOCATED},
         {NULL, TEN_MB, KNR_EXPECT_ALLOCATED},
         {NULL, HUNDRED_MB, KNR_EXPECT_ALLOCATED},
-        {NULL, (size_t)-1, KNR_EXPECT_UNALLOCATED}, // absurd size, should fail
-        {NULL, 0, KNR_EXPECT_UNALLOCATED}, // allocation of zero (policy: returns valid ptr)
+        {NULL, (size_t) -1, KNR_EXPECT_UNALLOCATED}, // absurd size (policy: returns NULL)
+        {NULL, 0, KNR_EXPECT_UNALLOCATED}, // allocation of zero (policy: returns NULL)
     };
 
     size_t count = sizeof(data) / sizeof(TestKNRAllocator);
