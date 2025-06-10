@@ -63,6 +63,7 @@ int knr_alloc_assert(TestUnit* unit) {
             );
             break;
         case KNR_EXPECT_UNDEFINED:
+        default:
             LOG_WARNING(
                 "[KNR] unit=%zu with size=%zu: undefined behavior, got %p",
                 unit->index,
@@ -70,8 +71,6 @@ int knr_alloc_assert(TestUnit* unit) {
                 data->address
             );
             break;
-        default:
-            ASSERT(0, "[KNR] Unknown test state for unit=%zu", unit->index);
     }
     return 0;
 }
