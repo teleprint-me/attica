@@ -66,6 +66,8 @@
     "list": "c",
     "stddef.h": "c",
     "stdint.h": "c",
-    "unistd.h": "c"
+    "unistd.h": "c",
+    "mman.h": "c",
+    "mman-linux.h": "c"
   }
 }
