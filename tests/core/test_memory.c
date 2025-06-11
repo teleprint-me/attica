@@ -313,6 +313,66 @@ int test_suite_memory_align_down(void) {
     return test_group_run(&group);
 }
 
+/** @} */
+
+/**
+ * @name Memory Padding
+ */
+
+typedef struct TestMemoryPadding {
+    uintptr_t value;
+    size_t alignment;
+    size_t expected;
+} TestMemoryPadding;
+
+int test_group_memory_padding_needed(TestUnit* unit) {
+    TestMemoryPadding* data = (TestMemoryPadding*) unit->data;
+
+    size_t result = memory_padding_needed(data->value, data->alignment);
+
+    ASSERT(
+        result == data->expected,
+        "[TestMemoryPadding] index=%zu, value=%p, alignment=%zu, expected=%zu, got=%zu",
+        unit->index,
+        (void*) data->value,
+        data->alignment,
+        data->expected,
+        result
+    );
+
+    return 0;
+}
+
+int test_suite_memory_padding_needed(void) {
+    TestMemoryPadding data[] = {
+        {0x00, 8, 0},
+        {0x01, 8, 7},
+        {0x07, 8, 1},
+        {0x08, 8, 0},
+        {0x09, 8, 7},
+        {0x1234, 16, 0x10 - (0x1234 % 0x10)}, // 0x1234 % 16 = 4 → padding = 12
+        {0x1234, 64, 64 - (0x1234 % 64)}, // 0x1234 % 64 = 52 → padding = 12
+        {0x1234, 128, 128 - (0x1234 % 128)}, // 0x1234 % 128 = 52 → padding = 76
+        {0x1234, 1, 0}, // aligned to 1
+    };
+
+    size_t count = sizeof(data) / sizeof(TestMemoryPadding);
+    TestUnit units[count];
+    for (size_t i = 0; i < count; ++i) {
+        units[i].index = i;
+        units[i].data = &data[i];
+    }
+
+    TestGroup group = {
+        .name = "memory_padding_needed",
+        .count = count,
+        .units = units,
+        .run = test_group_memory_padding_needed,
+    };
+
+    return test_group_run(&group);
+}
+
 int main(void) {
     TestSuite suites[] = {
         {"memory_bitwise_offset", test_suite_memory_bitwise_offset},
@@ -320,6 +380,7 @@ int main(void) {
         {"memory_is_aligned", test_suite_memory_is_aligned},
         {"memory_align_up", test_suite_memory_align_up},
         {"memory_align_down", test_suite_memory_align_down},
+        {"memory_padding_needed", test_suite_memory_padding_needed},
     };
 
     int result = 0;
