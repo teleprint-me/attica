@@ -84,6 +84,11 @@ bool memory_is_aligned(uintptr_t value, uintptr_t alignment) {
 
 uintptr_t memory_align_up(uintptr_t value, uintptr_t alignment) {
     assert(memory_is_power_of_two(alignment));
+
+    if (value > UINTPTR_MAX - alignment + 1) {
+        return UINTPTR_MAX; // Overflow guard
+    }
+
     return (value + alignment - 1) & ~(alignment - 1);
 }
 

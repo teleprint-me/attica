@@ -222,16 +222,17 @@ int test_group_memory_align_up(TestUnit* unit) {
 
 int test_suite_memory_align_up(void) {
     TestMemoryAlign data[] = {
-        {0x00, 8, 0x00},   // already aligned
-        {0x01, 8, 0x08},   // next aligned
-        {0x07, 8, 0x08},   // boundary
-        {0x08, 8, 0x08},   // exact
-        {0x09, 8, 0x10},   // next block
-        {0x10, 8, 0x10},   // aligned
-        {0x11, 8, 0x18},   // wrap
+        {0x00, 8, 0x00}, // already aligned
+        {0x01, 8, 0x08}, // next aligned
+        {0x07, 8, 0x08}, // boundary
+        {0x08, 8, 0x08}, // exact
+        {0x09, 8, 0x10}, // next block
+        {0x10, 8, 0x10}, // aligned
+        {0x11, 8, 0x18}, // wrap
         {0x1234, 16, 0x1240}, // test 16 alignment
         {0x1234, 64, 0x1240}, // test 64 alignment
-        {UINTPTR_MAX - 7, 8, UINTPTR_MAX - 7 + 8 - ((UINTPTR_MAX - 7) % 8)}, // edge
+        {UINTPTR_MAX - 7, 8, UINTPTR_MAX - 7}, // safe, already aligned
+        {UINTPTR_MAX - 6, 8, UINTPTR_MAX}, // triggers overflow guard
     };
 
     size_t count = sizeof(data) / sizeof(TestMemoryAlign);
