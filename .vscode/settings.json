@@ -72,6 +72,10 @@
     "mman.h": "c",
     "mman-linux.h": "c",
     "cstdint": "c",
-    "stacktrace": "c"
+    "stacktrace": "c",
+    "coroutine": "c",
+    "valarray": "c",
+    "knr.h": "c",
+    "sysinfo.h": "c"
   }
 }
