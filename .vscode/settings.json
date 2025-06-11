@@ -12,6 +12,8 @@
   "editor.lightbulb.enabled": "off",
   "editor.wordWrapColumn": 80,
   "editor.fontFamily": "'Noto Sans Mono', 'Source Code Pro', 'Droid Sans Mono'",
+  "editor.inlineSuggest.enabled": true,
+  "terminal.integrated.fontSize": 10,
   "[markdown]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
@@ -68,6 +70,8 @@
     "stdint.h": "c",
     "unistd.h": "c",
     "mman.h": "c",
-    "mman-linux.h": "c"
+    "mman-linux.h": "c",
+    "cstdint": "c",
+    "stacktrace": "c"
   }
 }
