@@ -449,6 +449,95 @@ int test_suite_memory_unit_count(void) {
 
 /** @} */
 
+/**
+ * @name Memory Allocation
+ */
+
+typedef enum TestAllocState {
+    TEST_EXPECT_ALLOC,
+    TEST_EXPECT_UNALLOC,
+} TestAllocState;
+
+typedef struct TestMemoryAlloc {
+    void* address;
+    size_t size;
+    size_t alignment;
+    TestAllocState state;
+} TestMemoryAlloc;
+
+int test_each_memory_alloc_setup(TestUnit* unit) {
+    TestMemoryAlloc* data = (TestMemoryAlloc*) unit->data;
+    data->address = memory_alloc(data->size, data->alignment);
+    return 0;
+}
+
+int test_each_memory_alloc_teardown(TestUnit* unit) {
+    TestMemoryAlloc* data = (TestMemoryAlloc*) unit->data;
+    memory_free(data->address);
+    return 0;
+}
+
+int test_group_memory_alloc(TestUnit* unit) {
+    TestMemoryAlloc* data = (TestMemoryAlloc*) unit->data;
+
+    if (data->state == TEST_EXPECT_ALLOC) {
+        ASSERT(
+            data->address != NULL,
+            "[TestMemoryAlloc] index=%zu: expected allocation, got NULL",
+            unit->index
+        );
+        ASSERT(
+            memory_is_aligned((uintptr_t) data->address, data->alignment),
+            "[TestMemoryAlloc] index=%zu: expected alignment=%zu, got unaligned address=%p",
+            unit->index,
+            data->alignment,
+            data->address
+        );
+    }
+
+    if (data->state == TEST_EXPECT_UNALLOC) {
+        ASSERT(
+            data->address == NULL,
+            "[TestMemoryAlloc] index=%zu: expected NULL allocation, got %p",
+            unit->index,
+            data->address
+        );
+    }
+
+    return 0;
+}
+
+int test_suite_memory_alloc(void) {
+    TestMemoryAlloc data[] = {
+        {NULL, 0, 0, TEST_EXPECT_UNALLOC}, // zero alloc
+        {NULL, 8, 8, TEST_EXPECT_ALLOC}, // small alloc
+        {NULL, 64, 16, TEST_EXPECT_ALLOC}, // aligned alloc
+        {NULL, 128, 256, TEST_EXPECT_ALLOC}, // alignment > size
+        {NULL, 4096, 4096, TEST_EXPECT_ALLOC}, // page-aligned alloc
+        {NULL, 1024 * 1024 * 1024, 64, TEST_EXPECT_ALLOC}, // large alloc (1 GiB)
+    };
+
+    size_t count = sizeof(data) / sizeof(TestMemoryAlloc);
+    TestUnit units[count];
+    for (size_t i = 0; i < count; ++i) {
+        units[i].index = i;
+        units[i].data = &data[i];
+    }
+
+    TestGroup group = {
+        .name = "memory_alloc",
+        .count = count,
+        .units = units,
+        .before_each = test_each_memory_alloc_setup,
+        .after_each = test_each_memory_alloc_teardown,
+        .run = test_group_memory_alloc,
+    };
+
+    return test_group_run(&group);
+}
+
+/** @} */
+
 int main(void) {
     TestSuite suites[] = {
         {"memory_bitwise_offset", test_suite_memory_bitwise_offset},
@@ -458,6 +547,7 @@ int main(void) {
         {"memory_align_down", test_suite_memory_align_down},
         {"memory_padding_needed", test_suite_memory_padding_needed},
         {"memory_align_unit_count", test_suite_memory_unit_count},
+        {"memory_alloc", test_suite_memory_alloc},
     };
 
     int result = 0;
