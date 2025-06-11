@@ -192,6 +192,8 @@ int test_suite_memory_is_aligned(void) {
     return test_group_run(&group);
 }
 
+/** @} */
+
 /**
  * @name Memory Align Up/Down
  */
@@ -201,6 +203,12 @@ typedef struct TestMemoryAlign {
     uintptr_t alignment;
     uintptr_t expected;
 } TestMemoryAlign;
+
+/** @} */
+
+/**
+ * @name Memory Align Up
+ */
 
 int test_group_memory_align_up(TestUnit* unit) {
     TestMemoryAlign* data = (TestMemoryAlign*) unit->data;
@@ -254,12 +262,64 @@ int test_suite_memory_align_up(void) {
 
 /** @} */
 
+/**
+ * @name Memory Align Down
+ */
+
+int test_group_memory_align_down(TestUnit* unit) {
+    TestMemoryAlign* data = (TestMemoryAlign*) unit->data;
+
+    uintptr_t result = memory_align_down(data->value, data->alignment);
+
+    ASSERT(
+        result == data->expected,
+        "[TestMemoryAlignDown] index=%zu, value=%p, alignment=%zu, expected=%p, got=%p",
+        unit->index,
+        (void*) data->value,
+        data->alignment,
+        (void*) data->expected,
+        (void*) result
+    );
+
+    return 0;
+}
+
+int test_suite_memory_align_down(void) {
+    TestMemoryAlign data[] = {
+        {0x00, 8, 0x00}, // already aligned
+        {0x01, 8, 0x00}, // before boundary
+        {0x07, 8, 0x00}, // just before boundary
+        {0x08, 8, 0x08}, // exactly aligned
+        {0x09, 8, 0x08}, // after aligned
+        {0x1234, 16, 0x1230},
+        {0x1234, 64, 0x1200},
+        {UINTPTR_MAX, 8, UINTPTR_MAX & ~(uintptr_t) (8 - 1)},
+    };
+
+    size_t count = sizeof(data) / sizeof(TestMemoryAlign);
+    TestUnit units[count];
+    for (size_t i = 0; i < count; ++i) {
+        units[i].index = i;
+        units[i].data = &data[i];
+    }
+
+    TestGroup group = {
+        .name = "memory_align_down",
+        .count = count,
+        .units = units,
+        .run = test_group_memory_align_down,
+    };
+
+    return test_group_run(&group);
+}
+
 int main(void) {
     TestSuite suites[] = {
         {"memory_bitwise_offset", test_suite_memory_bitwise_offset},
         {"memory_is_power_of_two", test_suite_memory_is_power_of_two},
         {"memory_is_aligned", test_suite_memory_is_aligned},
         {"memory_align_up", test_suite_memory_align_up},
+        {"memory_align_down", test_suite_memory_align_down},
     };
 
     int result = 0;
