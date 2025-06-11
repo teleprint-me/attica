@@ -119,6 +119,11 @@ bool memory_is_aligned(uintptr_t value, uintptr_t alignment);
  * @param value Value to align.
  * @param alignment Alignment boundary (must be a power of two).
  * @return Aligned value rounded up.
+ *
+ * @warning All alignment and sizing utilities honor overflow propagation:
+ * If `memory_align_up()` returns `UINTPTR_MAX`, downstream functions must treat it
+ * as a fatal alignment error. This guards against undefined behavior in arithmetic-heavy
+ * memory calculations.
  */
 uintptr_t memory_align_up(uintptr_t value, uintptr_t alignment);
 
