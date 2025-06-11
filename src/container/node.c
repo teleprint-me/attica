@@ -10,7 +10,7 @@
 
 ContainerNode* container_node_create(void* object) {
     ContainerNode* node
-        = (ContainerNode*) memory_aligned_alloc(sizeof(ContainerNode), alignof(ContainerNode));
+        = (ContainerNode*) memory_alloc(sizeof(ContainerNode), alignof(ContainerNode));
 
     if (NULL == node) {
         LOG_ERROR("Failed to allocate memory for ContainerNode.");
@@ -28,5 +28,5 @@ void container_node_free(ContainerNode* node) {
     if (NULL == node) {
         return;
     }
-    memory_aligned_free(node);
+    memory_free(node);
 }

@@ -10,7 +10,7 @@
 #include "container/stack.h"
 
 ContainerStack* container_stack_create(void) {
-    ContainerStack* stack = memory_aligned_alloc(sizeof(ContainerStack), alignof(ContainerStack));
+    ContainerStack* stack = memory_alloc(sizeof(ContainerStack), alignof(ContainerStack));
     if (!stack) {
         LOG_ERROR("Failed to create stack container.");
         return NULL;
@@ -28,7 +28,7 @@ void container_stack_free(ContainerStack* stack) {
             container_node_free(current);
             current = next;
         }
-        free(stack);
+        memory_free(stack);
     }
 }
 

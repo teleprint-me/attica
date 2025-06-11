@@ -6,7 +6,7 @@
  *
  * This module provides a simple linear memory arena implementation that allows
  * efficient memory allocation and deallocation without frequent calls to malloc
- * and free. The arena allocates memory in large chunks, and allocations are done
+ * and memory_free. The arena allocates memory in large chunks, and allocations are done
  * sequentially, which makes deallocation faster and easier by simply resetting
  * the arena. The arena supports reallocating and checkpoints for memory management.
  */
@@ -22,15 +22,15 @@
 // Public methods
 Arena* arena_create(size_t capacity) {
     // Allocate memory to the arena
-    Arena* arena = memory_aligned_alloc(sizeof(Arena), alignof(Arena));
+    Arena* arena = memory_alloc(sizeof(Arena), alignof(Arena));
     if (!arena) {
         return NULL;
     }
 
     // Allocate memory to the buffer
-    arena->buffer = memory_aligned_alloc(capacity, alignof(uint8_t));
+    arena->buffer = memory_alloc(capacity, alignof(uint8_t));
     if (!arena->buffer) {
-        free(arena);
+        memory_free(arena);
         return NULL;
     }
 
@@ -62,7 +62,7 @@ bool arena_realloc(Arena* arena, size_t new_capacity, size_t alignment) {
     }
 
     // Allocate a new, larger buffer
-    void* new_buffer = memory_aligned_alloc(new_capacity, alignment);
+    void* new_buffer = memory_alloc(new_capacity, alignment);
     if (NULL == new_buffer) {
         return false;
     }
@@ -73,7 +73,7 @@ bool arena_realloc(Arena* arena, size_t new_capacity, size_t alignment) {
     }
 
     // Free the old buffer
-    free(arena->buffer);
+    memory_free(arena->buffer);
 
     // Update arena metadata
     arena->buffer = new_buffer;
@@ -92,9 +92,9 @@ void arena_reset(Arena* arena) {
 void arena_free(Arena* arena) {
     if (arena) {
         if (arena->buffer) {
-            free(arena->buffer);
+            memory_free(arena->buffer);
         }
-        free(arena);
+        memory_free(arena);
     }
 }
 

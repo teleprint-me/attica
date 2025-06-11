@@ -12,12 +12,12 @@
 #include <stdio.h>
 
 Stack* stack_create(size_t capacity) {
-    Stack* stack = memory_aligned_alloc(sizeof(Stack), alignof(Stack));
+    Stack* stack = memory_alloc(sizeof(Stack), alignof(Stack));
     if (!stack) {
         return NULL;
     }
 
-    stack->buffer = memory_aligned_alloc(capacity, alignof(uint8_t));
+    stack->buffer = memory_alloc(capacity, alignof(uint8_t));
     if (!stack->buffer) {
         return NULL;
     }
@@ -89,7 +89,7 @@ bool stack_realloc(Stack* stack, size_t new_capacity, size_t alignment) {
     }
 
     // Allocate a new, larger buffer
-    void* new_buffer = memory_aligned_alloc(new_capacity, alignment);
+    void* new_buffer = memory_alloc(new_capacity, alignment);
     if (NULL == new_buffer) {
         return false;
     }
@@ -100,7 +100,7 @@ bool stack_realloc(Stack* stack, size_t new_capacity, size_t alignment) {
     }
 
     // Free the old buffer
-    free(stack->buffer);
+    memory_free(stack->buffer);
 
     // Update stack metadata
     stack->buffer = new_buffer;
@@ -112,7 +112,7 @@ bool stack_realloc(Stack* stack, size_t new_capacity, size_t alignment) {
 void stack_reset(Stack* stack) {
     if (stack) {
         if (stack->last_offset) {
-            free(stack->last_offset);
+            memory_free(stack->last_offset);
             stack->last_offset = NULL;
         }
         stack->offset = 0;
@@ -125,12 +125,12 @@ void stack_reset(Stack* stack) {
 void stack_free(Stack* stack) {
     if (stack) {
         if (stack->buffer) {
-            free(stack->buffer);
+            memory_free(stack->buffer);
         }
         if (stack->last_offset) {
-            free(stack->last_offset);
+            memory_free(stack->last_offset);
         }
-        free(stack);
+        memory_free(stack);
     }
 }
 

@@ -12,16 +12,16 @@
 
 Pool* pool_create(size_t capacity, size_t size, size_t alignment) {
     // Initialize the pool
-    Pool* pool = memory_aligned_alloc(sizeof(Pool), alignof(Pool));
+    Pool* pool = memory_alloc(sizeof(Pool), alignof(Pool));
     if (!pool) {
         return NULL;
     }
 
     // Initialize the buffer
     pool->capacity = capacity;
-    pool->buffer = (uint8_t*) memory_aligned_alloc(pool->capacity, alignof(uint8_t));
+    pool->buffer = (uint8_t*) memory_alloc(pool->capacity, alignof(uint8_t));
     if (!pool->buffer) {
-        free(pool);
+        memory_free(pool);
         return NULL;
     }
 
@@ -54,7 +54,7 @@ bool pool_realloc(Pool* pool, size_t new_capacity) {
     }
 
     // Allocate new buffer with desired alignment
-    uint8_t* new_buffer = memory_aligned_alloc(new_capacity, alignof(uint8_t));
+    uint8_t* new_buffer = memory_alloc(new_capacity, alignof(uint8_t));
     if (!new_buffer) {
         return false;
     }
@@ -65,7 +65,7 @@ bool pool_realloc(Pool* pool, size_t new_capacity) {
     }
 
     // Free the old buffer
-    free(pool->buffer);
+    memory_free(pool->buffer);
 
     // Calculate the block counts
     size_t old_block_count = pool->block_count;
@@ -90,9 +90,9 @@ bool pool_realloc(Pool* pool, size_t new_capacity) {
 void pool_free(Pool* pool) {
     if (pool) {
         if (pool->buffer) {
-            free(pool->buffer);
+            memory_free(pool->buffer);
         }
-        free(pool);
+        memory_free(pool);
     }
 }
 

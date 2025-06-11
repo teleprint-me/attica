@@ -38,7 +38,7 @@
  */
 
 HashTable* hash_table_create(uint64_t initial_size, HashTableType key_type) {
-    HashTable* table = memory_aligned_alloc(sizeof(HashTable), alignof(HashTable));
+    HashTable* table = memory_alloc(sizeof(HashTable), alignof(HashTable));
     if (!table) {
         LOG_ERROR("Failed to allocate memory for HashTable.");
         return NULL;
@@ -63,14 +63,14 @@ HashTable* hash_table_create(uint64_t initial_size, HashTableType key_type) {
             break;
         default:
             LOG_ERROR("Invalid HashTableType given.");
-            free(table);
+            memory_free(table);
             return NULL;
     }
 
-    table->entries = memory_aligned_calloc(table->size, sizeof(HashTableEntry), alignof(HashTableEntry));
+    table->entries = memory_calloc(table->size, sizeof(HashTableEntry), alignof(HashTableEntry));
     if (!table->entries) {
         LOG_ERROR("Failed to allocate memory for HashTable entries.");
-        free(table);
+        memory_free(table);
         return NULL;
     }
 
@@ -78,8 +78,8 @@ HashTable* hash_table_create(uint64_t initial_size, HashTableType key_type) {
     int error_code = pthread_mutex_init(&table->thread_lock, NULL);
     if (0 != error_code) {
         LOG_ERROR("Failed to initialize mutex with error: %d", error_code);
-        free(table->entries);
-        free(table);
+        memory_free(table->entries);
+        memory_free(table);
         return NULL;
     }
 
@@ -92,9 +92,9 @@ void hash_table_free(HashTable* table) {
         pthread_mutex_destroy(&table->thread_lock);
 
         if (table->entries) {
-            free(table->entries);
+            memory_free(table->entries);
         }
-        free(table);
+        memory_free(table);
         table = NULL;
     }
 }
@@ -167,7 +167,7 @@ static HashTableState hash_table_resize_internal(HashTable* table, uint64_t new_
             HashTableState state = hash_table_insert_internal(table, entry->key, entry->value);
             if (HASH_SUCCESS != state) {
                 LOG_ERROR("Failed to rehash key during resize.");
-                free(new_entries);
+                memory_free(new_entries);
                 table->entries = old_entries;
                 table->size = old_size;
                 return state;
@@ -177,7 +177,7 @@ static HashTableState hash_table_resize_internal(HashTable* table, uint64_t new_
     }
 
     table->count = rehashed_count;
-    free(old_entries);
+    memory_free(old_entries);
     return HASH_SUCCESS;
 }
 

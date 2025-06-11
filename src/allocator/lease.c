@@ -40,7 +40,7 @@ LeaseOwner* lease_create_owner(size_t capacity) {
 }
 
 LeasePolicy* lease_create_policy(LeaseAccess access, LeaseContract contract) {
-    LeasePolicy* policy = memory_aligned_alloc(sizeof(LeasePolicy), alignof(LeasePolicy));
+    LeasePolicy* policy = memory_alloc(sizeof(LeasePolicy), alignof(LeasePolicy));
     if (!policy) {
         return NULL;
     }
@@ -58,7 +58,7 @@ LeaseObject* lease_create_object(void* address, size_t size, size_t alignment) {
         return NULL;
     }
 
-    LeaseObject* object = memory_aligned_alloc(sizeof(LeaseObject), alignof(LeaseObject));
+    LeaseObject* object = memory_alloc(sizeof(LeaseObject), alignof(LeaseObject));
     if (!object) {
         return NULL;
     }
@@ -77,7 +77,7 @@ LeaseTenant* lease_create_tenant(LeasePolicy* policy, LeaseObject* object) {
         return NULL;
     }
 
-    LeaseTenant* tenant = memory_aligned_alloc(sizeof(LeaseTenant), alignof(LeaseTenant));
+    LeaseTenant* tenant = memory_alloc(sizeof(LeaseTenant), alignof(LeaseTenant));
     if (!tenant) {
         return NULL;
     }
@@ -114,16 +114,16 @@ void lease_free_owner(LeaseOwner* owner) {
 
 void lease_free_policy(LeasePolicy* policy) {
     if (policy) {
-        free(policy);
+        memory_free(policy);
     }
 }
 
 void lease_free_object(LeasePolicy* policy, LeaseObject* object) {
     if (policy && object) { // object depends upon policy
         if (object->address && policy->contract == LEASE_CONTRACT_OWNED) {
-            free(object->address); // policy determines freedom
+            memory_free(object->address); // policy determines freedom
         }
-        free(object);
+        memory_free(object);
     }
 }
 
@@ -131,7 +131,7 @@ void lease_free_tenant(LeaseTenant* tenant) {
     if (tenant) {
         lease_free_object(tenant->policy, tenant->object);
         lease_free_policy(tenant->policy);
-        free(tenant);
+        memory_free(tenant);
     }
 }
 
@@ -150,7 +150,7 @@ static LeaseTenant* lease_alloc_internal(
     LeaseObject* object = lease_create_object(address, size, alignment);
     if (!object) {
         if (policy->contract == LEASE_CONTRACT_OWNED) {
-            free(address);
+            memory_free(address);
         }
         lease_free_policy(policy);
         return NULL;
@@ -171,7 +171,7 @@ LeaseTenant* lease_alloc_owned_tenant(size_t size, size_t alignment) {
         return NULL;
     }
 
-    void* address = memory_aligned_alloc(size, alignment);
+    void* address = memory_alloc(size, alignment);
     if (!address) {
         return NULL;
     }

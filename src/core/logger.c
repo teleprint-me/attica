@@ -95,7 +95,7 @@ bool logger_set_file_path_and_stream(Logger* logger, const char* file_path) {
  */
 Logger* logger_new(LogType log_type) {
     // Allocate memory for the logger instance
-    Logger* logger = (Logger*) memory_aligned_alloc(sizeof(Logger), alignof(Logger));
+    Logger* logger = (Logger*) memory_alloc(sizeof(Logger), alignof(Logger));
 
     // Check if memory allocation was successful
     if (NULL == logger) {
@@ -109,7 +109,7 @@ Logger* logger_new(LogType log_type) {
     // Set logger type and name
     if (!logger_set_type_and_name(logger, log_type)) {
         fprintf(stderr, "Failed to initialize logger with type: %d\n", log_type);
-        memory_aligned_free(logger); // Clean up allocated memory to avoid memory leaks
+        memory_free(logger); // Clean up allocated memory to avoid memory leaks
         return NULL;
     }
 
@@ -120,7 +120,7 @@ Logger* logger_new(LogType log_type) {
     int error_code = pthread_mutex_init(&logger->thread_lock, NULL);
     if (0 != error_code) {
         fprintf(stderr, "Failed to initialize mutex with error: %d\n", error_code);
-        memory_aligned_free(logger); // Clean up allocated memory to avoid memory leaks
+        memory_free(logger); // Clean up allocated memory to avoid memory leaks
         return NULL;
     }
 
@@ -206,7 +206,7 @@ bool logger_free(Logger* logger) {
     }
 
     // Free memory for the logger instance
-    memory_aligned_free(logger);
+    memory_free(logger);
     return true;
 }
 
