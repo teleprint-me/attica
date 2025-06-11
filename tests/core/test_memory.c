@@ -23,7 +23,7 @@ typedef struct TestMemoryAlignmentOffset {
 int test_group_memory_bitwise_offset(TestUnit* unit) {
     TestMemoryAlignmentOffset* data = (TestMemoryAlignmentOffset*) unit->data;
 
-    uintptr_t result = memory_alignment_offset(data->value, data->alignment);
+    uintptr_t result = memory_align_offset(data->value, data->alignment);
 
     ASSERT(
         result == data->expected,
