@@ -131,6 +131,10 @@ uintptr_t memory_align_unit_count(uintptr_t value, uintptr_t size, uintptr_t ali
  */
 
 void* memory_alloc(size_t size, size_t alignment) {
+    if (0 == size || 0 == alignment) {
+        return NULL;
+    }
+
     if (alignment < sizeof(void*)) {
         alignment = sizeof(void*);
     }
@@ -148,10 +152,18 @@ void* memory_alloc(size_t size, size_t alignment) {
 }
 
 void* memory_calloc(size_t n, size_t size, size_t alignment) {
+    if (0 == n || 0 == size || 0 == alignment) {
+        return NULL;
+    }
+
+    if (SIZE_MAX / n < size) {
+        return NULL; // overflow
+    }
+
     size_t total = n * size;
     void* address = memory_alloc(total, alignment);
-    if (address && memset(address, 0, total)) {
-        return address;
+    if (address) {
+        return memset(address, 0, total);
     }
 
     return NULL;
@@ -162,7 +174,7 @@ void* memory_realloc(void* ptr, size_t old_size, size_t new_size, size_t alignme
         return memory_alloc(new_size, alignment);
     }
 
-    if (0 == new_size) {
+    if (0 == new_size || 0 == alignment) {
         free(ptr);
         return NULL;
     }

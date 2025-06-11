@@ -9,6 +9,9 @@
  * - Determine alignment of addresses or sizes
  * - Calculate padding and aligned sizes
  * - Allocate aligned memory blocks with posix_memalign
+ *
+ * This API explicitly disallows zero-size allocations and invalid alignments. All memory returned
+ * is guaranteed to be aligned and non-NULL, or the function fails explicitly with NULL.
  */
 
 #ifndef DSA_MEMORY_H
@@ -178,41 +181,51 @@ uintptr_t memory_align_unit_count(uintptr_t value, uintptr_t size, uintptr_t ali
  */
 
 /**
- * @brief Allocates memory of given size aligned to alignment boundary.
+ * @brief Allocates memory of the given size aligned to the specified boundary.
  *
- * Uses posix_memalign internally. The returned pointer must be freed with free().
+ * Internally uses posix_memalign. The returned pointer must be freed with free().
+ *
+ * If @p size or @p alignment is zero, the function returns NULL.
+ * This avoids undefined or implementation-defined behavior from zero-byte allocations
+ * or invalid alignment values.
  *
  * @param size Number of bytes to allocate.
- * @param alignment Alignment boundary; must be a power of two and >= sizeof(void *).
- * @return Pointer to allocated memory on success, or NULL on failure.
+ * @param alignment Alignment boundary (must be a non-zero power of two and >= sizeof(void*)).
+ * @return Pointer to aligned memory on success, or NULL on failure or invalid input.
  */
 void* memory_alloc(size_t size, size_t alignment);
 
 /**
  * @brief Allocates zero-initialized memory for an array with specified alignment.
  *
- * Equivalent to calloc but guarantees alignment.
+ * Semantically equivalent to calloc, but guarantees the returned pointer is aligned.
+ *
+ * If any of @p n, @p size, or @p alignment is zero, the function returns NULL.
+ * Overflow in @p n * @p size is also guarded.
  *
  * @param n Number of elements.
- * @param size Size of each element.
- * @param alignment Alignment boundary; must be a power of two.
- * @return Pointer to zeroed memory on success, or NULL on failure.
+ * @param size Size of each element in bytes.
+ * @param alignment Alignment boundary (must be a non-zero power of two and >= sizeof(void*)).
+ * @return Pointer to zeroed aligned memory on success, or NULL on failure or invalid input.
  */
 void* memory_calloc(size_t n, size_t size, size_t alignment);
 
 /**
- * @brief Reallocates aligned memory block to new size with alignment guarantee.
+ * @brief Reallocates an aligned memory block to a new size with alignment guarantee.
  *
- * If ptr is NULL, behaves like memory_alloc.
- * If new_size is zero, frees ptr and returns NULL.
+ * - If @p ptr is NULL, behaves like memory_alloc(@p new_size, @p alignment).
+ * - If @p new_size is zero, frees @p ptr and returns NULL.
+ * - Copies the lesser of @p old_size and @p new_size bytes to the new block.
  *
- * The original ptr must have been allocated with memory_alloc or memory_calloc.
+ * The original @p ptr must have been allocated using memory_alloc or memory_calloc.
+ * If @p alignment is not a valid power of two, or if any parameter is invalid,
+ * the function returns NULL.
  *
- * @param ptr Pointer to the memory block to reallocate.
- * @param old_size Size of the original allocation in bytes.
- * @param new_size New size in bytes.
- * @param alignment Desired alignment boundary (must be a power of two).
- * @return Pointer to newly allocated memory, or NULL on failure.
+ * @param ptr Pointer to previously allocated memory (or NULL).
+ * @param old_size Size of the existing allocation in bytes.
+ * @param new_size Desired size in bytes.
+ * @param alignment Alignment boundary (must be a non-zero power of two and >= sizeof(void*)).
+ * @return Pointer to newly allocated memory on success, or NULL on failure or invalid input.
  */
 void* memory_realloc(void* ptr, size_t old_size, size_t new_size, size_t alignment);
 
