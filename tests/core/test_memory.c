@@ -422,11 +422,11 @@ int test_suite_memory_unit_count(void) {
         {5, 4, 4, 2}, // spills into 2 units
         {8, 4, 4, 2}, // even split
         {9, 4, 4, 3}, // uneven split
-        {10, 4, 8, 3}, // aligned to 8, then units of 4
+        {10, 4, 8, 4}, // aligned to 8, then units of 4
         {15, 4, 8, 4}, // 16 aligned, 4-byte units → 4 units
-        {17, 4, 8, 5}, // 24 aligned, 4-byte units → 6
+        {17, 4, 8, 6}, // 24 aligned, 4-byte units → 6
         {64, 16, 32, 4}, // 64 aligned to 64 → 64/16 = 4
-        {65, 16, 64, 5}, // 65 aligned to 128 → 128/16 = 8
+        {65, 16, 64, 8}, // 65 aligned to 128 → 128/16 = 8
         {1, 1, 8, 8}, // aligned to 8, 1-byte units
     };
 
