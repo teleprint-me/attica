@@ -121,7 +121,7 @@ int test_suite_memory_bitwise_offset(void) {
     }
 
     TestGroup group = {
-        .name = "memory_bitwise_offset",
+        .name = "memory_align_offset",
         .count = count,
         .units = units,
         .run = test_group_memory_bitwise_offset,
@@ -381,6 +381,74 @@ int test_suite_memory_padding_needed(void) {
     return test_group_run(&group);
 }
 
+/** @} */
+
+/**
+ * @name Memory Unit Count
+ */
+
+typedef struct TestMemoryUnitCount {
+    uintptr_t value;
+    uintptr_t size;
+    uintptr_t alignment;
+    uintptr_t expected;
+} TestMemoryUnitCount;
+
+int test_group_memory_unit_count(TestUnit* unit) {
+    TestMemoryUnitCount* data = (TestMemoryUnitCount*) unit->data;
+
+    uintptr_t result = memory_align_unit_count(data->value, data->size, data->alignment);
+
+    ASSERT(
+        result == data->expected,
+        "[TestMemoryUnitCount] index=%zu, value=%zu, size=%zu, alignment=%zu, expected=%zu, "
+        "got=%zu",
+        unit->index,
+        data->value,
+        data->size,
+        data->alignment,
+        data->expected,
+        result
+    );
+
+    return 0;
+}
+
+int test_suite_memory_unit_count(void) {
+    TestMemoryUnitCount data[] = {
+        {0, 4, 4, 0}, // zero value
+        {1, 4, 4, 1}, // smallest non-zero
+        {4, 4, 4, 1}, // exact match
+        {5, 4, 4, 2}, // spills into 2 units
+        {8, 4, 4, 2}, // even split
+        {9, 4, 4, 3}, // uneven split
+        {10, 4, 8, 3}, // aligned to 8, then units of 4
+        {15, 4, 8, 4}, // 16 aligned, 4-byte units → 4 units
+        {17, 4, 8, 5}, // 24 aligned, 4-byte units → 6
+        {64, 16, 32, 4}, // 64 aligned to 64 → 64/16 = 4
+        {65, 16, 64, 5}, // 65 aligned to 128 → 128/16 = 8
+        {1, 1, 8, 8}, // aligned to 8, 1-byte units
+    };
+
+    size_t count = sizeof(data) / sizeof(TestMemoryUnitCount);
+    TestUnit units[count];
+    for (size_t i = 0; i < count; ++i) {
+        units[i].index = i;
+        units[i].data = &data[i];
+    }
+
+    TestGroup group = {
+        .name = "memory_align_unit_count",
+        .count = count,
+        .units = units,
+        .run = test_group_memory_unit_count,
+    };
+
+    return test_group_run(&group);
+}
+
+/** @} */
+
 int main(void) {
     TestSuite suites[] = {
         {"memory_bitwise_offset", test_suite_memory_bitwise_offset},
@@ -389,6 +457,7 @@ int main(void) {
         {"memory_align_up", test_suite_memory_align_up},
         {"memory_align_down", test_suite_memory_align_down},
         {"memory_padding_needed", test_suite_memory_padding_needed},
+        {"memory_align_unit_count", test_suite_memory_unit_count},
     };
 
     int result = 0;
