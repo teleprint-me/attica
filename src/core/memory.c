@@ -114,7 +114,12 @@ size_t memory_padding_needed(uintptr_t value, size_t alignment) {
 
 uintptr_t memory_align_unit_count(uintptr_t value, uintptr_t size, uintptr_t alignment) {
     assert(size > 0);
+
     uintptr_t aligned_size = memory_align_up(value, alignment);
+    if (UINTPTR_MAX == aligned_size) {
+        return UINTPTR_MAX; // Overflow guard
+    }
+
     return (aligned_size + size - 1) / size;
 }
 
