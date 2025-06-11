@@ -42,59 +42,78 @@ extern "C" {
  */
 
 /**
- * @brief Computes x modulo y, optimized for when y is a power of two.
+ * @brief Check if a value is a power of two (and not zero).
  *
- * @param x The value (or address) to compute offset for.
- * @param y The alignment boundary; must be greater than zero.
- * @return The remainder of x divided by y (x % y).
+ * @param value The value to check.
+ * @return true if value is a power of two and not zero, false otherwise.
  */
-uintptr_t memory_bitwise_offset(uintptr_t x, uintptr_t y);
+bool memory_is_power_of_two(uintptr_t value);
 
 /**
- * @brief Checks if a value is a nonzero power of two.
+ * @brief Returns the offset of a value within the given alignment.
  *
- * @param x Value to test.
- * @return true if x is a power of two and not zero, false otherwise.
+ * For example, for alignment = 8 and value = 14, returns 6.
+ *
+ * @param value The value to check.
+ * @param alignment The alignment boundary (must be a power of two).
+ * @return The offset of value within alignment.
  */
-bool memory_is_power_of_two(uintptr_t x);
+uintptr_t memory_alignment_offset(uintptr_t value, uintptr_t alignment);
 
 /**
- * @brief Checks if a value or address is aligned to the given boundary.
+ * @brief Returns true if value is aligned to the given alignment.
  *
- * @param x The value or address to check.
- * @param alignment Alignment boundary; must be a power of two.
- * @return true if x is aligned to alignment, false otherwise.
+ * @param value The value to check.
+ * @param alignment The alignment boundary (must be a power of two).
+ * @return true if value is aligned, false otherwise.
  */
-bool memory_is_aligned(uintptr_t x, uintptr_t alignment);
+bool memory_is_aligned(uintptr_t value, uintptr_t alignment);
 
 /**
- * @brief Rounds up an address to the next aligned boundary.
+ * @brief Aligns value *up* to the next multiple of alignment.
  *
- * If the address is already aligned, it is returned unchanged.
+ * If value is already aligned, returns value unchanged.
  *
- * @param address Starting address.
- * @param alignment Alignment boundary; must be a power of two.
- * @return The next aligned address >= address.
+ * @param value The value to align.
+ * @param alignment The alignment boundary (must be a power of two).
+ * @return The aligned value rounded up.
  */
-uintptr_t memory_next_aligned_address(uintptr_t address, uintptr_t alignment);
+uintptr_t memory_align_up(uintptr_t value, uintptr_t alignment);
 
 /**
- * @brief Computes the number of bytes needed to pad an address up to alignment.
+ * @brief Aligns value *down* to the previous multiple of alignment.
  *
- * @param address The current address.
- * @param alignment Alignment boundary; must be a power of two.
- * @return Number of bytes to add to address to align it.
+ * If value is already aligned, returns value unchanged.
+ *
+ * @param value The value to align.
+ * @param alignment The alignment boundary (must be a power of two).
+ * @return The aligned value rounded down.
+ */
+uintptr_t memory_align_down(uintptr_t value, uintptr_t alignment);
+
+/**
+ * @brief Returns the number of padding bytes needed to align address up to alignment.
+ *
+ * If already aligned, returns 0.
+ *
+ * @param address The address to check.
+ * @param alignment The alignment boundary (must be a power of two).
+ * @return Number of bytes padding needed.
  */
 size_t memory_padding_needed(uintptr_t address, size_t alignment);
 
 /**
- * @brief Rounds a size up to the nearest multiple of alignment.
+ * @brief Returns the minimal count of objects (of object_size) required to cover size,
+ *        after rounding size up to the given alignment.
  *
- * @param x Size (or address) to round.
- * @param alignment Alignment boundary; must be a power of two.
- * @return Rounded size, the smallest multiple of alignment >= x.
+ * For example, allocating N objects of size object_size with overall buffer size >= size (aligned).
+ *
+ * @param nbytes The required size in bytes.
+ * @param nsize The size of each object.
+ * @param alignment The alignment boundary (must be a power of two).
+ * @return The minimal number of objects required.
  */
-uintptr_t memory_aligned_size(uintptr_t x, uintptr_t alignment);
+uintptr_t memory_object_count(uintptr_t nbytes, uintptr_t nsize, uintptr_t alignment);
 
 /** @} */
 
@@ -148,7 +167,7 @@ void* memory_aligned_realloc(void* ptr, size_t old_size, size_t new_size, size_t
  * @brief Frees aligned memory.
  *
  * This function is equivalent to free, but works with aligned memory.
- * 
+ *
  * @param ptr Pointer to the memory block.
  */
 void memory_aligned_free(void* ptr);

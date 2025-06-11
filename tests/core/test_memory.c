@@ -14,20 +14,20 @@
 #include "core/memory.h"
 #include "test/unit.h"
 
-typedef struct TestMemoryBitwiseOffset {
-    uintptr_t x;
-    uintptr_t y;
+typedef struct TestMemoryAlignmentOffset {
+    uintptr_t value;
+    uintptr_t alignment;
     uintptr_t expected; // output
-} TestMemoryBitwiseOffset;
+} TestMemoryAlignmentOffset;
 
 int test_group_memory_bitwise_offset(TestUnit* unit) {
-    TestMemoryBitwiseOffset* data = (TestMemoryBitwiseOffset*) unit->data;
+    TestMemoryAlignmentOffset* data = (TestMemoryAlignmentOffset*) unit->data;
 
-    uintptr_t result = memory_bitwise_offset(data->x, data->y);
+    uintptr_t result = memory_alignment_offset(data->value, data->alignment);
 
     ASSERT(
         result == data->expected,
-        "[TestMemoryBitwiseOffset] index=%zu, expected=%p, got=%p",
+        "[TestMemoryAlignmentOffset] index=%zu, expected=%p, got=%p",
         unit->index,
         data->expected,
         result
@@ -37,7 +37,7 @@ int test_group_memory_bitwise_offset(TestUnit* unit) {
 }
 
 int test_suite_memory_bitwise_offset(void) {
-    TestMemoryBitwiseOffset data[] = {
+    TestMemoryAlignmentOffset data[] = {
         {0x00, 8, 0}, // aligned
         {0x01, 8, 1}, // 1 byte offset
         {0x07, 8, 7}, // just before alignment
@@ -50,7 +50,7 @@ int test_suite_memory_bitwise_offset(void) {
         {0x1234, 64, 52}, // edge case
     };
 
-    size_t count = sizeof(data) / sizeof(TestMemoryBitwiseOffset);
+    size_t count = sizeof(data) / sizeof(TestMemoryAlignmentOffset);
     TestUnit units[count];
     for (size_t i = 0; i < count; i++) {
         units[i].data = &data[i];

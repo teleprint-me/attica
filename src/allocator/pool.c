@@ -26,7 +26,7 @@ Pool* pool_create(size_t capacity, size_t size, size_t alignment) {
     }
 
     // Calculate the block size
-    pool->block_size = memory_aligned_size(size, alignment);
+    pool->block_size = memory_align_up(size, alignment);
     assert(pool->block_size > sizeof(FreeList) && "Block size is too small");
     assert(pool->block_size < pool->capacity && "Buffer capacity is smaller than the block size");
     assert(pool->block_size % alignment == 0 && "Block size is not properly aligned");

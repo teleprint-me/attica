@@ -15,35 +15,40 @@
 
 #include <string.h>
 
-uintptr_t memory_bitwise_offset(uintptr_t x, uintptr_t y) {
-    assert(y > 0);
-    return x & (y - 1);
+bool memory_is_power_of_two(uintptr_t value) {
+    return (0 != value) && (0 == (value & (value - 1)));
 }
 
-bool memory_is_power_of_two(uintptr_t x) {
-    return (x != 0) && ((x & (x - 1)) == 0);
-}
-
-bool memory_is_aligned(uintptr_t x, uintptr_t alignment) {
+uintptr_t memory_alignment_offset(uintptr_t value, uintptr_t alignment) {
     assert(memory_is_power_of_two(alignment));
-    return memory_bitwise_offset(x, alignment) == 0;
+    return value & (alignment - 1);
 }
 
-uintptr_t memory_next_aligned_address(uintptr_t address, uintptr_t alignment) {
+bool memory_is_aligned(uintptr_t value, uintptr_t alignment) {
     assert(memory_is_power_of_two(alignment));
-    uintptr_t offset = memory_bitwise_offset(address, alignment);
-    return (offset != 0) ? address + alignment - offset : address;
+    return 0 == memory_alignment_offset(value, alignment);
+}
+
+uintptr_t memory_align_up(uintptr_t value, uintptr_t alignment) {
+    assert(memory_is_power_of_two(alignment));
+    return (value + alignment - 1) & ~(alignment - 1);
+}
+
+uintptr_t memory_align_down(uintptr_t value, uintptr_t alignment) {
+    assert(memory_is_power_of_two(alignment));
+    return value & ~(alignment - 1);
 }
 
 size_t memory_padding_needed(uintptr_t address, size_t alignment) {
     assert(memory_is_power_of_two(alignment));
-    size_t offset = memory_bitwise_offset(address, alignment);
-    return (offset != 0) ? alignment - offset : 0;
+    size_t offset = memory_alignment_offset(address, alignment);
+    return (0 != offset) ? alignment - offset : 0;
 }
 
-uintptr_t memory_aligned_size(uintptr_t x, uintptr_t alignment) {
-    assert(memory_is_power_of_two(alignment));
-    return (x + alignment - 1) & ~(alignment - 1);
+uintptr_t memory_object_count(uintptr_t nbytes, uintptr_t nsize, uintptr_t alignment) {
+    assert(nsize > 0);
+    uintptr_t aligned_size = memory_align_up(nbytes, alignment);
+    return (aligned_size + nsize - 1) / nsize;
 }
 
 void* memory_aligned_alloc(size_t size, size_t alignment) {
@@ -56,7 +61,7 @@ void* memory_aligned_alloc(size_t size, size_t alignment) {
     }
 
     void* address = NULL;
-    if (posix_memalign(&address, alignment, size) != 0) {
+    if (0 != posix_memalign(&address, alignment, size)) {
         return NULL;
     }
 
@@ -74,11 +79,11 @@ void* memory_aligned_calloc(size_t n, size_t size, size_t alignment) {
 }
 
 void* memory_aligned_realloc(void* ptr, size_t old_size, size_t new_size, size_t alignment) {
-    if (ptr == NULL) {
+    if (NULL == ptr) {
         return memory_aligned_alloc(new_size, alignment);
     }
 
-    if (new_size == 0) {
+    if (0 == new_size) {
         free(ptr);
         return NULL;
     }
@@ -88,20 +93,19 @@ void* memory_aligned_realloc(void* ptr, size_t old_size, size_t new_size, size_t
     }
 
     void* new_ptr = memory_aligned_alloc(new_size, alignment);
-    if (!new_ptr) {
+    if (NULL == new_ptr) {
         return NULL;
     }
 
     // Copy only the smaller of the old or new sizes
     size_t min_size = old_size < new_size ? old_size : new_size;
     memcpy(new_ptr, ptr, min_size);
-
     free(ptr);
     return new_ptr;
 }
 
 void memory_aligned_free(void* ptr) {
-    if (ptr) {
+    if (NULL != ptr) {
         free(ptr);
     }
 }

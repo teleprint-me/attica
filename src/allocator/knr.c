@@ -157,7 +157,7 @@ void* allocator_freelist_malloc(size_t size) {
         return NULL;
     }
 
-    uintptr_t payload_size = memory_aligned_size(size, MEMORY_ALIGNMENT);
+    uintptr_t payload_size = memory_align_up(size, MEMORY_ALIGNMENT);
     size_t nunits = (payload_size + HEADER_SIZE - 1) / HEADER_SIZE + 1;
 
     FreeList* previous = freelist;
