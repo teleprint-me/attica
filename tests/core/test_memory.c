@@ -16,6 +16,7 @@
 
 /**
  * @name Memory is Power of Two
+ * {@
  */
 
 typedef struct TestMemoryIsPowerOfTwo {
@@ -76,6 +77,7 @@ int test_suite_memory_is_power_of_two(void) {
 
 /**
  * @name Memory Align Offset
+ * {@
  */
 
 typedef struct TestMemoryAlignOffset {
@@ -134,6 +136,7 @@ int test_suite_memory_bitwise_offset(void) {
 
 /**
  * @name Memory is Aligned
+ * {@
  */
 
 typedef struct TestMemoryIsAligned {
@@ -196,6 +199,7 @@ int test_suite_memory_is_aligned(void) {
 
 /**
  * @name Memory Align Up/Down
+ * {@
  */
 
 typedef struct TestMemoryAlign {
@@ -208,6 +212,7 @@ typedef struct TestMemoryAlign {
 
 /**
  * @name Memory Align Up
+ * {@
  */
 
 int test_group_memory_align_up(TestUnit* unit) {
@@ -264,6 +269,7 @@ int test_suite_memory_align_up(void) {
 
 /**
  * @name Memory Align Down
+ * {@
  */
 
 int test_group_memory_align_down(TestUnit* unit) {
@@ -317,6 +323,7 @@ int test_suite_memory_align_down(void) {
 
 /**
  * @name Memory Align up Page Size
+ * {@
  */
 
 /// @todo
@@ -325,6 +332,7 @@ int test_suite_memory_align_down(void) {
 
 /**
  * @name Memory Padding Needed
+ * {@
  */
 
 typedef struct TestMemoryPadding {
@@ -385,6 +393,7 @@ int test_suite_memory_padding_needed(void) {
 
 /**
  * @name Memory Unit Count
+ * {@
  */
 
 typedef struct TestMemoryUnitCount {
@@ -451,11 +460,14 @@ int test_suite_memory_unit_count(void) {
 
 /**
  * @name Memory Allocation
+ * {@
  */
 
 typedef enum TestAllocState {
     TEST_EXPECT_ALLOC,
     TEST_EXPECT_UNALLOC,
+    TEST_EXPECT_NULL,
+    TEST_EXPECT_ZEROED,
 } TestAllocState;
 
 typedef struct TestMemoryAlloc {
@@ -540,19 +552,15 @@ int test_suite_memory_alloc(void) {
 
 /**
  * @name Memory Counted Allocation
+ * {@
  */
-
-typedef enum TestCallocState {
-    TEST_CALLOC_EXPECT_NULL,
-    TEST_CALLOC_EXPECT_ZEROED,
-} TestCallocState;
 
 typedef struct TestMemoryCalloc {
     void* address;
     size_t count;
     size_t size;
     size_t alignment;
-    TestCallocState state;
+    TestAllocState state;
 } TestMemoryCalloc;
 
 int test_each_memory_calloc_setup(TestUnit* unit) {
@@ -570,7 +578,7 @@ int test_each_memory_calloc_teardown(TestUnit* unit) {
 int test_group_memory_calloc(TestUnit* unit) {
     TestMemoryCalloc* data = (TestMemoryCalloc*) unit->data;
 
-    if (data->state == TEST_CALLOC_EXPECT_NULL) {
+    if (data->state == TEST_EXPECT_NULL) {
         ASSERT(
             data->address == NULL,
             "[TestMemoryCalloc] index=%zu: expected NULL, got %p",
@@ -579,7 +587,7 @@ int test_group_memory_calloc(TestUnit* unit) {
         );
     }
 
-    if (data->state == TEST_CALLOC_EXPECT_ZEROED) {
+    if (data->state == TEST_EXPECT_ZEROED) {
         ASSERT(
             data->address != NULL,
             "[TestMemoryCalloc] index=%zu: expected allocation, got NULL",
@@ -610,12 +618,12 @@ int test_group_memory_calloc(TestUnit* unit) {
 
 int test_suite_memory_calloc(void) {
     TestMemoryCalloc data[] = {
-        {NULL, 0, 8, 8, TEST_CALLOC_EXPECT_NULL}, // zero count
-        {NULL, 4, 0, 8, TEST_CALLOC_EXPECT_NULL}, // zero size
-        {NULL, 4, 4, 0, TEST_CALLOC_EXPECT_NULL}, // zero alignment
-        {NULL, 4, 4, 8, TEST_CALLOC_EXPECT_ZEROED}, // normal calloc
-        {NULL, 16, 16, 64, TEST_CALLOC_EXPECT_ZEROED}, // aligned calloc
-        {NULL, SIZE_MAX / 2, 2, 8, TEST_CALLOC_EXPECT_NULL}, // overflow
+        {NULL, 0, 8, 8, TEST_EXPECT_NULL}, // zero count
+        {NULL, 4, 0, 8, TEST_EXPECT_NULL}, // zero size
+        {NULL, 4, 4, 0, TEST_EXPECT_NULL}, // zero alignment
+        {NULL, 4, 4, 8, TEST_EXPECT_ZEROED}, // normal calloc
+        {NULL, 16, 16, 64, TEST_EXPECT_ZEROED}, // aligned calloc
+        {NULL, SIZE_MAX / 2, 2, 8, TEST_EXPECT_NULL}, // overflow
     };
 
     size_t count = sizeof(data) / sizeof(TestMemoryCalloc);
@@ -639,6 +647,109 @@ int test_suite_memory_calloc(void) {
 
 /** @} */
 
+/**
+ * @name Memory Reallocation
+ * {@
+ */
+
+typedef struct TestMemoryRealloc {
+    void* original;
+    void* updated;
+    size_t old_size;
+    size_t new_size;
+    size_t alignment;
+    TestAllocState state;
+} TestMemoryRealloc;
+
+int test_each_memory_realloc_setup(TestUnit* unit) {
+    TestMemoryRealloc* data = (TestMemoryRealloc*) unit->data;
+    if (data->old_size > 0) {
+        data->original = memory_alloc(data->old_size, data->alignment);
+        if (data->original) {
+            memset(data->original, 0xAB, data->old_size);
+        }
+    }
+    return 0;
+}
+
+int test_each_memory_realloc_teardown(TestUnit* unit) {
+    TestMemoryRealloc* data = (TestMemoryRealloc*) unit->data;
+    memory_free(data->updated); // if realloc succeeds, this is the new ptr
+    data->original = NULL;
+    data->updated = NULL;
+    return 0;
+}
+
+int test_group_memory_realloc(TestUnit* unit) {
+    TestMemoryRealloc* data = (TestMemoryRealloc*) unit->data;
+
+    data->updated = memory_realloc(data->original, data->old_size, data->new_size, data->alignment);
+
+    if (data->state == TEST_EXPECT_ALLOC) {
+        ASSERT(
+            data->updated != NULL,
+            "[TestMemoryRealloc] index=%zu: expected non-NULL from realloc",
+            unit->index
+        );
+        ASSERT(
+            memory_is_aligned((uintptr_t) data->updated, data->alignment),
+            "[TestMemoryRealloc] index=%zu: expected alignment=%zu, got unaligned address=%p",
+            unit->index,
+            data->alignment,
+            data->updated
+        );
+        if (data->old_size > 0) {
+            ASSERT(((uint8_t*) data->updated)[0] == 0xAB, "Expected content preserved after realloc");
+        }
+    }
+
+    if (data->state == TEST_EXPECT_UNALLOC) {
+        ASSERT(
+            data->updated == NULL,
+            "[TestMemoryRealloc] index=%zu: expected NULL from realloc",
+            unit->index
+        );
+    }
+
+    return 0;
+}
+
+int test_suite_memory_realloc(void) {
+    TestMemoryRealloc data[] = {
+        {NULL, NULL, 0, 64, 16, TEST_EXPECT_ALLOC}, // realloc(NULL) → malloc
+        {NULL, NULL, 64, 0, 16, TEST_EXPECT_UNALLOC}, // realloc with new_size = 0
+        {NULL, NULL, 32, 64, 32, TEST_EXPECT_ALLOC}, // grow
+        {NULL, NULL, 64, 32, 32, TEST_EXPECT_ALLOC}, // shrink
+        {NULL, NULL, 64, 64, 0, TEST_EXPECT_UNALLOC}, // invalid alignment
+        {NULL, NULL, 128, 256, 128, TEST_EXPECT_ALLOC}, // valid large realloc
+    };
+
+    size_t count = sizeof(data) / sizeof(TestMemoryRealloc);
+    TestUnit units[count];
+    for (size_t i = 0; i < count; ++i) {
+        units[i].index = i;
+        units[i].data = &data[i];
+    }
+
+    TestGroup group = {
+        .name = "memory_realloc",
+        .count = count,
+        .units = units,
+        .before_each = test_each_memory_realloc_setup,
+        .after_each = test_each_memory_realloc_teardown,
+        .run = test_group_memory_realloc,
+    };
+
+    return test_group_run(&group);
+}
+
+/** @} */
+
+/**
+ * @name Main
+ * {@
+ */
+
 int main(void) {
     TestSuite suites[] = {
         {"memory_bitwise_offset", test_suite_memory_bitwise_offset},
@@ -650,6 +761,7 @@ int main(void) {
         {"memory_align_unit_count", test_suite_memory_unit_count},
         {"memory_alloc", test_suite_memory_alloc},
         {"memory_calloc", test_suite_memory_calloc},
+        {"memory_realloc", test_suite_memory_realloc},
     };
 
     int result = 0;
@@ -659,3 +771,5 @@ int main(void) {
     }
     return result;
 }
+
+/** @} */
