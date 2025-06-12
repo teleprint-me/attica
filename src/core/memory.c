@@ -135,6 +135,10 @@ void* memory_alloc(size_t size, size_t alignment) {
         return NULL;
     }
 
+    if (SIZE_MAX - size < size) {
+        return NULL; // overflow
+    }
+
     if (alignment < sizeof(void*)) {
         alignment = sizeof(void*);
     }

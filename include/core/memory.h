@@ -185,9 +185,11 @@ uintptr_t memory_align_unit_count(uintptr_t value, uintptr_t size, uintptr_t ali
  *
  * Internally uses posix_memalign. The returned pointer must be freed with free().
  *
- * If @p size or @p alignment is zero, the function returns NULL.
- * This avoids undefined or implementation-defined behavior from zero-byte allocations
- * or invalid alignment values.
+ * If @p size or @p alignment is zero, or if the allocation would overflow, the function returns
+ * NULL. This avoids undefined or implementation-defined behavior from zero-byte allocations or
+ * invalid alignment values.
+ *
+ * Additionally, checks if the alignment is a non-zero power of two.
  *
  * @param size Number of bytes to allocate.
  * @param alignment Alignment boundary (must be a non-zero power of two and >= sizeof(void*)).
@@ -200,8 +202,8 @@ void* memory_alloc(size_t size, size_t alignment);
  *
  * Semantically equivalent to calloc, but guarantees the returned pointer is aligned.
  *
- * If any of @p n, @p size, or @p alignment is zero, the function returns NULL.
- * Overflow in @p n * @p size is also guarded.
+ * If any of @p n, @p size, or @p alignment is zero, or if the allocation would overflow, the
+ * function returns NULL. Overflow in @p n * @p size is also guarded.
  *
  * @param n Number of elements.
  * @param size Size of each element in bytes.
