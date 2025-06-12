@@ -538,6 +538,107 @@ int test_suite_memory_alloc(void) {
 
 /** @} */
 
+/**
+ * @name Memory Counted Allocation
+ */
+
+typedef enum TestCallocState {
+    TEST_CALLOC_EXPECT_NULL,
+    TEST_CALLOC_EXPECT_ZEROED,
+} TestCallocState;
+
+typedef struct TestMemoryCalloc {
+    void* address;
+    size_t count;
+    size_t size;
+    size_t alignment;
+    TestCallocState state;
+} TestMemoryCalloc;
+
+int test_each_memory_calloc_setup(TestUnit* unit) {
+    TestMemoryCalloc* data = (TestMemoryCalloc*) unit->data;
+    data->address = memory_calloc(data->count, data->size, data->alignment);
+    return 0;
+}
+
+int test_each_memory_calloc_teardown(TestUnit* unit) {
+    TestMemoryCalloc* data = (TestMemoryCalloc*) unit->data;
+    memory_free(data->address);
+    return 0;
+}
+
+int test_group_memory_calloc(TestUnit* unit) {
+    TestMemoryCalloc* data = (TestMemoryCalloc*) unit->data;
+
+    if (data->state == TEST_CALLOC_EXPECT_NULL) {
+        ASSERT(
+            data->address == NULL,
+            "[TestMemoryCalloc] index=%zu: expected NULL, got %p",
+            unit->index,
+            data->address
+        );
+    }
+
+    if (data->state == TEST_CALLOC_EXPECT_ZEROED) {
+        ASSERT(
+            data->address != NULL,
+            "[TestMemoryCalloc] index=%zu: expected allocation, got NULL",
+            unit->index
+        );
+        ASSERT(
+            memory_is_aligned((uintptr_t) data->address, data->alignment),
+            "[TestMemoryCalloc] index=%zu: alignment=%zu, got unaligned address=%p",
+            unit->index,
+            data->alignment,
+            data->address
+        );
+
+        size_t total = data->count * data->size;
+        uint8_t* ptr = (uint8_t*) data->address;
+        for (size_t i = 0; i < total; ++i) {
+            ASSERT(
+                ptr[i] == 0,
+                "[TestMemoryCalloc] index=%zu: memory not zeroed at offset %zu",
+                unit->index,
+                i
+            );
+        }
+    }
+
+    return 0;
+}
+
+int test_suite_memory_calloc(void) {
+    TestMemoryCalloc data[] = {
+        {NULL, 0, 8, 8, TEST_CALLOC_EXPECT_NULL}, // zero count
+        {NULL, 4, 0, 8, TEST_CALLOC_EXPECT_NULL}, // zero size
+        {NULL, 4, 4, 0, TEST_CALLOC_EXPECT_NULL}, // zero alignment
+        {NULL, 4, 4, 8, TEST_CALLOC_EXPECT_ZEROED}, // normal calloc
+        {NULL, 16, 16, 64, TEST_CALLOC_EXPECT_ZEROED}, // aligned calloc
+        {NULL, SIZE_MAX / 2, 2, 8, TEST_CALLOC_EXPECT_NULL}, // overflow
+    };
+
+    size_t count = sizeof(data) / sizeof(TestMemoryCalloc);
+    TestUnit units[count];
+    for (size_t i = 0; i < count; ++i) {
+        units[i].index = i;
+        units[i].data = &data[i];
+    }
+
+    TestGroup group = {
+        .name = "memory_calloc",
+        .count = count,
+        .units = units,
+        .before_each = test_each_memory_calloc_setup,
+        .after_each = test_each_memory_calloc_teardown,
+        .run = test_group_memory_calloc,
+    };
+
+    return test_group_run(&group);
+}
+
+/** @} */
+
 int main(void) {
     TestSuite suites[] = {
         {"memory_bitwise_offset", test_suite_memory_bitwise_offset},
@@ -548,6 +649,7 @@ int main(void) {
         {"memory_padding_needed", test_suite_memory_padding_needed},
         {"memory_align_unit_count", test_suite_memory_unit_count},
         {"memory_alloc", test_suite_memory_alloc},
+        {"memory_calloc", test_suite_memory_calloc},
     };
 
     int result = 0;
