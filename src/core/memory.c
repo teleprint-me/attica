@@ -160,11 +160,11 @@ void* memory_calloc(size_t n, size_t size, size_t alignment) {
         return NULL;
     }
 
-    if (SIZE_MAX / n < size) {
+    size_t total = n * size;
+    if (SIZE_MAX - total < total) {
         return NULL; // overflow
     }
 
-    size_t total = n * size;
     void* address = memory_alloc(total, alignment);
     if (address) {
         return memset(address, 0, total);
