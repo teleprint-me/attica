@@ -42,12 +42,12 @@ static bool freelist_block_is_neighbor(FreeList* a, FreeList* b) {
     return a + a->size == b;
 }
 
-static void freelist_block_merge_upper(FreeList* a, FreeList* b) {
+static void freelist_block_merge_upward(FreeList* a, FreeList* b) {
     a->size += b->next->size;
     a->next = b->next->next;
 }
 
-static void freelist_block_merge_lower(FreeList* a, FreeList* b) {
+static void freelist_block_merge_downward(FreeList* a, FreeList* b) {
     a->size += b->size;
     a->next = b->next;
 }
@@ -69,14 +69,14 @@ static void freelist_block_insert(void* ptr) {
 
     // Merge with upper neighbor if possible
     if (freelist_block_is_neighbor(block, current->next)) {
-        freelist_block_merge_upper(block, current);
+        freelist_block_merge_upward(block, current);
     } else {
         block->next = current->next;
     }
 
     // Merge with lower neighbor if possible
     if (freelist_block_is_neighbor(current, block)) {
-        freelist_block_merge_lower(current, block);
+        freelist_block_merge_downward(current, block);
     } else {
         current->next = block;
     }
@@ -114,7 +114,7 @@ bool freelist_initialize(void) {
     if (NULL == base) {
         base = (FreeList*) memory_alloc(sizeof(FreeList), alignof(FreeList));
         if (NULL == base) {
-            return false; // previously returned nothing
+            return false;
         }
     }
 
@@ -217,3 +217,27 @@ void freelist_dump(void) {
 }
 
 /** @} */
+
+/// @brief Usage Example
+int main(void) {
+    if (!freelist_initialize()) {
+        fprintf(stderr, "Failed to initialize freelist state\n");
+        return EXIT_FAILURE;
+    }
+
+    int* x = (int*) freelist_malloc(sizeof(int));
+    if (!x) {
+        fprintf(stderr, "Failed to allocate int\n");
+        return EXIT_FAILURE;
+    }
+    *x = 5;
+    printf("Value of x: %d\n", *x);
+    freelist_free(x);
+
+    if (!freelist_terminate()) {
+        fprintf(stderr, "Failed to terminate freelist state\n");
+        return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
+}
