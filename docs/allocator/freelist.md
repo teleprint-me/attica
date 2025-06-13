@@ -279,7 +279,7 @@ When inserting a block back into the `FreeList`, we check whether it directly fo
 Here’s the function:
 
 ```c
-static void freelist_block_merge_lower(FreeList* a, FreeList* b) {
+static void freelist_block_merge_downward(FreeList* a, FreeList* b) {
     a->size += b->size;
     a->next = b->next;
 }
@@ -298,7 +298,7 @@ Here’s how it’s used in practice:
 ```c
 // Merge with lower neighbor if possible
 if (freelist_block_is_neighbor(current, block)) {
-    freelist_block_merge_lower(current, block);
+    freelist_block_merge_downward(current, block);
 } else {
     current->next = block;
 }
