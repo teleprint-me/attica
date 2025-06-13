@@ -341,78 +341,109 @@ This preserves the structure of the circular `FreeList` without coalescing.
 
 ## Free Block Insertion
 
-The moment we create a new block, we'll need to inject it into the existing `FreeList` every time we request a new address. In most cases, we'll accept a `size` from the user in bytes to be allocated. Internally, one a block is created, we have to keep track of it.
+Once a new block is created — either by splitting or allocating new memory — we
+need to insert it back into the `FreeList`. This process is crucial for
+maintaining the integrity of the allocator. We always insert blocks in sorted
+address order and merge adjacent blocks to minimize fragmentation.
 
 ### Inserting New Blocks
 
-We'll start off with the function signature first and work our way through definition.
-Keep in mind that any function that is responsible for managing a block of memory is private by definition.
+Let’s start with the function signature and walk through it.
 
 ```c
 static void freelist_block_insert(void* ptr)
 ```
 
-We do not need to return any information because the `FreeList` is managed internally. This means, we just need to pass in a newly created block to the function.
+Since the `FreeList` is managed internally, we don't need to return anything.
+We simply pass in a pointer to the user’s freed memory, and the allocator takes
+care of reintegrating it.
 
-If we have `NULL` reference, we simply block any further possible propogation to guard against this.
+The first thing we do is guard against a `NULL` pointer:
 
 ```c
-    if (NULL == ptr) {
-        return;
+if (NULL == ptr) {
+    return;
+}
+```
+
+Then we derive the block header from the pointer. Remember, when we allocate
+memory, the header is stored _before_ the user’s visible pointer:
+
+```c
+FreeList* block = ((FreeList*) ptr) - 1; // get header
+FreeList* current = head;
+```
+
+### Traversing the List
+
+This part of the function determines where the block should be inserted:
+
+```c
+while (!(block > current && block < current->next)) {
+    if (current >= current->next && (block > current || block < current->next)) {
+        break; // wrapped around
     }
+    current = current->next;
+}
 ```
 
-From there, we need to get the header and assign the `head` as the `current` segment.
+This loop can be tricky, so let’s break it down.
+
+- The goal is to find the correct spot to insert the block in address order.
+- Normally, we insert between `current` and `current->next` if `block` falls
+  between them.
+- But if the list wraps around (i.e., `current >= current->next`), we handle it
+  with a special condition:
+
+  - If the block is greater than `current` **or** less than `current->next`, it
+    belongs at the start or end of the list.
+
+This logic ensures the list stays properly sorted, even across the circular
+boundary.
+
+### Merging with Neighbors
+
+Once we’ve found the insertion point, we check if the block is adjacent to its
+neighbors and merge if possible.
 
 ```c
-    FreeList* block = ((FreeList*) ptr) - 1; // get header
-    FreeList* current = head;
+// Merge with upper neighbor if possible
+if (freelist_block_is_neighbor(block, current->next)) {
+    freelist_block_merge_upward(block, current);
+} else {
+    block->next = current->next;
+}
+
+// Merge with lower neighbor if possible
+if (freelist_block_is_neighbor(current, block)) {
+    freelist_block_merge_downward(current, block);
+} else {
+    current->next = block;
+}
 ```
 
-This next part is extremely nuanced and deserves some explanation.
+Here's what happens:
+
+- We check if `block` ends where `current->next` begins — if so, we merge
+  `block` with the next block.
+- Then we check if `current` ends where `block` begins — if so, we merge
+  `block` into `current`.
+- If neither merge is possible, we just link `block` between `current` and
+  `current->next`.
+
+These merges are what keep the freelist compact and efficient.
+
+### Finalizing the Insertion
+
+After insertion or merging, we update the freelist `head`:
 
 ```c
-    while (!(block > current && block < current->next)) {
-        if (current >= current->next && (block > current || block < current->next)) {
-            break; // wrapped around
-        }
-        current = current->next;
-    }
+head = current;
 ```
 
-Lets break this down bit-by-bit to get a feel for what's actually happening in here. This is how it was implemented in K&R, but the references we're enhanced to improve readability.
+This helps with future searches and maintains consistency in list traversal.
 
-If the current `block` address is greater than the `current` address and is less than the `current->next` address and this is `false`, then look at the next node.
-
-If the current address is greater than the next address and the block is greater than the current segment or the block is less than the next address, we've looped around and need to kill the loop. If we don't, it becomes an infinite loop (this is bad!).
-
-Otherwise, we continue to traverse the list until we circle back around to the head.
-
-We already covered node coalecing, so we can just plop that in here.
-
-```c
-    // Merge with upper neighbor if possible
-    if (freelist_block_is_neighbor(block, current->next)) {
-        freelist_block_merge_upward(block, current);
-    } else {
-        block->next = current->next;
-    }
-
-    // Merge with lower neighbor if possible
-    if (freelist_block_is_neighbor(current, block)) {
-        freelist_block_merge_downward(current, block);
-    } else {
-        current->next = block;
-    }
-```
-
-And then reset the `head` to `current`.
-
-```c
-    head = current;
-```
-
-So, altogether, it looks like the following.
+### Complete Function
 
 ```c
 static void freelist_block_insert(void* ptr) {
@@ -420,7 +451,7 @@ static void freelist_block_insert(void* ptr) {
         return;
     }
 
-    FreeList* block = ((FreeList*) ptr) - 1; // get header
+    FreeList* block = ((FreeList*) ptr) - 1;
     FreeList* current = head;
 
     while (!(block > current && block < current->next)) {
@@ -447,6 +478,10 @@ static void freelist_block_insert(void* ptr) {
     head = current;
 }
 ```
+
+This is one of the most important parts of the allocator. It ensures freed
+blocks are recycled properly and merged when possible — giving us a consistent,
+efficient freelist over time.
 
 ## References
 
