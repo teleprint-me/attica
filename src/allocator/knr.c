@@ -10,158 +10,155 @@
 #include "core/memory.h"
 #include "allocator/knr.h"
 
-#include <sys/mman.h>
-#include <unistd.h>
-
+#include <stdbool.h>
 #include <stdint.h>
-#include <stddef.h>
 #include <stdlib.h>
 #include <stdio.h>
 
 /**
- * Maximum amount of RAM to allocate (in bytes)
+ * @name Private
+ * {@
  */
 
-static size_t MAX_RAM = 0;
+typedef struct FreeList {
+    struct FreeList* next; /* next block if on free list */
+    size_t size; /* size of this block */
+} FreeList;
 
 /**
  * Global Freelist Sentinel
  */
-
-static FreeList base = {0}; /** sentinel value */
-static FreeList* freelist = NULL; /* start of free list (head) */
-
-/**
- * Private Functions
- */
-
-/**
- * @brief Returns the maximum allocatable memory based on system physical RAM,
- *        minus a fixed 1 GiB reserve to avoid exhausting system resources.
- *        Fallbacks to 4 GiB if RAM cannot be determined.
- */
-static size_t system_max_ram(void) {
-    int64_t pages = sysconf(_SC_PHYS_PAGES);
-    int64_t page_size = sysconf(_SC_PAGE_SIZE);
-
-    size_t max_ram;
-    if (pages <= 0 || page_size <= 0) {
-        max_ram = DSA_FALLBACK_MAX_RAM;
-    } else {
-        max_ram = (size_t) pages * (size_t) page_size;
-    }
-
-    // Never allow to allocate more than (fallback - reserve), but always at least 16 MiB.
-    if (max_ram > DSA_RAM_RESERVE) {
-        max_ram -= DSA_RAM_RESERVE;
-    } else {
-        max_ram = 16 * 1024 * 1024; // fallback minimum, 16 MiB
-    }
-
-    return max_ram;
-}
-
-static void allocator_freelist_init(void) {
-    if (0 == MAX_RAM) {
-        MAX_RAM = system_max_ram();
-    }
-
-    if (NULL == freelist) {
-        base.next = &base;
-        freelist = &base;
-    }
-}
-
-static bool coalesce_adjacent_neighbor(FreeList* a, FreeList* b) {
-    return a + a->size == b;
-}
-
-static void merge_with_upper_neighbor(FreeList* a, FreeList* b) {
-    a->size += b->next->size;
-    a->next = b->next->next;
-}
-
-static void merge_with_lower_neighbor(FreeList* a, FreeList* b) {
-    a->size += b->size;
-    a->next = b->next;
-}
+static FreeList* base = NULL; /** sentinel value */
+static FreeList* head = NULL; /* start of free list (head) */
 
 /**
  * @brief Insert block into freelist and coalesce if adjacent
  */
-static void allocator_freelist_insert(void* ptr) {
-    FreeList* block = (FreeList*) ptr - 1; // move back to header
-    FreeList* current = freelist;
 
-    // Find insert point
+static bool freelist_block_is_neighbor(FreeList* a, FreeList* b) {
+    return a + a->size == b;
+}
+
+static void freelist_block_merge_upper(FreeList* a, FreeList* b) {
+    a->size += b->next->size;
+    a->next = b->next->next;
+}
+
+static void freelist_block_merge_lower(FreeList* a, FreeList* b) {
+    a->size += b->size;
+    a->next = b->next;
+}
+
+static void freelist_block_insert(void* ptr) {
+    if (NULL == ptr) {
+        return;
+    }
+
+    FreeList* block = ((FreeList*) ptr) - 1; // get header
+    FreeList* current = head;
+
     while (!(block > current && block < current->next)) {
-        // Special case: At the start or end of circular list
-        if (((current >= current->next) && (block > current)) || block < current->next) {
-            break;
+        if (current >= current->next && (block > current || block < current->next)) {
+            break; // wrapped around
         }
-        // Update the current pointer
         current = current->next;
     }
 
-    // Try to merge with upper neighbor
-    if (coalesce_adjacent_neighbor(block, current->next)) {
-        merge_with_upper_neighbor(block, current);
+    // Merge with upper neighbor if possible
+    if (freelist_block_is_neighbor(block, current->next)) {
+        freelist_block_merge_upper(block, current);
     } else {
         block->next = current->next;
     }
 
-    // Try to merge with lower neighbor
-    if (coalesce_adjacent_neighbor(current, block)) {
-        merge_with_lower_neighbor(current, block);
+    // Merge with lower neighbor if possible
+    if (freelist_block_is_neighbor(current, block)) {
+        freelist_block_merge_lower(current, block);
     } else {
         current->next = block;
     }
 
-    // Update the free list
-    freelist = current;
+    head = current;
 }
 
 /**
  * @brief Allocate raw memory from heap
  */
-static FreeList* allocator_freelist_heap_bump(size_t nunits) {
-    size_t nbytes = nunits * HEADER_SIZE;
-    size_t page_size = (size_t) sysconf(_SC_PAGESIZE);
+static FreeList* freelist_block_new(size_t nunits) {
+    size_t nbytes = nunits * sizeof(FreeList);
 
-    // Round up to page size
-    if (0 != nbytes % page_size) {
-        nbytes += page_size - (nbytes % page_size);
-    }
-
-    void* address = mmap(NULL, nbytes, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-    if (MAP_FAILED == address) {
+    FreeList* block = (FreeList*) memory_alloc(nbytes, alignof(FreeList));
+    if (NULL == block) {
         return NULL;
     }
 
-    FreeList* block = (FreeList*) address;
-    block->size = nbytes / HEADER_SIZE;
-    allocator_freelist_insert(block + 1);
-    return freelist;
+    block->size = nbytes / sizeof(FreeList);
+    freelist_block_insert(block + 1);
+    return block;
+}
+
+/** @} */
+
+/**
+ * @name Public
+ * {@
+ */
+
+/**
+ * @brief Initialize the global free list.
+ */
+bool freelist_initialize(void) {
+    if (NULL == base) {
+        base = (FreeList*) memory_alloc(sizeof(FreeList), alignof(FreeList));
+        if (NULL == base) {
+            return false; // previously returned nothing
+        }
+    }
+
+    if (NULL == head) {
+        base->next = base;
+        base->size = 0;
+        head = base;
+    }
+
+    return true;
 }
 
 /**
- * Public Functions
+ * @brief Destroy the global free list and free all blocks.
  */
+bool freelist_terminate(void) {
+    if (NULL == base) {
+        return false;
+    }
 
-/**
- * @brief Allocate memory block
- */
-void* allocator_freelist_malloc(size_t size) {
-    allocator_freelist_init();
-    if (size == 0 || size > MAX_RAM) {
+    FreeList* current = base->next;
+    while (current != base) {
+        FreeList* next = current->next;
+        memory_free(current);
+        current = next;
+    }
+
+    memory_free(base);
+    base = NULL;
+    head = NULL;
+    return true;
+}
+
+void* freelist_malloc(size_t size) {
+    if (size == 0 || size > memory_ram_free()) {
         return NULL;
     }
 
-    uintptr_t payload_size = memory_align_up(size, MEMORY_ALIGNMENT);
-    size_t nunits = (payload_size + HEADER_SIZE - 1) / HEADER_SIZE + 1;
+    if (!freelist_initialize()) {
+        return NULL;
+    }
 
-    FreeList* previous = freelist;
-    FreeList* current = freelist->next;
+    uintptr_t payload_size = memory_align_up(size, alignof(FreeList));
+    size_t nunits = (payload_size + sizeof(FreeList) - 1) / sizeof(FreeList) + 1;
+
+    FreeList* previous = head;
+    FreeList* current = head->next;
 
     while (true) {
         if (current->size >= nunits) {
@@ -175,12 +172,12 @@ void* allocator_freelist_malloc(size_t size) {
                 current->size -= nunits;
                 current = alloc;
             }
-            freelist = previous;
+            head = previous;
             return (void*) (current + 1);
         }
 
-        if (current == freelist) {
-            if (NULL == allocator_freelist_heap_bump(nunits)) {
+        if (current == head) {
+            if (NULL == freelist_block_new(nunits)) {
                 return NULL; // Out of memory
             }
         }
@@ -190,29 +187,30 @@ void* allocator_freelist_malloc(size_t size) {
     }
 }
 
-/**
- * @brief Return memory block to freelist
- */
-void allocator_freelist_free(void* ptr) {
+void freelist_free(void* ptr) {
     if (NULL == ptr) {
         return;
     }
-    allocator_freelist_insert(ptr);
+    freelist_block_insert(ptr);
 }
 
-/**
- * @brief Dump the contents of the freelist to the console
- */
-void allocator_freelist_dump(void) {
-    FreeList* current = freelist;
-    printf("FreeList:\n");
-    do {
+void freelist_dump(void) {
+    printf("freelist:\n");
+    if (!base) {
+        printf("  [uninitialized]\n");
+        return;
+    }
+
+    FreeList* current = base->next;
+    while (current != base) {
         printf(
-            "  Block at %p, size: %zu (%zu bytes)\n",
+            "  block: %p | size: %zu | next: %p\n",
             (void*) current,
             current->size,
-            current->size * sizeof(FreeList)
+            (void*) current->next
         );
         current = current->next;
-    } while (current != freelist);
+    }
 }
+
+/** @} */
