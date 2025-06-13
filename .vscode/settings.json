@@ -76,6 +76,8 @@
     "coroutine": "c",
     "valarray": "c",
     "knr.h": "c",
-    "sysinfo.h": "c"
+    "sysinfo.h": "c",
+    "cstdlib": "c",
+    "stdio.h": "c"
   }
 }
