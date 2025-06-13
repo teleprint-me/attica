@@ -296,7 +296,7 @@ Let’s clarify the parameters:
 - `b` is the block being inserted (i.e. just freed).
 - If `a + a->size == b`, we merge them.
 
-> In this context, “merging lower” means extending the **previous** block `a`
+> In this context, “merging downward means extending the **previous** block `a`
 > downward to absorb `b`, eliminating the gap between them.
 
 Here’s how it’s used in practice:
@@ -338,6 +338,115 @@ current->next = block;
 ```
 
 This preserves the structure of the circular `FreeList` without coalescing.
+
+## Free Block Insertion
+
+The moment we create a new block, we'll need to inject it into the existing `FreeList` every time we request a new address. In most cases, we'll accept a `size` from the user in bytes to be allocated. Internally, one a block is created, we have to keep track of it.
+
+### Inserting New Blocks
+
+We'll start off with the function signature first and work our way through definition.
+Keep in mind that any function that is responsible for managing a block of memory is private by definition.
+
+```c
+static void freelist_block_insert(void* ptr)
+```
+
+We do not need to return any information because the `FreeList` is managed internally. This means, we just need to pass in a newly created block to the function.
+
+If we have `NULL` reference, we simply block any further possible propogation to guard against this.
+
+```c
+    if (NULL == ptr) {
+        return;
+    }
+```
+
+From there, we need to get the header and assign the `head` as the `current` segment.
+
+```c
+    FreeList* block = ((FreeList*) ptr) - 1; // get header
+    FreeList* current = head;
+```
+
+This next part is extremely nuanced and deserves some explanation.
+
+```c
+    while (!(block > current && block < current->next)) {
+        if (current >= current->next && (block > current || block < current->next)) {
+            break; // wrapped around
+        }
+        current = current->next;
+    }
+```
+
+Lets break this down bit-by-bit to get a feel for what's actually happening in here. This is how it was implemented in K&R, but the references we're enhanced to improve readability.
+
+If the current `block` address is greater than the `current` address and is less than the `current->next` address and this is `false`, then look at the next node.
+
+If the current address is greater than the next address and the block is greater than the current segment or the block is less than the next address, we've looped around and need to kill the loop. If we don't, it becomes an infinite loop (this is bad!).
+
+Otherwise, we continue to traverse the list until we circle back around to the head.
+
+We already covered node coalecing, so we can just plop that in here.
+
+```c
+    // Merge with upper neighbor if possible
+    if (freelist_block_is_neighbor(block, current->next)) {
+        freelist_block_merge_upward(block, current);
+    } else {
+        block->next = current->next;
+    }
+
+    // Merge with lower neighbor if possible
+    if (freelist_block_is_neighbor(current, block)) {
+        freelist_block_merge_downward(current, block);
+    } else {
+        current->next = block;
+    }
+```
+
+And then reset the `head` to `current`.
+
+```c
+    head = current;
+```
+
+So, altogether, it looks like the following.
+
+```c
+static void freelist_block_insert(void* ptr) {
+    if (NULL == ptr) {
+        return;
+    }
+
+    FreeList* block = ((FreeList*) ptr) - 1; // get header
+    FreeList* current = head;
+
+    while (!(block > current && block < current->next)) {
+        if (current >= current->next && (block > current || block < current->next)) {
+            break; // wrapped around
+        }
+        current = current->next;
+    }
+
+    // Merge with upper neighbor if possible
+    if (freelist_block_is_neighbor(block, current->next)) {
+        freelist_block_merge_upward(block, current);
+    } else {
+        block->next = current->next;
+    }
+
+    // Merge with lower neighbor if possible
+    if (freelist_block_is_neighbor(current, block)) {
+        freelist_block_merge_downward(current, block);
+    } else {
+        current->next = block;
+    }
+
+    head = current;
+}
+```
 
 ## References
 
