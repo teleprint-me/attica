@@ -24,14 +24,14 @@ typedef struct TestKNRAllocator {
 
 int knr_alloc_setup(TestUnit* unit) {
     TestKNRAllocator* data = (TestKNRAllocator*) unit->data;
-    data->address = allocator_freelist_malloc(data->size);
+    data->address = freelist_malloc(data->size);
     return 0;
 }
 
 int knr_alloc_teardown(TestUnit* unit) {
     TestKNRAllocator* data = (TestKNRAllocator*) unit->data;
     if (data->address) {
-        allocator_freelist_free(data->address);
+        freelist_free(data->address);
         data->address = NULL;
     }
     return 0;
