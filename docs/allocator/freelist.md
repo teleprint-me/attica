@@ -87,9 +87,9 @@ First, we `malloc()` an aligned sentinel value to the base. You can use
 `malloc()` here or `posix_memalign()`. `memory_alloc()` is simply a
 `posix_memalign()` wrapper that handles the nuances for me.
 
-Then we link the `base` to itself. This creates a circular linked-list. We simply
-initialize the `size` to `0` because there's nothing allocated besides the `head`.
-Finally, we assign the sentinel `base` to the `head`.
+Then we link the `base` to itself. This creates a circular linked-list. We
+simply initialize the `size` to `0` because there's nothing allocated besides
+the `head`. Finally, we assign the sentinel `base` to the `head`.
 
 There is a reason behind the madness which will be revealed later on.
 
@@ -99,10 +99,11 @@ it's already initialized, it will simply return `true`, `false` otherwise.
 I set it up this way to guard against reinitialization (which is bad... very
 bad), but this allows us to call this anytime it's needed (or required).
 
-For example, reinitializing the `FreeList` could cause serious issues like memory
-leaks, dangling pointers, or even double-free errors if the caller still holds
-references to previously allocated memory. By making initialization idempotent
-and guarded, we at least make an attempt to eliminate that class of bugs.
+For example, reinitializing the `FreeList` could cause serious issues like
+memory leaks, dangling pointers, or even double-free errors if the caller still
+holds references to previously allocated memory. By making initialization
+idempotent and guarded, we at least make an attempt to eliminate that class of
+bugs.
 
 ### Terminating the FreeList
 
@@ -272,9 +273,13 @@ merging happens.
 
 ### Merging the Previous Neighbor
 
-Merging with the **previous** neighbor is slightly more subtle than merging forward, but the goal is the same: **reduce fragmentation** by coalescing adjacent free blocks.
+Merging with the **previous** neighbor is slightly more subtle than merging
+forward, but the goal is the same: **reduce fragmentation** by coalescing
+adjacent free blocks.
 
-When inserting a block back into the `FreeList`, we check whether it directly follows the previous block. If it does, we merge the two into one larger free block.
+When inserting a block back into the `FreeList`, we check whether it directly
+follows the previous block. If it does, we merge the two into one larger free
+block.
 
 Here’s the function:
 
@@ -287,11 +292,12 @@ static void freelist_block_merge_downward(FreeList* a, FreeList* b) {
 
 Let’s clarify the parameters:
 
-* `a` is the *previous* block in the list.
-* `b` is the block being inserted (i.e. just freed).
-* If `a + a->size == b`, we merge them.
+- `a` is the _previous_ block in the list.
+- `b` is the block being inserted (i.e. just freed).
+- If `a + a->size == b`, we merge them.
 
-> In this context, “merging lower” means extending the **previous** block `a` downward to absorb `b`, eliminating the gap between them.
+> In this context, “merging lower” means extending the **previous** block `a`
+> downward to absorb `b`, eliminating the gap between them.
 
 Here’s how it’s used in practice:
 
@@ -306,12 +312,14 @@ if (freelist_block_is_neighbor(current, block)) {
 
 Let’s break it down:
 
-* `block` is the block we want to insert (i.e., just freed).
-* `current` is the last block we visited while traversing the list — it comes *before* `block` in memory.
-* If `current` ends where `block` begins, we merge them by:
+- `block` is the block we want to insert (i.e., just freed).
+- `current` is the last block we visited while traversing the list — it comes
+  _before_ `block` in memory.
+- If `current` ends where `block` begins, we merge them by:
 
   1. Extending `current->size` to include `block`.
-  2. Skipping `block` in the linked-list by pointing `current->next` to `block->next`.
+  2. Skipping `block` in the linked-list by pointing `current->next` to
+     `block->next`.
 
 Diagram:
 
