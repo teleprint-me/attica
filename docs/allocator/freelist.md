@@ -483,6 +483,138 @@ This is one of the most important parts of the allocator. It ensures freed
 blocks are recycled properly and merged when possible — giving us a consistent,
 efficient freelist over time.
 
+## Bytes, Units, and Alignment
+
+Now that we’ve laid out the foundational pieces of the allocator — list
+management, block insertion, and merging — we can finally create new blocks on
+demand.
+
+This might seem simple at first glance, but there's a surprising amount of
+nuance involved in turning **bytes** into properly aligned **freelist units**.
+
+### What is a "unit"?
+
+In this allocator, a **unit** is the basic allocation block — it's equivalent
+to the size of a `FreeList` node.
+
+We don’t just allocate raw bytes — we allocate memory in **multiples of
+`sizeof(FreeList)`**. This simplifies alignment and block sizing internally.
+
+So when we allocate, we don’t ask, “how many bytes?” — we ask, “how many units
+of memory do we need?”
+
+### So how does malloc fit in?
+
+We’ll go over `freelist_malloc()` in detail soon, but here’s the important part
+for context:
+
+```c
+uintptr_t payload_size = memory_align_up(size, alignof(FreeList));
+size_t nunits = (payload_size + sizeof(FreeList) - 1) / sizeof(FreeList) + 1;
+```
+
+- The user requests some number of **bytes**.
+- We align that size up to the next multiple of `FreeList` alignment.
+- Then we convert the aligned byte size into a **unit count**.
+- The final `+1` is to include space for the block header.
+
+Why units? Because internally, every free block is sized and traversed in units
+— not bytes. It's a lightweight abstraction that makes coalescing and splitting
+easier.
+
+### Creating New Blocks
+
+When we run out of memory in the freelist, we fall back to allocating new
+memory from the system. That’s the job of:
+
+```c
+static FreeList* freelist_block_new(size_t nunits);
+```
+
+Let’s walk through the function:
+
+```c
+size_t nbytes = nunits * sizeof(FreeList);
+```
+
+We convert the unit count back into raw bytes — this is the actual memory we
+request.
+
+Then we allocate aligned memory:
+
+```c
+FreeList* block = (FreeList*) memory_alloc(nbytes, alignof(FreeList));
+if (NULL == block) {
+    return NULL;
+}
+```
+
+Next, we store the number of units in the header:
+
+```c
+block->size = nbytes / sizeof(FreeList);
+```
+
+This might seem circular — we converted bytes to units and back again — but
+it's just a bookkeeping step to ensure `block->size` matches the internal unit
+count expected by the rest of the allocator.
+
+We then insert the new block into the freelist:
+
+```c
+freelist_block_insert(block + 1);
+```
+
+> Why `block + 1`? Because we always insert the **payload** portion of the
+> block — the part after the header. Inside `freelist_block_insert()`, we
+> subtract one to get back to the header.
+
+Finally, we return the full block in case the caller (e.g. `freelist_malloc`)
+needs it:
+
+```c
+return block;
+```
+
+### Full Implementation
+
+```c
+static FreeList* freelist_block_new(size_t nunits) {
+    size_t nbytes = nunits * sizeof(FreeList);
+
+    FreeList* block = (FreeList*) memory_alloc(nbytes, alignof(FreeList));
+    if (NULL == block) {
+        return NULL;
+    }
+
+    block->size = nbytes / sizeof(FreeList);
+    freelist_block_insert(block + 1);
+    return block;
+}
+```
+
+### Why not just use bytes?
+
+You might wonder why we don’t just pass around byte counts. The reason is:
+**units are simpler and cheaper** to work with.
+
+If we passed raw bytes:
+
+- We'd constantly have to convert between bytes and units in every freelist
+  operation.
+- We'd risk misalignments or partial block comparisons.
+
+Sticking to `sizeof(FreeList)`-aligned units lets the allocator stay small,
+fast, and safe — exactly what the original K\&R design intended (minus the
+union hacks).
+
+### Final Note
+
+This is a deceptively simple function — and that’s the beauty of it. Once all
+the pieces are in place (alignment, headers, coalescing), allocating new memory
+becomes a one-liner that fits into the larger machinery of the allocator with
+minimal overhead.
+
 ## References
 
 - K&R C - 8.7: A Storage Allocator
