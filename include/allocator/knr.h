@@ -1,6 +1,9 @@
 /**
- * @file include/allocator/knr.h
+ * Copyright © 2023 Austin Berrio
+ *
+ * @file include/allocator/knr.c
  * @brief K&R-style allocator using a static memory arena.
+ *
  * @ref K&R C - 8.7: A Storage Allocator
  * @ref https://stackoverflow.com/q/13159564
  * @ref https://stackoverflow.com/q/1119134
@@ -10,29 +13,48 @@
 #ifndef DSA_ALLOCATOR_KNR_H
 #define DSA_ALLOCATOR_KNR_H
 
-#include <stddef.h>
-
-#ifndef DSA_FALLBACK_MAX_RAM
-    #define DSA_FALLBACK_MAX_RAM ((size_t) 1 << 32) // 4 GiB
-#endif
-
-#ifndef DSA_RAM_RESERVE
-    #define DSA_RAM_RESERVE ((size_t) 1 << 30) // 1 GiB
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 /**
- * FreeList Block
+ * @brief Initialize the freelist allocator.
+ *
+ * Must be called before any allocation.
+ * Safe to call multiple times (no-op after first init).
  */
+bool freelist_initialize(void);
 
-typedef struct FreeList {
-    struct FreeList* next; /* next block if on free list */
-    size_t size; /* size of this block */
-} FreeList;
+/**
+ * @brief Destroy all freelist state.
+ *
+ * Frees any resources owned by the allocator.
+ * After this, no allocations are valid.
+ */
+bool freelist_terminate(void);
 
-#define HEADER_SIZE sizeof(FreeList)
+/**
+ * @brief Allocate a memory block using the freelist allocator.
+ *
+ * @param size Number of bytes to allocate.
+ * @return Pointer to memory block, or NULL on failure.
+ */
+void* freelist_malloc(size_t size);
 
-void* allocator_freelist_malloc(size_t size);
-void allocator_freelist_free(void* ptr);
-void allocator_freelist_dump(void);
+/**
+ * @brief Return a previously allocated block to the freelist.
+ *
+ * @param ptr Pointer to memory block previously allocated with allocator_freelist_malloc().
+ */
+void freelist_free(void* ptr);
+
+/**
+ * @brief Dump the current state of the freelist (for debugging).
+ */
+void freelist_dump(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // DSA_ALLOCATOR_KNR_H
