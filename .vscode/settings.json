@@ -78,6 +78,7 @@
     "knr.h": "c",
     "sysinfo.h": "c",
     "cstdlib": "c",
-    "stdio.h": "c"
+    "stdio.h": "c",
+    "assert.h": "c"
   }
 }
