@@ -37,7 +37,7 @@
  * @section Hash Life-cycle
  */
 
-HashMap* hash_table_create(uint64_t initial_size, HashMapKeyType key_type) {
+HashMap* hash_map_create(uint64_t initial_size, HashMapKeyType key_type) {
     HashMap* table = memory_alloc(sizeof(HashMap), alignof(HashMap));
     if (!table) {
         LOG_ERROR("Failed to allocate memory for HashMap.");
@@ -86,7 +86,7 @@ HashMap* hash_table_create(uint64_t initial_size, HashMapKeyType key_type) {
     return table;
 }
 
-void hash_table_free(HashMap* table) {
+void hash_map_free(HashMap* table) {
     if (table) {
         // Destroy the mutex before freeing memory
         pthread_mutex_destroy(&table->thread_lock);
@@ -104,7 +104,7 @@ void hash_table_free(HashMap* table) {
  * @section Private Functions
  */
 
-static HashMapState hash_table_insert_internal(HashMap* table, const void* key, void* value) {
+static HashMapState hash_map_insert_internal(HashMap* table, const void* key, void* value) {
     if (!table || !table->entries || table->size == 0) {
         LOG_ERROR("Invalid table for insert internal.");
         return HASH_MAP_STATE_ERROR;
@@ -136,7 +136,7 @@ static HashMapState hash_table_insert_internal(HashMap* table, const void* key, 
     return HASH_MAP_STATE_FULL;
 }
 
-static HashMapState hash_table_resize_internal(HashMap* table, uint64_t new_size) {
+static HashMapState hash_map_resize_internal(HashMap* table, uint64_t new_size) {
     if (!table || !table->entries || table->size == 0) {
         LOG_ERROR("Invalid table for resize internal.");
         return HASH_MAP_STATE_ERROR;
@@ -165,7 +165,7 @@ static HashMapState hash_table_resize_internal(HashMap* table, uint64_t new_size
     for (uint64_t i = 0; i < old_size; i++) {
         HashMapEntry* entry = &old_entries[i];
         if (entry->key) {
-            HashMapState state = hash_table_insert_internal(table, entry->key, entry->value);
+            HashMapState state = hash_map_insert_internal(table, entry->key, entry->value);
             if (HASH_MAP_STATE_SUCCESS != state) {
                 LOG_ERROR("Failed to rehash key during resize.");
                 memory_free(new_entries);
@@ -182,7 +182,7 @@ static HashMapState hash_table_resize_internal(HashMap* table, uint64_t new_size
     return HASH_MAP_STATE_SUCCESS;
 }
 
-static HashMapState hash_table_delete_internal(HashMap* table, const void* key) {
+static HashMapState hash_map_delete_internal(HashMap* table, const void* key) {
     if (!table || !table->entries || table->size == 0) {
         LOG_ERROR("Invalid table for delete internal.");
         return HASH_MAP_STATE_ERROR;
@@ -224,7 +224,7 @@ static HashMapState hash_table_delete_internal(HashMap* table, const void* key) 
                 table->count--;
 
                 // Reinsert into new position
-                HashMapState state = hash_table_insert_internal(table, rehash_key, rehash_value);
+                HashMapState state = hash_map_insert_internal(table, rehash_key, rehash_value);
                 if (HASH_MAP_STATE_SUCCESS != state) {
                     LOG_ERROR("Failed to reinsert during delete.");
                     return HASH_MAP_STATE_ERROR;
@@ -238,7 +238,7 @@ static HashMapState hash_table_delete_internal(HashMap* table, const void* key) 
     return HASH_MAP_STATE_KEY_NOT_FOUND;
 }
 
-static HashMapState hash_table_clear_internal(HashMap* table) {
+static HashMapState hash_map_clear_internal(HashMap* table) {
     if (!table || !table->entries || table->size == 0) {
         LOG_ERROR("Invalid table for clear internal.");
         return HASH_MAP_STATE_ERROR;
@@ -253,7 +253,7 @@ static HashMapState hash_table_clear_internal(HashMap* table) {
     return HASH_MAP_STATE_SUCCESS;
 }
 
-static void* hash_table_search_internal(HashMap* table, const void* key) {
+static void* hash_map_search_internal(HashMap* table, const void* key) {
     if (!table || !table->entries || table->size == 0) {
         LOG_ERROR("Invalid table for search internal.");
         return NULL;
@@ -284,7 +284,7 @@ static void* hash_table_search_internal(HashMap* table, const void* key) {
  * @section Hash Functions
  */
 
-HashMapState hash_table_insert(HashMap* table, const void* key, void* value) {
+HashMapState hash_map_insert(HashMap* table, const void* key, void* value) {
     if (!table || !table->entries || table->size == 0) {
         LOG_ERROR("Invalid table for insert.");
         return HASH_MAP_STATE_ERROR;
@@ -304,19 +304,19 @@ HashMapState hash_table_insert(HashMap* table, const void* key, void* value) {
     pthread_mutex_lock(&table->thread_lock);
 
     if ((double) table->count / table->size > 0.75) {
-        if (HASH_MAP_STATE_SUCCESS != hash_table_resize_internal(table, table->size * 2)) {
+        if (HASH_MAP_STATE_SUCCESS != hash_map_resize_internal(table, table->size * 2)) {
             state = HASH_MAP_STATE_ERROR;
             goto exit;
         }
     }
-    state = hash_table_insert_internal(table, key, value);
+    state = hash_map_insert_internal(table, key, value);
 
 exit:
     pthread_mutex_unlock(&table->thread_lock);
     return state;
 }
 
-HashMapState hash_table_resize(HashMap* table, uint64_t new_size) {
+HashMapState hash_map_resize(HashMap* table, uint64_t new_size) {
     if (!table || !table->entries || table->size == 0) {
         LOG_ERROR("Invalid table for resize.");
         return HASH_MAP_STATE_ERROR;
@@ -324,12 +324,12 @@ HashMapState hash_table_resize(HashMap* table, uint64_t new_size) {
 
     HashMapState state;
     pthread_mutex_lock(&table->thread_lock);
-    state = hash_table_resize_internal(table, new_size);
+    state = hash_map_resize_internal(table, new_size);
     pthread_mutex_unlock(&table->thread_lock);
     return state;
 }
 
-HashMapState hash_table_delete(HashMap* table, const void* key) {
+HashMapState hash_map_delete(HashMap* table, const void* key) {
     if (!table || !table->entries || table->size == 0) {
         LOG_ERROR("Invalid table for delete.");
         return HASH_MAP_STATE_ERROR;
@@ -342,12 +342,12 @@ HashMapState hash_table_delete(HashMap* table, const void* key) {
 
     HashMapState state;
     pthread_mutex_lock(&table->thread_lock);
-    state = hash_table_delete_internal(table, key);
+    state = hash_map_delete_internal(table, key);
     pthread_mutex_unlock(&table->thread_lock);
     return state;
 }
 
-HashMapState hash_table_clear(HashMap* table) {
+HashMapState hash_map_clear(HashMap* table) {
     if (!table || !table->entries || table->size == 0) {
         LOG_ERROR("Invalid table for clear.");
         return HASH_MAP_STATE_ERROR;
@@ -355,12 +355,12 @@ HashMapState hash_table_clear(HashMap* table) {
 
     HashMapState state;
     pthread_mutex_lock(&table->thread_lock);
-    state = hash_table_clear_internal(table);
+    state = hash_map_clear_internal(table);
     pthread_mutex_unlock(&table->thread_lock);
     return state;
 }
 
-void* hash_table_search(HashMap* table, const void* key) {
+void* hash_map_search(HashMap* table, const void* key) {
     if (!table || !table->entries || table->size == 0) {
         LOG_ERROR("Invalid table for search.");
         return NULL;
@@ -373,7 +373,7 @@ void* hash_table_search(HashMap* table, const void* key) {
 
     void* value = NULL;
     pthread_mutex_lock(&table->thread_lock);
-    value = hash_table_search_internal(table, key);
+    value = hash_map_search_internal(table, key);
     pthread_mutex_unlock(&table->thread_lock);
     return value;
 }
@@ -393,7 +393,7 @@ int hash_integer_compare(const void* key1, const void* key2) {
 }
 
 int32_t* hash_integer_search(HashMap* table, const void* key) {
-    return (int32_t*) hash_table_search_internal(table, key);
+    return (int32_t*) hash_map_search_internal(table, key);
 }
 
 /**
@@ -421,7 +421,7 @@ int hash_string_compare(const void* key1, const void* key2) {
 }
 
 char* hash_string_search(HashMap* table, const void* key) {
-    return (char*) hash_table_search_internal(table, key);
+    return (char*) hash_map_search_internal(table, key);
 }
 
 /**
@@ -441,5 +441,5 @@ int hash_address_compare(const void* key1, const void* key2) {
 }
 
 void* hash_address_search(HashMap* table, const void* key) {
-    return (void*) hash_table_search_internal(table, key);
+    return (void*) hash_map_search_internal(table, key);
 }

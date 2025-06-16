@@ -36,7 +36,7 @@
  */
 
 LeaseOwner* lease_create_owner(size_t capacity) {
-    return hash_table_create(capacity, HASH_MAP_KEY_TYPE_ADDRESS);
+    return hash_map_create(capacity, HASH_MAP_KEY_TYPE_ADDRESS);
 }
 
 LeasePolicy* lease_create_policy(LeaseAccess access, LeaseContract contract) {
@@ -108,7 +108,7 @@ void lease_free_owner(LeaseOwner* owner) {
             }
         }
 
-        hash_table_free(owner);
+        hash_map_free(owner);
     }
 }
 
@@ -221,7 +221,7 @@ void* lease_alloc_owned_address(LeaseOwner* owner, size_t size, size_t alignment
         return NULL;
     }
 
-    if (HASH_MAP_STATE_SUCCESS != hash_table_insert(owner, address, tenant)) {
+    if (HASH_MAP_STATE_SUCCESS != hash_map_insert(owner, address, tenant)) {
         lease_free_tenant(tenant);
         return NULL;
     }
@@ -241,7 +241,7 @@ void* lease_alloc_borrowed_address(
         return NULL;
     }
 
-    if (HASH_MAP_STATE_SUCCESS != hash_table_insert(owner, address, tenant)) {
+    if (HASH_MAP_STATE_SUCCESS != hash_map_insert(owner, address, tenant)) {
         lease_free_tenant(tenant);
         return NULL;
     }
@@ -259,7 +259,7 @@ void* lease_alloc_static_address(LeaseOwner* owner, void* address, size_t size, 
         return NULL;
     }
 
-    if (HASH_MAP_STATE_SUCCESS != hash_table_insert(owner, address, tenant)) {
+    if (HASH_MAP_STATE_SUCCESS != hash_map_insert(owner, address, tenant)) {
         lease_free_tenant(tenant);
         return NULL;
     }
@@ -299,7 +299,7 @@ LeaseTenant* lease_get_tenant(LeaseOwner* owner, void* address) {
     if (!owner || !address) {
         return NULL;
     }
-    return (LeaseTenant*) hash_table_search(owner, address);
+    return (LeaseTenant*) hash_map_search(owner, address);
 }
 
 LeaseObject* lease_get_object(LeaseOwner* owner, void* address) {
@@ -359,13 +359,13 @@ LeaseState lease_realloc(LeaseOwner* owner, void* address, size_t size, size_t a
     memcpy(new_address, old_address, old_size);
 
     // Remove old address from table
-    if (HASH_MAP_STATE_SUCCESS != hash_table_delete(owner, address)) {
+    if (HASH_MAP_STATE_SUCCESS != hash_map_delete(owner, address)) {
         lease_free_tenant(new_tenant);
         return HASH_MAP_STATE_ERROR;
     }
 
     // Insert new address/tenant pair
-    if (HASH_MAP_STATE_SUCCESS != hash_table_insert(owner, new_address, new_tenant)) {
+    if (HASH_MAP_STATE_SUCCESS != hash_map_insert(owner, new_address, new_tenant)) {
         lease_free_tenant(new_tenant);
         return HASH_MAP_STATE_ERROR;
     }
@@ -391,11 +391,11 @@ LeaseState lease_transfer(LeaseOwner* from, LeaseOwner* to, void* address) {
         return HASH_MAP_STATE_KEY_EXISTS;
     }
 
-    if (HASH_MAP_STATE_SUCCESS != hash_table_delete(from, address)) {
+    if (HASH_MAP_STATE_SUCCESS != hash_map_delete(from, address)) {
         return HASH_MAP_STATE_ERROR;
     }
 
-    if (HASH_MAP_STATE_SUCCESS != hash_table_insert(to, address, from_tenant)) {
+    if (HASH_MAP_STATE_SUCCESS != hash_map_insert(to, address, from_tenant)) {
         return HASH_MAP_STATE_ERROR;
     }
 
@@ -408,7 +408,7 @@ LeaseState lease_terminate(LeaseOwner* owner, void* address) {
         return HASH_MAP_STATE_KEY_NOT_FOUND;
     }
 
-    HashMapState state = hash_table_delete(owner, address);
+    HashMapState state = hash_map_delete(owner, address);
     if (HASH_MAP_STATE_SUCCESS == state) {
         lease_free_tenant(tenant);
     }

@@ -73,14 +73,14 @@ typedef struct HashMap {
  * @param key_type Type of keys (integer, string, or address).
  * @return Pointer to the new hash table, or NULL on failure.
  */
-HashMap* hash_table_create(uint64_t initial_size, HashMapKeyType key_type);
+HashMap* hash_map_create(uint64_t initial_size, HashMapKeyType key_type);
 
 /**
  * @brief Frees a hash table and all associated memory.
  *
  * @param table Pointer to the hash table to free.
  */
-void hash_table_free(HashMap* table);
+void hash_map_free(HashMap* table);
 
 /** @} */
 
@@ -97,7 +97,7 @@ void hash_table_free(HashMap* table);
  * @param value Pointer to the value.
  * @return HASH_MAP_STATE_SUCCESS if insertion succeeded, or error code.
  */
-HashMapState hash_table_insert(HashMap* table, const void* key, void* value);
+HashMapState hash_map_insert(HashMap* table, const void* key, void* value);
 
 /**
  * @brief Resizes the hash table to a new capacity.
@@ -106,7 +106,7 @@ HashMapState hash_table_insert(HashMap* table, const void* key, void* value);
  * @param new_size Desired new capacity.
  * @return HASH_MAP_STATE_SUCCESS on success, HASH_MAP_STATE_ERROR on failure.
  */
-HashMapState hash_table_resize(HashMap* table, uint64_t new_size);
+HashMapState hash_map_resize(HashMap* table, uint64_t new_size);
 
 /**
  * @brief Deletes a key and its associated value from the hash table.
@@ -115,7 +115,7 @@ HashMapState hash_table_resize(HashMap* table, uint64_t new_size);
  * @param key Pointer to the key to delete.
  * @return HASH_MAP_STATE_SUCCESS if deletion succeeded, HASH_MAP_STATE_KEY_NOT_FOUND if not found.
  */
-HashMapState hash_table_delete(HashMap* table, const void* key);
+HashMapState hash_map_delete(HashMap* table, const void* key);
 
 /**
  * @brief Removes all entries from the hash table.
@@ -123,7 +123,7 @@ HashMapState hash_table_delete(HashMap* table, const void* key);
  * @param table Pointer to the hash table.
  * @return HASH_MAP_STATE_SUCCESS on success, HASH_MAP_STATE_ERROR on failure.
  */
-HashMapState hash_table_clear(HashMap* table);
+HashMapState hash_map_clear(HashMap* table);
 
 /**
  * @brief Searches for a key in the hash table.
@@ -132,7 +132,7 @@ HashMapState hash_table_clear(HashMap* table);
  * @param key Pointer to the key to search.
  * @return Pointer to the associated value, or NULL if not found.
  */
-void* hash_table_search(HashMap* table, const void* key);
+void* hash_map_search(HashMap* table, const void* key);
 
 /** @} */
 
