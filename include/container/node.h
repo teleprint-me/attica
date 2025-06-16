@@ -11,6 +11,8 @@
 extern "C" {
 #endif
 
+#include "core/posix.h"
+
 #include <stddef.h>
 
 /**
@@ -25,11 +27,11 @@ extern "C" {
  * 
  * @note Users own the object and are responsible for cleanup.
  */
-typedef struct ContainerNode {
-    size_t index; /**< (Optional) Index of the node in the container. */
+typedef struct MAX_ALIGN_ATTR ContainerNode {
     void* object; /**< Pointer to user data. */
     struct ContainerNode* next; /**< Next node in the container. */
     struct ContainerNode* prev; /**< Previous node in the container. */
+    size_t index; /**< (Optional) Index of the node in the container. */
 } ContainerNode;
 
 /**
