@@ -93,6 +93,8 @@
     "queue": "c",
     "stack": "c",
     "thread": "c",
-    "vector": "c"
+    "vector": "c",
+    "flat_set": "c",
+    "initializer_list": "c"
   }
 }
