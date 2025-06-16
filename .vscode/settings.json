@@ -79,6 +79,20 @@
     "sysinfo.h": "c",
     "cstdlib": "c",
     "stdio.h": "c",
-    "assert.h": "c"
+    "assert.h": "c",
+    "compare": "c",
+    "charconv": "c",
+    "expected": "c",
+    "optional": "c",
+    "ratio": "c",
+    "system_error": "c",
+    "regex": "c",
+    "tuple": "c",
+    "type_traits": "c",
+    "utility": "c",
+    "queue": "c",
+    "stack": "c",
+    "thread": "c",
+    "vector": "c"
   }
 }
