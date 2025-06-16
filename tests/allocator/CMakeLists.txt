@@ -1,4 +1,4 @@
-# @file tests/container/CMakeLists.txt
+# @file tests/allocator/CMakeLists.txt
 
 # Define test units
 set(TEST_UNITS
