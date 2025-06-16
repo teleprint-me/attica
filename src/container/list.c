@@ -44,11 +44,11 @@ void linked_list_free(ContainerList* list, void (*callback)(void*)) {
         if (callback) {
             callback(current->object);
         }
-        free(current);
+        memory_free(current);
         current = next;
     }
 
-    free(list);
+    memory_free(list);
 }
 
 void linked_list_append(ContainerList* list, void* object) {
