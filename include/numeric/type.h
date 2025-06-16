@@ -144,20 +144,20 @@ bool dequantize_scalar(const void* input, float* output, DataTypeId id);
 // Vector conversions (1D arrays)
 
 // Half-precision floating-point
-void quantize_row_fp16(const float* input, uint16_t* output, size_t length, size_t step_size);
-void dequantize_row_fp16(const uint16_t* input, float* output, size_t length, size_t step_size);
+void quantize_row_fp16(const float* input, uint16_t* output, size_t length);
+void dequantize_row_fp16(const uint16_t* input, float* output, size_t length);
 
 // Google brain floating-point quantization
-void quantize_row_bf16(const float* input, uint16_t* output, size_t length, size_t step_size);
-void dequantize_row_bf16(const uint16_t* input, float* output, size_t length, size_t step_size);
+void quantize_row_bf16(const float* input, uint16_t* output, size_t length);
+void dequantize_row_bf16(const uint16_t* input, float* output, size_t length);
 
 // 8-bit integer quantization
-void quantize_row_q8(const float* input, Q8Row output, size_t length, size_t step_size);
-void dequantize_row_q8(const Q8Row input, float* output, size_t length, size_t step_size);
+void quantize_row_q8(const float* input, Q8Row output, size_t length);
+void dequantize_row_q8(const Q8Row input, float* output, size_t length);
 
 // 4-bit integer quantization
-void quantize_row_q4(const float* input, Q4Row output, size_t length, size_t step_size);
-void dequantize_row_q4(const Q4Row input, float* output, size_t length, size_t step_size);
+void quantize_row_q4(const float* input, Q4Row output, size_t length);
+void dequantize_row_q4(const Q4Row input, float* output, size_t length);
 
 // Supports 32, 16, and 8-bit formats. Q4 is excluded.
 bool quantize_row(const float* input, void* output, size_t length, DataTypeId id);
