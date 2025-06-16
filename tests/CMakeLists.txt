@@ -3,6 +3,7 @@
 # Define test modules
 set(TEST_MODULES
     "core"
+    "sort"
     "allocator"
     "container"
     "utf8"
