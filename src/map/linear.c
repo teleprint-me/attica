@@ -37,7 +37,7 @@
  * @section Hash Life-cycle
  */
 
-HashTable* hash_table_create(uint64_t initial_size, HashTableType key_type) {
+HashTable* hash_table_create(uint64_t initial_size, HashMapKeyType key_type) {
     HashTable* table = memory_alloc(sizeof(HashTable), alignof(HashTable));
     if (!table) {
         LOG_ERROR("Failed to allocate memory for HashTable.");
@@ -49,20 +49,20 @@ HashTable* hash_table_create(uint64_t initial_size, HashTableType key_type) {
     table->type = key_type;
 
     switch (table->type) {
-        case HASH_TYPE_STRING:
+        case HASH_MAP_KEY_TYPE_STRING:
             table->hash = hash_string;
             table->compare = hash_string_compare;
             break;
-        case HASH_TYPE_INTEGER:
+        case HASH_MAP_KEY_TYPE_INTEGER:
             table->hash = hash_integer;
             table->compare = hash_integer_compare;
             break;
-        case HASH_TYPE_ADDRESS:
+        case HASH_MAP_KEY_TYPE_ADDRESS:
             table->hash = hash_address;
             table->compare = hash_address_compare;
             break;
         default:
-            LOG_ERROR("Invalid HashTableType given.");
+            LOG_ERROR("Invalid HashMapKeyType given.");
             memory_free(table);
             return NULL;
     }

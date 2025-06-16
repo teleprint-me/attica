@@ -34,17 +34,17 @@ typedef enum HashMapState {
 /**
  * @brief Types of keys supported by the hash table.
  */
-typedef enum HashTableType {
-    HASH_TYPE_INTEGER, /**< Keys are integers (uint64_t). */
-    HASH_TYPE_STRING, /**< Keys are null-terminated strings. */
-    HASH_TYPE_ADDRESS /**< Keys are memory addresses (uintptr_t). */
-} HashTableType;
+typedef enum HashMapKeyType {
+    HASH_MAP_KEY_TYPE_INTEGER, /**< Keys are integers (uint64_t). */
+    HASH_MAP_KEY_TYPE_STRING, /**< Keys are null-terminated strings. */
+    HASH_MAP_KEY_TYPE_ADDRESS /**< Keys are memory addresses (uintptr_t). */
+} HashMapKeyType;
 
 /**
  * @brief Represents a key-value pair entry in the hash table.
  */
 typedef struct HashTableEntry {
-    void* key; /**< Pointer to the key (type depends on HashTableType). */
+    void* key; /**< Pointer to the key (type depends on HashMapKeyType). */
     void* value; /**< Pointer to the associated value. */
 } HashTableEntry;
 
@@ -54,7 +54,7 @@ typedef struct HashTableEntry {
 typedef struct HashTable {
     uint64_t count; /**< Current number of entries in the table. */
     uint64_t size; /**< Total capacity of the hash table. */
-    HashTableType type; /**< Type of keys stored. */
+    HashMapKeyType type; /**< Type of keys stored. */
     HashTableEntry* entries; /**< Array of hash entries. */
     uint64_t (*hash)(const void* key, uint64_t size, uint64_t i); /**< Hash function with probing. */
     int (*compare)(const void* key1, const void* key2); /**< Key comparison function. */
@@ -73,7 +73,7 @@ typedef struct HashTable {
  * @param key_type Type of keys (integer, string, or address).
  * @return Pointer to the new hash table, or NULL on failure.
  */
-HashTable* hash_table_create(uint64_t initial_size, HashTableType key_type);
+HashTable* hash_table_create(uint64_t initial_size, HashMapKeyType key_type);
 
 /**
  * @brief Frees a hash table and all associated memory.

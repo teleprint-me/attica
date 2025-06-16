@@ -36,7 +36,7 @@
  */
 
 LeaseOwner* lease_create_owner(size_t capacity) {
-    return hash_table_create(capacity, HASH_TYPE_ADDRESS);
+    return hash_table_create(capacity, HASH_MAP_KEY_TYPE_ADDRESS);
 }
 
 LeasePolicy* lease_create_policy(LeaseAccess access, LeaseContract contract) {
