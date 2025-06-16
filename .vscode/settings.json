@@ -95,6 +95,7 @@
     "thread": "c",
     "vector": "c",
     "flat_set": "c",
-    "initializer_list": "c"
+    "initializer_list": "c",
+    "constant.h": "c"
   }
 }
