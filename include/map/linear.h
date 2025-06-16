@@ -51,7 +51,7 @@ typedef struct HashMapEntry {
 /**
  * @brief Core hash table structure.
  */
-typedef struct HashTable {
+typedef struct HashMap {
     uint64_t count; /**< Current number of entries in the table. */
     uint64_t size; /**< Total capacity of the hash table. */
     HashMapKeyType type; /**< Type of keys stored. */
@@ -59,7 +59,7 @@ typedef struct HashTable {
     uint64_t (*hash)(const void* key, uint64_t size, uint64_t i); /**< Hash function with probing. */
     int (*compare)(const void* key1, const void* key2); /**< Key comparison function. */
     pthread_mutex_t thread_lock; /**< Mutex for thread safety. */
-} HashTable;
+} HashMap;
 
 /**
  * @name Life-cycle Management
@@ -73,14 +73,14 @@ typedef struct HashTable {
  * @param key_type Type of keys (integer, string, or address).
  * @return Pointer to the new hash table, or NULL on failure.
  */
-HashTable* hash_table_create(uint64_t initial_size, HashMapKeyType key_type);
+HashMap* hash_table_create(uint64_t initial_size, HashMapKeyType key_type);
 
 /**
  * @brief Frees a hash table and all associated memory.
  *
  * @param table Pointer to the hash table to free.
  */
-void hash_table_free(HashTable* table);
+void hash_table_free(HashMap* table);
 
 /** @} */
 
@@ -97,7 +97,7 @@ void hash_table_free(HashTable* table);
  * @param value Pointer to the value.
  * @return HASH_MAP_STATE_SUCCESS if insertion succeeded, or error code.
  */
-HashMapState hash_table_insert(HashTable* table, const void* key, void* value);
+HashMapState hash_table_insert(HashMap* table, const void* key, void* value);
 
 /**
  * @brief Resizes the hash table to a new capacity.
@@ -106,7 +106,7 @@ HashMapState hash_table_insert(HashTable* table, const void* key, void* value);
  * @param new_size Desired new capacity.
  * @return HASH_MAP_STATE_SUCCESS on success, HASH_MAP_STATE_ERROR on failure.
  */
-HashMapState hash_table_resize(HashTable* table, uint64_t new_size);
+HashMapState hash_table_resize(HashMap* table, uint64_t new_size);
 
 /**
  * @brief Deletes a key and its associated value from the hash table.
@@ -115,7 +115,7 @@ HashMapState hash_table_resize(HashTable* table, uint64_t new_size);
  * @param key Pointer to the key to delete.
  * @return HASH_MAP_STATE_SUCCESS if deletion succeeded, HASH_MAP_STATE_KEY_NOT_FOUND if not found.
  */
-HashMapState hash_table_delete(HashTable* table, const void* key);
+HashMapState hash_table_delete(HashMap* table, const void* key);
 
 /**
  * @brief Removes all entries from the hash table.
@@ -123,7 +123,7 @@ HashMapState hash_table_delete(HashTable* table, const void* key);
  * @param table Pointer to the hash table.
  * @return HASH_MAP_STATE_SUCCESS on success, HASH_MAP_STATE_ERROR on failure.
  */
-HashMapState hash_table_clear(HashTable* table);
+HashMapState hash_table_clear(HashMap* table);
 
 /**
  * @brief Searches for a key in the hash table.
@@ -132,7 +132,7 @@ HashMapState hash_table_clear(HashTable* table);
  * @param key Pointer to the key to search.
  * @return Pointer to the associated value, or NULL if not found.
  */
-void* hash_table_search(HashTable* table, const void* key);
+void* hash_table_search(HashMap* table, const void* key);
 
 /** @} */
 
@@ -167,7 +167,7 @@ int hash_integer_compare(const void* key1, const void* key2);
  * @param key Pointer to the integer key to search.
  * @return Pointer to associated value, or NULL if not found.
  */
-int32_t* hash_integer_search(HashTable* table, const void* key);
+int32_t* hash_integer_search(HashMap* table, const void* key);
 
 /** @} */
 
@@ -210,7 +210,7 @@ int hash_string_compare(const void* key1, const void* key2);
  * @param key Pointer to the string key to search.
  * @return Pointer to associated value, or NULL if not found.
  */
-char* hash_string_search(HashTable* table, const void* key);
+char* hash_string_search(HashMap* table, const void* key);
 
 /** @} */
 
@@ -245,7 +245,7 @@ int hash_address_compare(const void* key1, const void* key2);
  * @param key Pointer to the address key to search.
  * @return Pointer to associated value, or NULL if not found.
  */
-void* hash_address_search(HashTable* table, const void* key);
+void* hash_address_search(HashMap* table, const void* key);
 
 /** @} */
 

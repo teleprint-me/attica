@@ -87,7 +87,7 @@ typedef HashMapState LeaseState;
 /** @typedef LeaseOwner
  *  @brief Represents an owner tracking leases using an underlying hash table.
  */
-typedef HashTable LeaseOwner;
+typedef HashMap LeaseOwner;
 
 /**
  * @name Creation Functions

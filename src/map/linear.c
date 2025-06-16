@@ -9,7 +9,7 @@
  * addresses, much like a dictionary in Python. Users can map integers, strings, and memory
  * addresses to other data types, supporting insertion, search, deletion, and table clearing.
  *
- * @note Comparison functions used with the HashTable must:
+ * @note Comparison functions used with the HashMap must:
  * - Return 0 for equality.
  * - Return a non-zero value for inequality.
  *
@@ -37,10 +37,10 @@
  * @section Hash Life-cycle
  */
 
-HashTable* hash_table_create(uint64_t initial_size, HashMapKeyType key_type) {
-    HashTable* table = memory_alloc(sizeof(HashTable), alignof(HashTable));
+HashMap* hash_table_create(uint64_t initial_size, HashMapKeyType key_type) {
+    HashMap* table = memory_alloc(sizeof(HashMap), alignof(HashMap));
     if (!table) {
-        LOG_ERROR("Failed to allocate memory for HashTable.");
+        LOG_ERROR("Failed to allocate memory for HashMap.");
         return NULL;
     }
 
@@ -69,7 +69,7 @@ HashTable* hash_table_create(uint64_t initial_size, HashMapKeyType key_type) {
 
     table->entries = memory_calloc(table->size, sizeof(HashMapEntry), alignof(HashMapEntry));
     if (!table->entries) {
-        LOG_ERROR("Failed to allocate memory for HashTable entries.");
+        LOG_ERROR("Failed to allocate memory for HashMap entries.");
         memory_free(table);
         return NULL;
     }
@@ -86,7 +86,7 @@ HashTable* hash_table_create(uint64_t initial_size, HashMapKeyType key_type) {
     return table;
 }
 
-void hash_table_free(HashTable* table) {
+void hash_table_free(HashMap* table) {
     if (table) {
         // Destroy the mutex before freeing memory
         pthread_mutex_destroy(&table->thread_lock);
@@ -103,7 +103,7 @@ void hash_table_free(HashTable* table) {
  * @section Private Functions
  */
 
-static HashMapState hash_table_insert_internal(HashTable* table, const void* key, void* value) {
+static HashMapState hash_table_insert_internal(HashMap* table, const void* key, void* value) {
     if (!table || !table->entries || table->size == 0) {
         LOG_ERROR("Invalid table for insert internal.");
         return HASH_MAP_STATE_ERROR;
@@ -135,7 +135,7 @@ static HashMapState hash_table_insert_internal(HashTable* table, const void* key
     return HASH_MAP_STATE_FULL;
 }
 
-static HashMapState hash_table_resize_internal(HashTable* table, uint64_t new_size) {
+static HashMapState hash_table_resize_internal(HashMap* table, uint64_t new_size) {
     if (!table || !table->entries || table->size == 0) {
         LOG_ERROR("Invalid table for resize internal.");
         return HASH_MAP_STATE_ERROR;
@@ -181,7 +181,7 @@ static HashMapState hash_table_resize_internal(HashTable* table, uint64_t new_si
     return HASH_MAP_STATE_SUCCESS;
 }
 
-static HashMapState hash_table_delete_internal(HashTable* table, const void* key) {
+static HashMapState hash_table_delete_internal(HashMap* table, const void* key) {
     if (!table || !table->entries || table->size == 0) {
         LOG_ERROR("Invalid table for delete internal.");
         return HASH_MAP_STATE_ERROR;
@@ -237,7 +237,7 @@ static HashMapState hash_table_delete_internal(HashTable* table, const void* key
     return HASH_MAP_STATE_KEY_NOT_FOUND;
 }
 
-static HashMapState hash_table_clear_internal(HashTable* table) {
+static HashMapState hash_table_clear_internal(HashMap* table) {
     if (!table || !table->entries || table->size == 0) {
         LOG_ERROR("Invalid table for clear internal.");
         return HASH_MAP_STATE_ERROR;
@@ -252,7 +252,7 @@ static HashMapState hash_table_clear_internal(HashTable* table) {
     return HASH_MAP_STATE_SUCCESS;
 }
 
-static void* hash_table_search_internal(HashTable* table, const void* key) {
+static void* hash_table_search_internal(HashMap* table, const void* key) {
     if (!table || !table->entries || table->size == 0) {
         LOG_ERROR("Invalid table for search internal.");
         return NULL;
@@ -283,7 +283,7 @@ static void* hash_table_search_internal(HashTable* table, const void* key) {
  * @section Hash Functions
  */
 
-HashMapState hash_table_insert(HashTable* table, const void* key, void* value) {
+HashMapState hash_table_insert(HashMap* table, const void* key, void* value) {
     if (!table || !table->entries || table->size == 0) {
         LOG_ERROR("Invalid table for insert.");
         return HASH_MAP_STATE_ERROR;
@@ -315,7 +315,7 @@ exit:
     return state;
 }
 
-HashMapState hash_table_resize(HashTable* table, uint64_t new_size) {
+HashMapState hash_table_resize(HashMap* table, uint64_t new_size) {
     if (!table || !table->entries || table->size == 0) {
         LOG_ERROR("Invalid table for resize.");
         return HASH_MAP_STATE_ERROR;
@@ -328,7 +328,7 @@ HashMapState hash_table_resize(HashTable* table, uint64_t new_size) {
     return state;
 }
 
-HashMapState hash_table_delete(HashTable* table, const void* key) {
+HashMapState hash_table_delete(HashMap* table, const void* key) {
     if (!table || !table->entries || table->size == 0) {
         LOG_ERROR("Invalid table for delete.");
         return HASH_MAP_STATE_ERROR;
@@ -346,7 +346,7 @@ HashMapState hash_table_delete(HashTable* table, const void* key) {
     return state;
 }
 
-HashMapState hash_table_clear(HashTable* table) {
+HashMapState hash_table_clear(HashMap* table) {
     if (!table || !table->entries || table->size == 0) {
         LOG_ERROR("Invalid table for clear.");
         return HASH_MAP_STATE_ERROR;
@@ -359,7 +359,7 @@ HashMapState hash_table_clear(HashTable* table) {
     return state;
 }
 
-void* hash_table_search(HashTable* table, const void* key) {
+void* hash_table_search(HashMap* table, const void* key) {
     if (!table || !table->entries || table->size == 0) {
         LOG_ERROR("Invalid table for search.");
         return NULL;
@@ -391,7 +391,7 @@ int hash_integer_compare(const void* key1, const void* key2) {
     return *(const int32_t*) key1 - *(const int32_t*) key2;
 }
 
-int32_t* hash_integer_search(HashTable* table, const void* key) {
+int32_t* hash_integer_search(HashMap* table, const void* key) {
     return (int32_t*) hash_table_search_internal(table, key);
 }
 
@@ -419,7 +419,7 @@ int hash_string_compare(const void* key1, const void* key2) {
     return strcmp((const char*) key1, (const char*) key2);
 }
 
-char* hash_string_search(HashTable* table, const void* key) {
+char* hash_string_search(HashMap* table, const void* key) {
     return (char*) hash_table_search_internal(table, key);
 }
 
@@ -439,6 +439,6 @@ int hash_address_compare(const void* key1, const void* key2) {
     return (a > b) - (a < b);
 }
 
-void* hash_address_search(HashTable* table, const void* key) {
+void* hash_address_search(HashMap* table, const void* key) {
     return (void*) hash_table_search_internal(table, key);
 }
