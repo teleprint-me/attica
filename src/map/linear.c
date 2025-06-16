@@ -94,6 +94,7 @@ void hash_table_free(HashMap* table) {
         if (table->entries) {
             memory_free(table->entries);
         }
+
         memory_free(table);
         table = NULL;
     }
