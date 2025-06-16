@@ -23,13 +23,13 @@
 /**
  * @brief Possible outcomes for hash table operations.
  */
-typedef enum HashTableState {
-    HASH_SUCCESS, /**< Operation completed successfully. */
-    HASH_ERROR, /**< General error occurred during operation. */
-    HASH_KEY_EXISTS, /**< Duplicate key insertion attempted. */
-    HASH_KEY_NOT_FOUND, /**< Key not found in the table. */
-    HASH_TABLE_FULL /**< Hash table has reached maximum capacity. */
-} HashTableState;
+typedef enum HashMapState {
+    HASH_MAP_STATE_SUCCESS, /**< Operation completed successfully. */
+    HASH_MAP_STATE_ERROR, /**< General error occurred during operation. */
+    HASH_MAP_STATE_KEY_EXISTS, /**< Duplicate key insertion attempted. */
+    HASH_MAP_STATE_KEY_NOT_FOUND, /**< Key not found in the table. */
+    HASH_MAP_STATE_FULL /**< Hash table has reached maximum capacity. */
+} HashMapState;
 
 /**
  * @brief Types of keys supported by the hash table.
@@ -95,35 +95,35 @@ void hash_table_free(HashTable* table);
  * @param table Pointer to the hash table.
  * @param key Pointer to the key.
  * @param value Pointer to the value.
- * @return HASH_SUCCESS if insertion succeeded, or error code.
+ * @return HASH_MAP_STATE_SUCCESS if insertion succeeded, or error code.
  */
-HashTableState hash_table_insert(HashTable* table, const void* key, void* value);
+HashMapState hash_table_insert(HashTable* table, const void* key, void* value);
 
 /**
  * @brief Resizes the hash table to a new capacity.
  *
  * @param table Pointer to the hash table.
  * @param new_size Desired new capacity.
- * @return HASH_SUCCESS on success, HASH_ERROR on failure.
+ * @return HASH_MAP_STATE_SUCCESS on success, HASH_MAP_STATE_ERROR on failure.
  */
-HashTableState hash_table_resize(HashTable* table, uint64_t new_size);
+HashMapState hash_table_resize(HashTable* table, uint64_t new_size);
 
 /**
  * @brief Deletes a key and its associated value from the hash table.
  *
  * @param table Pointer to the hash table.
  * @param key Pointer to the key to delete.
- * @return HASH_SUCCESS if deletion succeeded, HASH_KEY_NOT_FOUND if not found.
+ * @return HASH_MAP_STATE_SUCCESS if deletion succeeded, HASH_MAP_STATE_KEY_NOT_FOUND if not found.
  */
-HashTableState hash_table_delete(HashTable* table, const void* key);
+HashMapState hash_table_delete(HashTable* table, const void* key);
 
 /**
  * @brief Removes all entries from the hash table.
  *
  * @param table Pointer to the hash table.
- * @return HASH_SUCCESS on success, HASH_ERROR on failure.
+ * @return HASH_MAP_STATE_SUCCESS on success, HASH_MAP_STATE_ERROR on failure.
  */
-HashTableState hash_table_clear(HashTable* table);
+HashMapState hash_table_clear(HashTable* table);
 
 /**
  * @brief Searches for a key in the hash table.

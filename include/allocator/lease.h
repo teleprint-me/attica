@@ -82,7 +82,7 @@ typedef struct LeaseTenant {
 /** @typedef LeaseState
  *  @brief Represents the state or result of lease operations (e.g., success/failure).
  */
-typedef HashTableState LeaseState;
+typedef HashMapState LeaseState;
 
 /** @typedef LeaseOwner
  *  @brief Represents an owner tracking leases using an underlying hash table.
