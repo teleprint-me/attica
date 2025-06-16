@@ -48,7 +48,7 @@ int knr_alloc_assert(TestUnit* unit) {
                 data->size
             );
             ASSERT(
-                ((size_t) data->address % MEMORY_ALIGNMENT) == 0,
+                ((size_t) data->address % MAX_ALIGN) == 0,
                 "[KNR] unit=%zu with size=%zu: allocation not aligned",
                 unit->index,
                 data->size
