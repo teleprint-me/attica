@@ -97,7 +97,7 @@ LeaseTenant* lease_create_tenant(LeasePolicy* policy, LeaseObject* object) {
 void lease_free_owner(LeaseOwner* owner) {
     if (owner) {
         for (uint64_t i = 0; i < owner->size; i++) {
-            HashTableEntry* entry = &owner->entries[i];
+            HashMapEntry* entry = &owner->entries[i];
             if (!entry || !entry->key || !entry->value) {
                 continue; // Skip empty or invalid entries
             }
@@ -482,7 +482,7 @@ void lease_debug_owner(LeaseOwner* owner) {
     if (owner) {
         LOG_INFO("[LeaseOwner] address=%p", owner);
         for (uint64_t i = 0; i < owner->size; i++) {
-            HashTableEntry* entry = &owner->entries[i];
+            HashMapEntry* entry = &owner->entries[i];
             if (!entry || !entry->key || !entry->value) {
                 continue; // Skip empty or invalid entries
             }

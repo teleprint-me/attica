@@ -43,10 +43,10 @@ typedef enum HashMapKeyType {
 /**
  * @brief Represents a key-value pair entry in the hash table.
  */
-typedef struct HashTableEntry {
+typedef struct HashMapEntry {
     void* key; /**< Pointer to the key (type depends on HashMapKeyType). */
     void* value; /**< Pointer to the associated value. */
-} HashTableEntry;
+} HashMapEntry;
 
 /**
  * @brief Core hash table structure.
@@ -55,7 +55,7 @@ typedef struct HashTable {
     uint64_t count; /**< Current number of entries in the table. */
     uint64_t size; /**< Total capacity of the hash table. */
     HashMapKeyType type; /**< Type of keys stored. */
-    HashTableEntry* entries; /**< Array of hash entries. */
+    HashMapEntry* entries; /**< Array of hash entries. */
     uint64_t (*hash)(const void* key, uint64_t size, uint64_t i); /**< Hash function with probing. */
     int (*compare)(const void* key1, const void* key2); /**< Key comparison function. */
     pthread_mutex_t thread_lock; /**< Mutex for thread safety. */

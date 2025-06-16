@@ -67,7 +67,7 @@ HashTable* hash_table_create(uint64_t initial_size, HashMapKeyType key_type) {
             return NULL;
     }
 
-    table->entries = memory_calloc(table->size, sizeof(HashTableEntry), alignof(HashTableEntry));
+    table->entries = memory_calloc(table->size, sizeof(HashMapEntry), alignof(HashMapEntry));
     if (!table->entries) {
         LOG_ERROR("Failed to allocate memory for HashTable entries.");
         memory_free(table);
@@ -145,14 +145,14 @@ static HashMapState hash_table_resize_internal(HashTable* table, uint64_t new_si
         return HASH_MAP_STATE_SUCCESS;
     }
 
-    HashTableEntry* new_entries = (HashTableEntry*) calloc(new_size, sizeof(HashTableEntry));
+    HashMapEntry* new_entries = (HashMapEntry*) calloc(new_size, sizeof(HashMapEntry));
     if (!new_entries) {
         LOG_ERROR("Failed to allocate memory for resized table.");
         return HASH_MAP_STATE_ERROR;
     }
 
     // Backup
-    HashTableEntry* old_entries = table->entries;
+    HashMapEntry* old_entries = table->entries;
     uint64_t old_size = table->size;
 
     // Swap
@@ -162,7 +162,7 @@ static HashMapState hash_table_resize_internal(HashTable* table, uint64_t new_si
     // Probe entries
     uint64_t rehashed_count = 0;
     for (uint64_t i = 0; i < old_size; i++) {
-        HashTableEntry* entry = &old_entries[i];
+        HashMapEntry* entry = &old_entries[i];
         if (entry->key) {
             HashMapState state = hash_table_insert_internal(table, entry->key, entry->value);
             if (HASH_MAP_STATE_SUCCESS != state) {
@@ -194,7 +194,7 @@ static HashMapState hash_table_delete_internal(HashTable* table, const void* key
 
     for (uint64_t i = 0; i < table->size; i++) {
         uint64_t index = table->hash(key, table->size, i);
-        HashTableEntry* entry = &table->entries[index];
+        HashMapEntry* entry = &table->entries[index];
 
         if (!entry->key) {
             return HASH_MAP_STATE_KEY_NOT_FOUND; // Stop probing
@@ -209,7 +209,7 @@ static HashMapState hash_table_delete_internal(HashTable* table, const void* key
             // Rehash the remainder of the probe sequence
             for (uint64_t j = i + 1; j < table->size; j++) {
                 uint64_t rehash_index = table->hash(key, table->size, j);
-                HashTableEntry* rehash_entry = &table->entries[rehash_index];
+                HashMapEntry* rehash_entry = &table->entries[rehash_index];
 
                 if (!rehash_entry->key) {
                     break;
@@ -265,7 +265,7 @@ static void* hash_table_search_internal(HashTable* table, const void* key) {
 
     for (uint64_t i = 0; i < table->size; i++) {
         uint64_t index = table->hash(key, table->size, i);
-        HashTableEntry* entry = &table->entries[index];
+        HashMapEntry* entry = &table->entries[index];
 
         if (!entry->key) {
             return NULL;
