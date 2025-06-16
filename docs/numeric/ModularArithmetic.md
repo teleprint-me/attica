@@ -1,3 +1,11 @@
+---
+title: "Quantization: Error-Free Modeling"
+type: "algorithm"
+version: "1"
+date: "2024-11-24"
+license: "cc-by-nc-sa-4.0"
+---
+
 # Modular Arithmetic in Lehmer RNG
 
 ## Introduction

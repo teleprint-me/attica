@@ -1,3 +1,11 @@
+---
+title: "The K&R Storage Allocator"
+type: "algorithm"
+version: "1"
+date: "2025-06-15"
+license: "cc-by-nc-sa-4.0"
+---
+
 # The K&R Storage Allocator
 
 ## Introduction
