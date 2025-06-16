@@ -52,13 +52,14 @@ typedef struct HashMapEntry {
  * @brief Core hash table structure.
  */
 typedef struct HashMap {
+    HashMapEntry* entries; /**< Array of hash entries. */
     uint64_t count; /**< Current number of entries in the table. */
     uint64_t size; /**< Total capacity of the hash table. */
     HashMapKeyType type; /**< Type of keys stored. */
-    HashMapEntry* entries; /**< Array of hash entries. */
+    pthread_mutex_t thread_lock; /**< Mutex for thread safety. */
+
     uint64_t (*hash)(const void* key, uint64_t size, uint64_t i); /**< Hash function with probing. */
     int (*compare)(const void* key1, const void* key2); /**< Key comparison function. */
-    pthread_mutex_t thread_lock; /**< Mutex for thread safety. */
 } HashMap;
 
 /**
