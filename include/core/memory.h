@@ -21,21 +21,14 @@
 extern "C" {
 #endif // __cplusplus
 
+#include "core/posix.h"
+
 #include <stdalign.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <assert.h>
-
-#ifndef alignof
-    #define alignof _Alignof
-#endif
-
-/**
- * @brief Default memory alignment.
- */
-#define MEMORY_ALIGNMENT (alignof(max_align_t))
 
 /**
  * @brief Default maximum fallback memory size in bytes.
