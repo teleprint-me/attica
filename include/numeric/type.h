@@ -9,11 +9,6 @@
  * - Single and half-precision floating-point support.
  * - 8-bit and 4-bit quantized integer support.
  * - Minimal dependencies with a consistent, extensible design.
- *
- * Notes:
- * - A modern transformer typically consists of 32 blocks.
- * - Each block contains a single layer with 9 sub-layers.
- * - The number of blocks corresponds to the number of layers.
  */
 
 #ifndef NUMERIC_TYPE_H
@@ -128,6 +123,10 @@ float decode_scalar_fp32(uint32_t bits); /**< Decode bits to 32-bit float */
 uint16_t quantize_scalar_fp16(float value); /**< Quantize 32-bit float to 16-bit */
 float dequantize_scalar_fp16(uint16_t bits); /**< Dequantize 16-bit to 32-bit float */
 
+// Google brain floating-point format
+uint16_t quantize_scalar_bf16(float value); /**< Quantize 32-bit float to 16-bit */
+float dequantize_scalar_bf16(uint16_t bits); /**< Dequantize 16-bit to 32-bit float */
+
 // 8-bit integer quantization
 Q8 quantize_scalar_q8(float value); /**< Quantize 32-bit float to 8-bit */
 float dequantize_scalar_q8(Q8 q8); /**< Dequantize 8-bit to 32-bit float */
@@ -137,11 +136,18 @@ Q4 quantize_scalar_q4(float a, float b); /**< Quantize two floats to 4-bit */
 float dequantize_scalar_q4_index(Q4 q4, uint32_t index); /**< Dequantize by index */
 void dequantize_scalar_q4_reference(Q4 q4, float* a, float* b); /**< Dequantize to references */
 
+void* quantize_scalar(float value, DataTypeId id); /**< Quantize 32-bit float to any */
+float dequantize_scalar(void* bits, DataTypeId id); /**< Dequantize any to 32-bit float */
+
 // Vector conversions (1D arrays)
 
 // Half-precision floating-point
 void quantize_row_fp16(const float* input, uint16_t* output, uint32_t length, uint32_t step_size);
 void dequantize_row_fp16(const uint16_t* input, float* output, uint32_t length, uint32_t step_size);
+
+// Google brain floating-point quantization
+void quantize_row_bf16(const float* input, uint16_t* output, uint32_t length, uint32_t step_size);
+void dequantize_row_bf16(const uint16_t* input, float* output, uint32_t length, uint32_t step_size);
 
 // 8-bit integer quantization
 void quantize_row_q8(const float* input, Q8Row output, uint32_t length, uint32_t step_size);

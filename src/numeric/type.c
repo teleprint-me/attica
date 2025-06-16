@@ -3,12 +3,12 @@
  *
  * @file src/numeric/type.c
  *
- * @brief API for handling numeric data types and conversions.
+ * @brief API for numeric data types and conversions.
  *
- * Focused on:
- * - Single and half-precision floating-point.
- * - 8-bit and 4-bit quantized integers.
- * - Minimal dependencies and consistent design.
+ * Features:
+ * - Single and half-precision floating-point support.
+ * - 8-bit and 4-bit quantized integer support.
+ * - Minimal dependencies with a consistent, extensible design.
  */
 
 #include "numeric/type.h"
@@ -89,6 +89,32 @@ float dequantize_scalar_fp16(uint16_t bits) {
                             | (two_w < denormalized_cutoff ? encode_scalar_fp32(denormalized_value)
                                                            : encode_scalar_fp32(normalized_value));
     return decode_scalar_fp32(result);
+}
+
+// Google brain floating-point format
+uint16_t quantize_scalar_bf16(float value) {
+    const uint32_t exp = 0x7f800000u;
+    const uint32_t sign = 0x80000000u;
+    const uint32_t abs = 0x7fffffffu;
+    const uint32_t qnan = 0x40u;
+
+    FloatBits raw = {.value = value};
+
+    if ((raw.bits & abs) > exp) { /* nan */
+        return (uint16_t) ((raw.bits >> 16) | qnan);
+    }
+
+    if (!(raw.bits & exp)) { /* subnormal */
+        return (uint16_t) ((raw.bits & sign) >> 16); /* flush */
+    }
+
+    return (uint16_t) ((raw.bits + (0x7fff + ((raw.bits >> 16) & 1))) >> 16);
+}
+
+float dequantize_scalar_bf16(uint16_t bits) {
+    FloatBits raw = {.bits = bits};
+    raw.bits = (uint32_t) bits << 16;
+    return raw.value;
 }
 
 // 8-bit quantization with residual baking
@@ -231,6 +257,31 @@ void dequantize_row_fp16(
 
     for (uint32_t i = 0, j = 0; i < length; i += step_size, ++j) {
         output[i] = dequantize_scalar_fp16(input[j]);
+    }
+}
+
+// Google brain floating-point quantization
+void quantize_row_bf16(const float* input, uint16_t* output, uint32_t length, uint32_t step_size) {
+    assert(input != NULL);
+    assert(output != NULL);
+    assert(length > 0);
+    assert(step_size > 0);
+
+    for (uint32_t i = 0, j = 0; i < length; i += step_size, ++j) {
+        output[j] = quantize_scalar_bf16(input[i]);
+    }
+}
+
+void dequantize_row_bf16(
+    const uint16_t* input, float* output, uint32_t length, uint32_t step_size
+) {
+    assert(input != NULL);
+    assert(output != NULL);
+    assert(length > 0);
+    assert(step_size > 0);
+
+    for (uint32_t i = 0, j = 0; i < length; i += step_size, ++j) {
+        output[i] = dequantize_scalar_bf16(input[j]);
     }
 }
 
