@@ -54,6 +54,8 @@ add_library(dsa SHARED
     "src/allocator/stack.c"
     "src/allocator/lease.c"
 
+    "src/sort/heap.c"
+
     "src/container/node.c"
     "src/container/stack.c"
     # "src/container/queue.c"
