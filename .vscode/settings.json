@@ -96,6 +96,7 @@
     "vector": "c",
     "flat_set": "c",
     "initializer_list": "c",
-    "constant.h": "c"
+    "constant.h": "c",
+    "stdbool.h": "c"
   }
 }
