@@ -1,7 +1,7 @@
 /**
  * Copyright © 2023 Austin Berrio
  *
- * @file src/hash_table.c
+ * @file src/map/linear.c
  * @brief Minimalistic hash table implementation providing mapping between integers, strings, and
  * memory addresses.
  *

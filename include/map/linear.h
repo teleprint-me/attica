@@ -1,11 +1,11 @@
 /**
  * Copyright © 2023 Austin Berrio
  *
- * @file include/hash_table.h
+ * @file include/map/linear.h
  * @brief Minimalistic hash table implementation providing mapping between integers, strings, and
  * memory addresses.
  *
- * The Hash Interface provides a minimal dictionary-like API supporting insertion, search, deletion,
+ * The Map Interface provides a minimal dictionary-like API supporting insertion, search, deletion,
  * and clearing for keys of type integer, string, or memory address.
  *
  * @note Comparison functions must return 0 for equality, non-zero otherwise.
@@ -14,8 +14,8 @@
  * @note Collision resolution: Uses linear probing.
  */
 
-#ifndef MAP_OPEN_ADDRESS_H
-#define MAP_OPEN_ADDRESS_H
+#ifndef MAP_LINEAR_H
+#define MAP_LINEAR_H
 
 #include <stdint.h>
 #include <pthread.h>
@@ -249,4 +249,4 @@ void* hash_address_search(HashTable* table, const void* key);
 
 /** @} */
 
-#endif // MAP_OPEN_ADDRESS_H
+#endif // MAP_LINEAR_H
