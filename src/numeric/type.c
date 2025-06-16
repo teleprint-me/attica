@@ -112,7 +112,7 @@ uint16_t quantize_scalar_bf16(float value) {
 }
 
 float dequantize_scalar_bf16(uint16_t bits) {
-    FloatBits raw = {.bits = bits};
+    FloatBits raw;
     raw.bits = (uint32_t) bits << 16;
     return raw.value;
 }
@@ -233,103 +233,194 @@ void dequantize_scalar_q4_reference(Q4 q4, float* a, float* b) {
     *b = (float) (qb * scalar);
 }
 
+// Generic interface
+
+// Supports 32, 16, and 8-bit formats. Q4 is excluded.
+bool quantize_scalar(float input, void* output, DataTypeId id) {
+    switch (id) {
+        case TYPE_FLOAT32:
+            {
+                uint32_t* out = TYPE_CAST_SAFE(output, uint32_t, sizeof(uint32_t));
+                *out = encode_scalar_fp32(input);
+                break;
+            }
+        case TYPE_FLOAT16:
+            {
+                uint16_t* out = TYPE_CAST_SAFE(output, uint16_t, sizeof(uint16_t));
+                *out = quantize_scalar_fp16(input);
+                break;
+            }
+        case TYPE_BFLOAT16:
+            {
+                uint16_t* out = TYPE_CAST_SAFE(output, uint16_t, sizeof(uint16_t));
+                *out = quantize_scalar_bf16(input);
+                break;
+            }
+        case TYPE_QUANT8:
+            {
+                Q8* out = TYPE_CAST_SAFE(output, Q8, sizeof(Q8));
+                *out = quantize_scalar_q8(input);
+                break;
+            }
+        default:
+            return false;
+    }
+    return true;
+}
+
+bool dequantize_scalar(const void* input, float* output, DataTypeId id) {
+    float* out = (float*) output;
+    switch (id) {
+        case TYPE_FLOAT32:
+            *out = decode_scalar_fp32(*(uint32_t*) input);
+            break;
+        case TYPE_FLOAT16:
+            *out = dequantize_scalar_fp16(*(uint16_t*) input);
+            break;
+        case TYPE_BFLOAT16:
+            *out = dequantize_scalar_bf16(*(uint16_t*) input);
+            break;
+        case TYPE_QUANT8:
+            *out = dequantize_scalar_q8(*(Q8*) input);
+            break;
+        default:
+            return false;
+    }
+    return true;
+}
+
 // Vector Conversions (1D arrays)
 
 // Half-precision floating-point quantization
-void quantize_row_fp16(const float* input, uint16_t* output, uint32_t length, uint32_t step_size) {
+void quantize_row_fp16(const float* input, uint16_t* output, size_t length, size_t step_size) {
     assert(input != NULL);
     assert(output != NULL);
     assert(length > 0);
     assert(step_size > 0);
 
-    for (uint32_t i = 0, j = 0; i < length; i += step_size, ++j) {
+    for (size_t i = 0, j = 0; i < length; i += step_size, ++j) {
         output[j] = quantize_scalar_fp16(input[i]);
     }
 }
 
-void dequantize_row_fp16(
-    const uint16_t* input, float* output, uint32_t length, uint32_t step_size
-) {
+void dequantize_row_fp16(const uint16_t* input, float* output, size_t length, size_t step_size) {
     assert(input != NULL);
     assert(output != NULL);
     assert(length > 0);
     assert(step_size > 0);
 
-    for (uint32_t i = 0, j = 0; i < length; i += step_size, ++j) {
+    for (size_t i = 0, j = 0; i < length; i += step_size, ++j) {
         output[i] = dequantize_scalar_fp16(input[j]);
     }
 }
 
 // Google brain floating-point quantization
-void quantize_row_bf16(const float* input, uint16_t* output, uint32_t length, uint32_t step_size) {
+void quantize_row_bf16(const float* input, uint16_t* output, size_t length, size_t step_size) {
     assert(input != NULL);
     assert(output != NULL);
     assert(length > 0);
     assert(step_size > 0);
 
-    for (uint32_t i = 0, j = 0; i < length; i += step_size, ++j) {
+    for (size_t i = 0, j = 0; i < length; i += step_size, ++j) {
         output[j] = quantize_scalar_bf16(input[i]);
     }
 }
 
-void dequantize_row_bf16(
-    const uint16_t* input, float* output, uint32_t length, uint32_t step_size
-) {
+void dequantize_row_bf16(const uint16_t* input, float* output, size_t length, size_t step_size) {
     assert(input != NULL);
     assert(output != NULL);
     assert(length > 0);
     assert(step_size > 0);
 
-    for (uint32_t i = 0, j = 0; i < length; i += step_size, ++j) {
+    for (size_t i = 0, j = 0; i < length; i += step_size, ++j) {
         output[i] = dequantize_scalar_bf16(input[j]);
     }
 }
 
 // 8-bit integer quantization
-void quantize_row_q8(const float* input, Q8Row output, uint32_t length, uint32_t step_size) {
+void quantize_row_q8(const float* input, Q8Row output, size_t length, size_t step_size) {
     assert(input != NULL);
     assert(output != NULL);
     assert(length > 0);
     assert(step_size > 0);
 
-    for (uint32_t i = 0, j = 0; i < length; i += step_size, ++j) {
+    for (size_t i = 0, j = 0; i < length; i += step_size, ++j) {
         output[j] = quantize_scalar_q8(input[i]);
     }
 }
 
-void dequantize_row_q8(const Q8Row input, float* output, uint32_t length, uint32_t step_size) {
+void dequantize_row_q8(const Q8Row input, float* output, size_t length, size_t step_size) {
     assert(input != NULL);
     assert(output != NULL);
     assert(length > 0);
     assert(step_size > 0);
 
-    for (uint32_t i = 0, j = 0; i < length; i += step_size, ++j) {
+    for (size_t i = 0, j = 0; i < length; i += step_size, ++j) {
         output[i] = dequantize_scalar_q8(input[j]);
     }
 }
 
 // 4-bit integer quantization
-void quantize_row_q4(const float* input, Q4Row output, uint32_t length, uint32_t step_size) {
+void quantize_row_q4(const float* input, Q4Row output, size_t length, size_t step_size) {
     assert(input != NULL);
     assert(output != NULL);
     assert(length > 0);
     assert(step_size > 0);
     assert((length / step_size) % 2 == 0); // Ensure input size is even for Q4
 
-    for (uint32_t i = 0, j = 0; i < length; i += 2 * step_size, ++j) {
+    for (size_t i = 0, j = 0; i < length; i += 2 * step_size, ++j) {
         output[j] = quantize_scalar_q4(input[i], input[i + step_size]);
     }
 }
 
-void dequantize_row_q4(const Q4Row input, float* output, uint32_t length, uint32_t step_size) {
+void dequantize_row_q4(const Q4Row input, float* output, size_t length, size_t step_size) {
     assert(input != NULL);
     assert(output != NULL);
     assert(length > 0);
     assert(step_size > 0);
     assert((length / step_size) % 2 == 0); // Ensure output size is even for Q4
 
-    for (uint32_t i = 0, j = 0; i < length; i += 2 * step_size, ++j) {
+    for (size_t i = 0, j = 0; i < length; i += 2 * step_size, ++j) {
         output[i] = dequantize_scalar_q4_index(input[j], 0); // Lower nibble
         output[i + step_size] = dequantize_scalar_q4_index(input[j], 1); // Upper nibble
     }
+}
+
+// Generic interface
+
+// Supports 32, 16, and 8-bit formats. Q4 is excluded.
+bool quantize_row(const float* input, void* output, size_t length, DataTypeId id) {
+    assert(input != NULL);
+    assert(output != NULL);
+    assert(length > 0);
+    assert(id < TYPE_COUNT);
+
+    size_t stride = data_type_size(id);
+    assert(stride > 0);
+
+    for (size_t i = 0; i < length; ++i) {
+        void* dst = (uint8_t*) output + i * stride;
+        if (!quantize_scalar(input[i], dst, id)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool dequantize_row(const void* input, float* output, size_t length, DataTypeId id) {
+    assert(input != NULL);
+    assert(output != NULL);
+    assert(length > 0);
+    assert(id < TYPE_COUNT);
+
+    size_t stride = data_type_size(id);
+    assert(stride > 0);
+
+    for (size_t i = 0; i < length; ++i) {
+        const void* src = (const uint8_t*) input + i * stride;
+        if (!dequantize_scalar(src, &output[i], id)) {
+            return false;
+        }
+    }
+    return true;
 }
