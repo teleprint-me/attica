@@ -78,8 +78,8 @@ extern "C" {
 #endif
 
 // Struct-level default alignment attribute (GCC/Clang)
-#if !defined(MAX_ATTR_ALIGN) && (defined(__GNUC__) || defined(__clang__))
-    #define MAX_ATTR_ALIGN __attribute__((aligned(MAX_ALIGN)))
+#if !defined(MAX_ALIGN_ATTR) && (defined(__GNUC__) || defined(__clang__))
+    #define MAX_ALIGN_ATTR __attribute__((aligned(MAX_ALIGN)))
 #endif
 
 /** @} */
