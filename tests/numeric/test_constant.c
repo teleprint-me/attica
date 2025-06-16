@@ -9,8 +9,8 @@
  *       decimal digits precision (2−53 ≈ 1.11 × 10−16).
  */
 
-#include "logger.h"
-#include "unit_test.h"
+#include "core/logger.h"
+#include "test/unit.h"
 #include "numeric/constant.h"
 
 #include <math.h>
