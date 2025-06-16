@@ -29,7 +29,7 @@
 extern "C" {
 #endif // __cplusplus
 
-#include "map/open-address.h"
+#include "map/linear.h"
 
 #include <stddef.h>
 #include <stdint.h>

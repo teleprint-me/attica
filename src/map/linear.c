@@ -29,7 +29,7 @@
 #include "core/memory.h"
 
 #include "core/logger.h"
-#include "map/open-address.h"
+#include "map/linear.h"
 
 #include <string.h>
 

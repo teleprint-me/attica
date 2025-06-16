@@ -46,7 +46,7 @@ add_library(dsa SHARED
 
     "src/test/unit.c"
 
-    "src/map/open-address.c"
+    "src/map/linear.c"
 
     "src/allocator/knr.c"
     "src/allocator/arena.c"
