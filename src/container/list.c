@@ -165,47 +165,46 @@ size_t container_list_get_index(const ContainerList* list, const void* data) {
     return SIZE_MAX;
 }
 
-void linked_list_remove(ContainerList* list, void* object, linked_list_compare_t compare) {
-    // Ensure the list is valid
-    if (NULL == list || NULL == list->head) {
-        LOG_ERROR("Invalid list or empty list.\n");
-        return;
+bool container_list_remove(ContainerList* list, void* data) {
+    if (!list || !list->head || !data) {
+        LOG_ERROR("[ContainerList] Invalid list or empty.");
+        return false;
     }
 
+    uintptr_t address = (uintptr_t) data;
     ContainerNode* current = list->head;
-    ContainerNode* previous = NULL;
 
-    // Traverse the list to find the matching node
-    while (NULL != current) {
-        if (0 == compare(object, current->object)) {
-            // Found the matching node to remove
-            if (NULL == previous) {
-                // Removing the head node
-                list->head = current->next;
+    while (current) {
+        if (address == (uintptr_t) current->data) {
+            // Relink neighbors
+            if (current->prev) {
+                current->prev->next = current->next;
             } else {
-                // Remove from the middle or end
-                previous->next = current->next;
+                // Node is head
+                list->head = current->next;
             }
 
-            node_free(current); // Free the node's memory
+            if (current->next) {
+                current->next->prev = current->prev;
+            } else {
+                // Node is tail
+                list->tail = current->prev;
+            }
+
+            container_node_free(current);
             list->size--;
 
-            LOG_INFO("Node removed successfully.\n");
-            return;
+            LOG_INFO("[ContainerList] Node removed successfully.");
+            return true;
         }
 
-        // Move to the next node
-        previous = current;
         current = current->next;
     }
 
-    // If we reached here, the object was not found
-    LOG_ERROR("Data not found in the list.\n");
+    LOG_ERROR("[ContainerList] Data not found in the list.");
+    return false;
 }
 
-ContainerNode*
-linked_list_find(const ContainerList* list, const void* object, linked_list_compare_t compare);
+void* container_list_pop(ContainerList* list);
 
-void* linked_list_pop_last(ContainerList* list);
-
-void* linked_list_pop_first(ContainerList* list);
+void* container_list_pop_index(ContainerList* list, size_t index);
