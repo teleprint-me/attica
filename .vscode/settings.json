@@ -97,6 +97,7 @@
     "flat_set": "c",
     "initializer_list": "c",
     "constant.h": "c",
-    "stdbool.h": "c"
+    "stdbool.h": "c",
+    "list.h": "c"
   }
 }
