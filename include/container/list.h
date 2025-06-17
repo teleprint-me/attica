@@ -25,25 +25,6 @@ extern "C" {
 typedef Container ContainerList;
 
 /**
- * @brief Comparison function type for linked list operations.
- *
- * This function should return:
- * - A negative value if the first argument is less than the second.
- * - Zero if the first argument is equal to the second.
- * - A positive value if the first argument is greater than the second.
- */
-typedef int (*ContainerListCompare)(const void*, const void*);
-
-/**
- * @brief Default comparison function for numeric data.
- *
- * @param a Pointer to the first number.
- * @param b Pointer to the second number.
- * @return -1 if a < b, 0 if a == b, 1 if a > b.
- */
-int container_list_numeric_compare(const void* a, const void* b);
-
-/**
  * @brief Initialize a new linked list.
  *
  * @return A pointer to the newly created linked list.
@@ -55,33 +36,8 @@ ContainerList* container_list_create(void);
  * using a custom cleanup function.
  *
  * @param list Pointer to the linked list to be freed.
- * @param callback (Optional) Function pointer to a user-defined cleanup
- * function for freeing node data. Pass NULL if no custom cleanup is needed,
- * free() for simple cleanup, or a custom function for more complex objects.
- *
- * This function will:
- * - Free the memory occupied by each node in the linked list
- * - If a callback function is provided, call it with the corresponding data
- *   pointer from each node before freeing its memory
  */
-void container_list_free(ContainerList* list, void (*callback)(void*));
-
-/**
- * @brief Add a node to the end of a list.
- *
- * @param list Pointer to the linked list.
- * @param data Pointer to the data to be stored in the new node.
- */
-void container_list_append(ContainerList* list, void* data);
-
-/**
- * @brief Insert a node at a given index in the list.
- *
- * @param list Pointer to the linked list.
- * @param data Pointer to the data to be stored in the new node.
- * @param index Position where the new node will be inserted.
- */
-void container_list_insert(ContainerList* list, void* data, size_t index);
+void container_list_free(ContainerList* list);
 
 /**
  * @brief Get the number of nodes in the list.
@@ -100,16 +56,39 @@ size_t container_list_size(const ContainerList* list);
 bool container_list_is_empty(const ContainerList* list);
 
 /**
+ * @brief Add a node to the end of a list.
+ *
+ * @param list Pointer to the linked list.
+ * @param data Pointer to the data to be stored in the new node.
+ */
+bool container_list_append(ContainerList* list, void* data);
+
+/**
+ * @brief Insert a node at a given index in the list.
+ *
+ * @param list Pointer to the linked list.
+ * @param data Pointer to the data to be stored in the new node.
+ * @param index Position where the new node will be inserted.
+ */
+bool container_list_insert(ContainerList* list, void* data, size_t index);
+
+/**
+ * @brief Remove a node at a given index from the list.
+ *
+ * @param list Pointer to the linked list.
+ * @param index Position of the node to be removed.
+ * @return A pointer to the removed node, or NULL if the index is out of bounds.
+ */
+ContainerNode* container_list_search(const ContainerList* list, size_t index);
+
+/**
  * @brief Find the first node containing the matching data.
  *
  * @param list Pointer to the linked list.
  * @param data Pointer to the data to search for.
- * @param compare A custom comparison function.
  * @return A pointer to the found node, or NULL if not found.
  */
-ContainerNode* container_list_find(
-    const ContainerList* list, const void* data, ContainerListCompare compare
-);
+ContainerNode* container_list_find(const ContainerList* list, const void* data);
 
 /**
  * @brief Remove the first node with matching data.
@@ -117,12 +96,10 @@ ContainerNode* container_list_find(
  * @param list Pointer to the linked list.
  * @param data Pointer to the data to be matched for removal.
  */
-void container_list_remove(
-    ContainerList* list, void* data, ContainerListCompare compare
-);
+bool container_list_remove(ContainerList* list, void* data);
 
 /**
- * @brief Remove and return the last node in the list.
+ * @brief Remove and return the last item in the list.
  *
  * @param list Pointer to the linked list.
  * @return Data pointer from the removed node, or NULL if the list is empty.
@@ -130,7 +107,7 @@ void container_list_remove(
 void* container_list_pop(ContainerList* list);
 
 /**
- * @brief Remove and return a node by index from the list.
+ * @brief Remove and return an item by index from the list.
  *
  * @param list Pointer to the linked list.
  * @return Data pointer from the removed node, or NULL if the list is empty.
