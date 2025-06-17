@@ -2,6 +2,9 @@
  * Copyright © 2023 Austin Berrio
  *
  * @file include/container/list.h
+ * 
+ * @brief A doubly linked-list data structure.
+ * @note Data is owned by the user and is not managed by the list.
  */
 
 #ifndef DSA_CONTAINER_LIST_H
@@ -60,6 +63,7 @@ bool container_list_is_empty(const ContainerList* list);
  *
  * @param list Pointer to the linked list.
  * @param data Pointer to the data to be stored in the new node.
+ * @return True if the node was added successfully, false otherwise.
  */
 bool container_list_append(ContainerList* list, void* data);
 
@@ -69,6 +73,7 @@ bool container_list_append(ContainerList* list, void* data);
  * @param list Pointer to the linked list.
  * @param data Pointer to the data to be stored in the new node.
  * @param index Position where the new node will be inserted.
+ * @return True if the node was inserted successfully, false otherwise.
  */
 bool container_list_insert(ContainerList* list, void* data, size_t index);
 
@@ -95,22 +100,24 @@ size_t container_list_get_index(const ContainerList* list, const void* data);
  *
  * @param list Pointer to the linked list.
  * @param data Pointer to the data to be matched for removal.
+ * @return True if a node was removed, false otherwise.
  */
 bool container_list_remove(ContainerList* list, void* data);
 
 /**
- * @brief Remove and return the last item in the list.
+ * @brief Remove and return the data of the last node in the list.
  *
  * @param list Pointer to the linked list.
- * @return Data pointer from the removed node, or NULL if the list is empty.
+ * @return Pointer to the data of the removed node, or NULL if the list is empty.
  */
 void* container_list_pop(ContainerList* list);
 
 /**
- * @brief Remove and return an item by index from the list.
+ * @brief Remove and return the data at the specified index.
  *
- * @param list Pointer to the linked list.
- * @return Data pointer from the removed node, or NULL if the list is empty.
+ * @param list Pointer to the list.
+ * @param index Index of the node to remove.
+ * @return Pointer to the data of the removed node, or NULL if index is out of bounds.
  */
 void* container_list_pop_index(ContainerList* list, size_t index);
 
