@@ -228,4 +228,34 @@ void* container_list_pop(ContainerList* list) {
     return data;
 }
 
-void* container_list_pop_index(ContainerList* list, size_t index);
+void* container_list_pop_index(ContainerList* list, size_t index) {
+    if (!list || index >= list->size) {
+        return NULL;
+    }
+
+    ContainerNode* current = list->head;
+    for (size_t i = 0; i < index; i++) {
+        current = current->next;
+    }
+
+    void* data = current->data;
+
+    if (current->prev) {
+        current->prev->next = current->next;
+    } else {
+        // Removing head
+        list->head = current->next;
+    }
+
+    if (current->next) {
+        current->next->prev = current->prev;
+    } else {
+        // Removing tail
+        list->tail = current->prev;
+    }
+
+    container_node_free(current);
+    list->size--;
+
+    return data;
+}
