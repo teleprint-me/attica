@@ -11,7 +11,7 @@
  */
 
 #include "core/memory.h"
-#include "allocator/knr.h"
+#include "allocator/freelist.h"
 
 #include <stdbool.h>
 #include <stdint.h>

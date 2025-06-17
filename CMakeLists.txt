@@ -48,7 +48,7 @@ add_library(dsa SHARED
 
     "src/map/linear.c"
 
-    "src/allocator/knr.c"
+    "src/allocator/freelist.c"
     "src/allocator/arena.c"
     "src/allocator/pool.c"
     "src/allocator/stack.c"

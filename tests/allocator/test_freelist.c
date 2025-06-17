@@ -4,7 +4,7 @@
 #include "core/logger.h"
 #include "test/unit.h"
 
-#include "allocator/knr.h"
+#include "allocator/freelist.h"
 
 #define ONE_MB (1024 * 1024)
 #define TEN_MB (10 * ONE_MB)

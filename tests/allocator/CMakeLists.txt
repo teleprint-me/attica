@@ -2,7 +2,7 @@
 
 # Define test units
 set(TEST_UNITS
-    "test_knr"
+    "test_freelist"
 )
 
 set(INPUT_DIR ${PROJECT_SOURCE_DIR}/tests/allocator)
