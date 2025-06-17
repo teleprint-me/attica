@@ -31,7 +31,6 @@ typedef struct MAX_ALIGN_ATTR ContainerNode {
     void* data; /**< Pointer to user data. */
     struct ContainerNode* next; /**< Next node in the container. */
     struct ContainerNode* prev; /**< Previous node in the container. */
-    size_t index; /**< (Optional) Index of the node in the container. */
 } ContainerNode;
 
 /**

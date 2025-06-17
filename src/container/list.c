@@ -71,7 +71,6 @@ bool container_list_append(ContainerList* list, void* data) {
         list->tail = node;
     }
 
-    node->index = list->size; // Track the position of the node
     list->size++; // Increment the size of the list
     return true;
 }
@@ -129,7 +128,6 @@ bool container_list_insert(ContainerList* list, void* data, size_t index) {
         }
     }
 
-    node->index = index;
     list->size++;
     return true;
 }
@@ -155,9 +153,9 @@ size_t container_list_get_index(const ContainerList* list, const void* data) {
     uintptr_t address = (uintptr_t) data;
     ContainerNode* current = list->head;
 
-    while (current) {
+    for (size_t i = 0; current; i++) {
         if (address == (uintptr_t) current->data) {
-            return current->index;
+            return i;
         }
         current = current->next;
     }

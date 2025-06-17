@@ -17,7 +17,6 @@ ContainerNode* container_node_create(void* data) {
         return NULL;
     }
 
-    node->index = SIZE_MAX; // SIZE_MAX is used to denote 'unset'
     node->data = data;
     node->next = NULL;
     node->prev = NULL;
