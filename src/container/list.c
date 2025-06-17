@@ -40,7 +40,7 @@ void container_list_free(ContainerList* list) {
     memory_free(list);
 }
 
-uint32_t container_list_size(const ContainerList* list) {
+size_t container_list_size(const ContainerList* list) {
     return list->size;
 }
 
@@ -48,16 +48,15 @@ bool container_list_is_empty(const ContainerList* list) {
     return 0 == list->size;
 }
 
-bool linked_list_append(ContainerList* list, void* data) {
+bool container_list_append(ContainerList* list, void* data) {
     if (NULL == list) {
-        LOG_ERROR("List is NULL.\n");
+        LOG_ERROR("[ContainerList] Attempted append on NULL list.");
         return false;
     }
 
-    // Create a new node
     ContainerNode* node = container_node_create(data);
     if (NULL == node) {
-        LOG_ERROR("Failed to create node.\n");
+        LOG_ERROR("[ContainerList] Failed to allocate new node.");
         return false;
     }
 
@@ -77,24 +76,21 @@ bool linked_list_append(ContainerList* list, void* data) {
     return true;
 }
 
-void linked_list_insert(ContainerList* list, void* object, uint32_t index) {
-    // Handle null list case
+bool container_list_insert(ContainerList* list, void* data, size_t index) {
     if (NULL == list) {
-        LOG_ERROR("List is NULL.\n");
-        return;
+        LOG_ERROR("[ContainerList] Attempted insert on NULL list.");
+        return false;
     }
 
-    // Check for invalid insertion index
-    if (index > list->size) { // Allow inserting at the end
-        LOG_ERROR("Invalid insertion position.\n");
-        return;
+    if (index > list->size) {
+        LOG_ERROR("[ContainerList] Invalid index %u (size is %zu).", index, list->size);
+        return false;
     }
 
-    // Create a new node
-    ContainerNode* node = container_node_create(object);
+    ContainerNode* node = container_node_create(data);
     if (NULL == node) {
-        LOG_ERROR("Failed to create node.\n");
-        return;
+        LOG_ERROR("[ContainerList] Failed to allocate new node.");
+        return false;
     }
 
     if (0 == index) {
@@ -118,7 +114,9 @@ void linked_list_insert(ContainerList* list, void* object, uint32_t index) {
         current->next = node;
     }
 
-    list->size++;
+    node->index = list->size; // Track the position of the node
+    list->size++; // Increment the size of the list
+    return true;
 }
 
 void linked_list_remove(ContainerList* list, void* object, linked_list_compare_t compare) {
