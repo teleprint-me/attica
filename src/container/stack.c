@@ -15,14 +15,15 @@ ContainerStack* container_stack_create(void) {
         LOG_ERROR("Failed to create stack container.");
         return NULL;
     }
-    stack->node = NULL;
+    stack->head = NULL;
+    stack->tail = NULL; // Tail is unused in stack semantics.
     stack->size = 0;
     return stack;
 }
 
 void container_stack_free(ContainerStack* stack) {
     if (stack) {
-        ContainerNode* current = stack->node;
+        ContainerNode* current = stack->head;
         while (current) {
             ContainerNode* next = current->next;
             container_node_free(current);
@@ -32,22 +33,22 @@ void container_stack_free(ContainerStack* stack) {
     }
 }
 
-bool container_stack_push(ContainerStack* stack, void* object) {
-    if (!stack || !object) {
+bool container_stack_push(ContainerStack* stack, void* data) {
+    if (!stack || !data) {
         return false;
     }
 
-    ContainerNode* node = container_node_create(object);
+    ContainerNode* node = container_node_create(data);
     if (!node) {
         return false;
     }
 
-    node->next = stack->node;
-    if (stack->node) {
-        stack->node->prev = node;
+    node->next = stack->head;
+    if (stack->head) {
+        stack->head->prev = node;
     }
 
-    stack->node = node;
+    stack->head = node;
     stack->size += 1;
     return true;
 }
@@ -58,16 +59,16 @@ void* container_stack_pop(ContainerStack* stack) {
         return NULL;
     }
 
-    ContainerNode* current = stack->node;
+    ContainerNode* current = stack->head;
     if (!current) {
         LOG_ERROR("Stack node is unexpectedly NULL.");
         return NULL;
     }
 
-    void* object = current->object;
-    stack->node = current->next;
-    if (stack->node) {
-        stack->node->prev = NULL;
+    void* object = current->data;
+    stack->head = current->next;
+    if (stack->head) {
+        stack->head->prev = NULL;
     }
 
     container_node_free(current);
@@ -76,10 +77,10 @@ void* container_stack_pop(ContainerStack* stack) {
 }
 
 void* container_stack_peek(const ContainerStack* stack) {
-    if (!stack || !stack->node || stack->size == 0) {
+    if (!stack || !stack->head || stack->size == 0) {
         LOG_ERROR("Cannot peek: stack is NULL or empty.");
         return NULL;
     }
 
-    return stack->node->object;
+    return stack->head->data;
 }

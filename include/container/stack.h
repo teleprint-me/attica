@@ -22,7 +22,7 @@ typedef Container ContainerStack;
 ContainerStack* container_stack_create(void);
 void container_stack_free(ContainerStack* stack);
 
-bool  container_stack_push(ContainerStack* stack, void* object);
+bool  container_stack_push(ContainerStack* stack, void* data);
 void* container_stack_pop(ContainerStack* stack);
 void* container_stack_peek(const ContainerStack* stack);
 
