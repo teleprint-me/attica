@@ -113,9 +113,9 @@ typedef int (*TestSuiteHook)(void);
  * @brief Represents a individual unit test.
  */
 typedef struct TestUnit {
-    int8_t result; /**< Result of the test unit (0 = success, 1 = failure). */
-    size_t index; /**< Index number of the test unit (1-based). */
     const void* data; /**< User-defined parameters. */
+    size_t index; /**< Index number of the test unit (1-based). */
+    int8_t result; /**< Result of the test unit (0 = success, 1 = failure). */
 } TestUnit;
 
 /**
@@ -123,8 +123,10 @@ typedef struct TestUnit {
  */
 typedef struct TestGroup {
     const char* name; /**< Group name. */
-    size_t count; /**< Number of unit tests. */
+    const void* shared;
     TestUnit* units; /**< Array of unit tests. */
+    size_t count; /**< Number of unit tests. */
+
     TestUnitHook run; /**< Hook to run a single test. */
     TestUnitHook before_each; /**< Hook to run before each test. */
     TestUnitHook after_each; /**< Hook to run after each test. */
