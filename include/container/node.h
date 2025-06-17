@@ -28,7 +28,7 @@ extern "C" {
  * @note Users own the object and are responsible for cleanup.
  */
 typedef struct MAX_ALIGN_ATTR ContainerNode {
-    void* object; /**< Pointer to user data. */
+    void* data; /**< Pointer to user data. */
     struct ContainerNode* next; /**< Next node in the container. */
     struct ContainerNode* prev; /**< Previous node in the container. */
     size_t index; /**< (Optional) Index of the node in the container. */
@@ -39,9 +39,10 @@ typedef struct MAX_ALIGN_ATTR ContainerNode {
  *
  * May be used for linked lists, queues, stacks, etc.
  */
-typedef struct Container {
+typedef struct MAX_ALIGN_ATTR Container {
+    ContainerNode* head; /**< Head node (may be NULL). */
+    ContainerNode* tail; /**< Tail node (may be NULL). */
     size_t size; /**< Number of elements. */
-    ContainerNode* node; /**< Head node (may be NULL). */
 } Container;
 
 /**
@@ -55,10 +56,10 @@ typedef struct Container {
 /**
  * @brief Allocates and initializes a new node with the given object pointer.
  *
- * @param object Pointer to user data to store in the node.
+ * @param data Pointer to user data to store in the node.
  * @return Pointer to new node, or NULL on failure.
  */
-ContainerNode* container_node_create(void* object);
+ContainerNode* container_node_create(void* data);
 
 /**
  * @brief Frees a node. Does not free the contained object.

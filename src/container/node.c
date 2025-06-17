@@ -8,17 +8,17 @@
 #include "core/memory.h"
 #include "container/node.h"
 
-ContainerNode* container_node_create(void* object) {
+ContainerNode* container_node_create(void* data) {
     ContainerNode* node
         = (ContainerNode*) memory_alloc(sizeof(ContainerNode), alignof(ContainerNode));
 
     if (NULL == node) {
-        LOG_ERROR("Failed to allocate memory for ContainerNode.");
+        LOG_ERROR("[ContainerNode] Failed to allocate memory.");
         return NULL;
     }
 
     node->index = SIZE_MAX; // SIZE_MAX is used to denote 'unset'
-    node->object = object;
+    node->data = data;
     node->next = NULL;
     node->prev = NULL;
     return node;

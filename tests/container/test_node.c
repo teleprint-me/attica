@@ -28,7 +28,7 @@ int test_group_node_teardown(TestUnit* unit) {
 
 int test_group_container_node(TestUnit* unit) {
     TestContainerNode* data = (TestContainerNode*) unit->data;
-    int result = *(int*) data->node->object;
+    int result = *(int*) data->node->data;
 
     ASSERT(
         result == data->expected,
