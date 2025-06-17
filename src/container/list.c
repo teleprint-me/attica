@@ -96,26 +96,41 @@ bool container_list_insert(ContainerList* list, void* data, size_t index) {
     if (0 == index) {
         // Insert at the beginning
         node->next = list->head;
+        if (NULL != list->head) {
+            list->head->prev = node;
+        } else { // List was empty
+            list->tail = node; // Node is also the tail
+        }
         list->head = node;
+    } else if (index == list->size) {
+        // Insert at the end - identical to append
+        node->prev = list->tail;
+        if (NULL != list->tail) {
+            list->tail->next = node;
+        }
+        list->tail = node;
     } else {
+        // Insert in the middle
         ContainerNode* current = list->head;
-
-        for (uint32_t i = 1; i < index && NULL != current->next; ++i) {
+        for (size_t i = 0; i < index; i++) {
             current = current->next;
         }
 
-        if (NULL == current) {
-            LOG_ERROR("Invalid insertion position.\n");
-            node_free(node);
-            return;
-        }
+        node->prev = current->prev;
+        node->next = current;
 
-        node->next = current->next;
-        current->next = node;
+        if (current->prev) {
+            current->prev->next = node;
+        }
+        current->prev = node;
+
+        if (1 == index) { // Edge case
+            list->head->next = node; // Insert after head
+        }
     }
 
-    node->index = list->size; // Track the position of the node
-    list->size++; // Increment the size of the list
+    node->index = index;
+    list->size++;
     return true;
 }
 
