@@ -205,6 +205,27 @@ bool container_list_remove(ContainerList* list, void* data) {
     return false;
 }
 
-void* container_list_pop(ContainerList* list);
+void* container_list_pop(ContainerList* list) {
+    if (!list || !list->tail) {
+        return NULL;
+    }
+
+    ContainerNode* node = list->tail;
+    void* data = node->data;
+
+    if (node->prev) {
+        node->prev->next = NULL;
+        list->tail = node->prev;
+    } else {
+        // This was the only node in the list
+        list->head = NULL;
+        list->tail = NULL;
+    }
+
+    container_node_free(node);
+    list->size--;
+
+    return data;
+}
 
 void* container_list_pop_index(ContainerList* list, size_t index);
