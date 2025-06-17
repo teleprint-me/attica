@@ -73,22 +73,22 @@ bool container_list_append(ContainerList* list, void* data);
 bool container_list_insert(ContainerList* list, void* data, size_t index);
 
 /**
- * @brief Remove a node at a given index from the list.
+ * @brief Return the data at a specific index in the list.
  *
- * @param list Pointer to the linked list.
- * @param index Position of the node to be removed.
- * @return A pointer to the removed node, or NULL if the index is out of bounds.
+ * @param list Pointer to the list.
+ * @param index Index of the element.
+ * @return Pointer to the data at that index, or NULL if out-of-bounds.
  */
-ContainerNode* container_list_search(const ContainerList* list, size_t index);
+void* container_list_get_data(const ContainerList* list, size_t index);
 
 /**
- * @brief Find the first node containing the matching data.
+ * @brief Find the index of the first element matching the pointer.
  *
- * @param list Pointer to the linked list.
- * @param data Pointer to the data to search for.
- * @return A pointer to the found node, or NULL if not found.
+ * @param list Pointer to the list.
+ * @param data Pointer to the data to match.
+ * @return Index of the first match, or SIZE_MAX if not found.
  */
-ContainerNode* container_list_find(const ContainerList* list, const void* data);
+size_t container_list_get_index(const ContainerList* list, const void* data);
 
 /**
  * @brief Remove the first node with matching data.

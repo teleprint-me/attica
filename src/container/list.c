@@ -134,6 +134,37 @@ bool container_list_insert(ContainerList* list, void* data, size_t index) {
     return true;
 }
 
+void* container_list_get_data(const ContainerList* list, size_t index) {
+    if (!list || index >= list->size) {
+        return NULL;
+    }
+
+    ContainerNode* current = list->head;
+    for (size_t i = 0; i < index; i++) {
+        current = current->next;
+    }
+
+    return current ? current->data : NULL;
+}
+
+size_t container_list_get_index(const ContainerList* list, const void* data) {
+    if (!list || !data) {
+        return SIZE_MAX; // sentinel not found
+    }
+
+    uintptr_t address = (uintptr_t) data;
+    ContainerNode* current = list->head;
+
+    while (current) {
+        if (address == (uintptr_t) current->data) {
+            return current->index;
+        }
+        current = current->next;
+    }
+
+    return SIZE_MAX;
+}
+
 void linked_list_remove(ContainerList* list, void* object, linked_list_compare_t compare) {
     // Ensure the list is valid
     if (NULL == list || NULL == list->head) {
