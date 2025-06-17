@@ -4,6 +4,8 @@
 set(TEST_UNITS
     "test_node"
     "test_stack"
+    # "test_queue"
+    "test_list"
 )
 
 set(INPUT_DIR ${PROJECT_SOURCE_DIR}/tests/container)
