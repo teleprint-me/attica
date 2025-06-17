@@ -1,7 +1,6 @@
-# Data Structures and Algorithms written in pure C
+# dsa
 
-A portable collection of foundational C libraries for algorithms and data
-structures, built for systems programming and real-world experimentation.
+Data Structures and Algorithms written in pure C.
 
 ## 🗃️ Dependencies
 
