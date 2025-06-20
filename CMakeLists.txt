@@ -52,6 +52,7 @@ add_library(dsa SHARED
     "src/allocator/arena.c"
     "src/allocator/pool.c"
     "src/allocator/stack.c"
+    "src/allocator/page.c"
     "src/allocator/lease.c"
 
     "src/sort/heap.c"
