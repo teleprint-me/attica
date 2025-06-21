@@ -104,6 +104,7 @@
     "deque": "c",
     "forward_list": "c",
     "unordered_map": "c",
-    "unordered_set": "c"
+    "unordered_set": "c",
+    "page.h": "c"
   }
 }
