@@ -182,4 +182,50 @@ void hash_page_free(HashMap* ctx, void* ptr) {
     memory_free(ptr);
 }
 
+void hash_page_free_all(HashMap* ctx) {
+    if (!ctx) {
+        return;
+    }
+
+    HashMapIterator it = hash_map_iter(ctx);
+    HashMapEntry* entry = NULL;
+
+    while ((entry = hash_map_next(&it))) {
+        void* ptr = entry->key;
+        Page* page = (Page*) entry->value;
+
+        if (ptr && page) {
+#if defined(DEBUG) && (1 == DEBUG)
+            LOG_DEBUG(
+                "[HP_CLEAR] Freeing %p (%zu bytes, %zu aligned)", ptr, page->size, page->alignment
+            );
+#endif
+            page_free(page);
+            memory_free(ptr);
+        }
+    }
+
+    hash_map_clear(ctx); // Clears internal map state
+}
+
+void hash_page_dump(HashMap* ctx) {
+    if (!ctx) return;
+
+    size_t total = 0;
+    HashMapIterator it = hash_map_iter(ctx);
+    HashMapEntry* entry = NULL;
+
+    while ((entry = hash_map_next(&it))) {
+        Page* page = (Page*) entry->value;
+        void* ptr = entry->key;
+
+        if (ptr && page) {
+            total += page->size;
+            LOG_INFO("[HP_DUMP] %p (%zu bytes, %zu aligned)", ptr, page->size, page->alignment);
+        }
+    }
+
+    LOG_INFO("[HP_DUMP] Total memory still tracked: %zu bytes", total);
+}
+
 /** @} */
