@@ -67,6 +67,7 @@ void hash_page_free(HashMap* ctx, void* ptr);
  * This is useful for bulk cleanup or teardown of a scoped allocator.
  *
  * @param ctx Pointer to a valid `HashMap` used for tracking.
+ * @warning This is not thread-safe (yet).
  */
 void hash_page_free_all(HashMap* ctx);
 
