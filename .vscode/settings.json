@@ -99,6 +99,11 @@
     "constant.h": "c",
     "stdbool.h": "c",
     "list.h": "c",
-    "freelist.h": "c"
+    "freelist.h": "c",
+    "linear.h": "c",
+    "deque": "c",
+    "forward_list": "c",
+    "unordered_map": "c",
+    "unordered_set": "c"
   }
 }
