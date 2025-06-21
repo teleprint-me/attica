@@ -64,14 +64,18 @@ void* hash_page_malloc(HashMap* ctx, size_t size, size_t alignment) {
     }
 
     HashMapState state = hash_map_insert(ctx, address, page);
-    if (HASH_MAP_STATE_FULL != state) {
-        // resize the hash table if there's not enough space
-        state = hash_map_resize(ctx, ctx->size * 2); // increase the size allocated to the table
-        if (HASH_MAP_STATE_SUCCESS != state) {
-            return NULL; // failed to resize the table
+    if (HASH_MAP_STATE_FULL == state) {
+        // Attempt to resize
+        state = hash_map_resize(ctx, ctx->size * 2);
+        if (state != HASH_MAP_STATE_SUCCESS) {
+            memory_free(address);
+            page_free(page);
+            LOG_ERROR("[HP_MALLOC] Failed to resize page ctx.");
+            return NULL;
         }
 
-        state = hash_map_insert(ctx, address, page); // try again and update the state
+        // Retry insertion
+        state = hash_map_insert(ctx, address, page);
     }
 
     if (HASH_MAP_STATE_SUCCESS != state) {
@@ -136,14 +140,18 @@ void* hash_page_realloc(HashMap* ctx, void* ptr, size_t size, size_t alignment) 
     }
 
     HashMapState state = hash_map_insert(ctx, address, page);
-    if (HASH_MAP_STATE_FULL != state) {
-        // resize the hash table if there's not enough space
-        state = hash_map_resize(ctx, ctx->size * 2); // increase the size allocated to the table
-        if (HASH_MAP_STATE_SUCCESS != state) {
-            return NULL; // failed to resize the table
+    if (HASH_MAP_STATE_FULL == state) {
+        // Attempt to resize
+        state = hash_map_resize(ctx, ctx->size * 2);
+        if (state != HASH_MAP_STATE_SUCCESS) {
+            memory_free(address);
+            page_free(page);
+            LOG_ERROR("[HP_MALLOC] Failed to resize page ctx.");
+            return NULL;
         }
 
-        state = hash_map_insert(ctx, address, page); // try again and update the state
+        // Retry insertion
+        state = hash_map_insert(ctx, address, page);
     }
 
     if (HASH_MAP_STATE_SUCCESS != state) {
@@ -209,7 +217,9 @@ void hash_page_free_all(HashMap* ctx) {
 }
 
 void hash_page_dump(HashMap* ctx) {
-    if (!ctx) return;
+    if (!ctx) {
+        return;
+    }
 
     size_t total = 0;
     HashMapIterator it = hash_map_iter(ctx);
