@@ -63,6 +63,14 @@ typedef struct HashMap {
 } HashMap;
 
 /**
+ * @brief Iterator for traversing active entries in a hash map.
+ */
+typedef struct HashMapIterator {
+    HashMap* table; /**< Pointer to the hash table being iterated. */
+    uint64_t index; /**< Current index within the table. */
+} HashMapIterator;
+
+/**
  * @name Life-cycle Management
  * @{
  */
@@ -134,6 +142,31 @@ HashMapState hash_map_clear(HashMap* table);
  * @return Pointer to the associated value, or NULL if not found.
  */
 void* hash_map_search(HashMap* table, const void* key);
+
+/** @} */
+
+/**
+ * @name Hash Iterator
+ * {@
+ */
+
+/**
+ * @brief Initializes an iterator for a given hash map.
+ *
+ * @param table Pointer to the hash map.
+ * @return Initialized iterator positioned at the first valid entry, or at the end.
+ * @warning Requires external locking for thread safety.
+ */
+HashMapIterator hash_map_iter(HashMap* table);
+
+/**
+ * @brief Advances the iterator to the next valid entry.
+ *
+ * @param iter Pointer to the iterator.
+ * @return Pointer to the next active entry, or NULL if end is reached.
+ * @warning Requires external locking for thread safety.
+ */
+HashMapEntry* hash_map_next(HashMapIterator* iter);
 
 /** @} */
 

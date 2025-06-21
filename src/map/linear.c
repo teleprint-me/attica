@@ -379,6 +379,33 @@ void* hash_map_search(HashMap* table, const void* key) {
 }
 
 /**
+ * @section Hash Iterator
+ * {@
+ */
+
+HashMapIterator hash_map_iter(HashMap* table) {
+    HashMapIterator iter = { .table = table, .index = 0 };
+    return iter;
+}
+
+HashMapEntry* hash_map_next(HashMapIterator* iter) {
+    if (!iter || !iter->table || !iter->table->entries) {
+        return NULL;
+    }
+
+    while (iter->index < iter->table->size) {
+        HashMapEntry* entry = &iter->table->entries[iter->index++];
+        if (entry->key != NULL) {
+            return entry;
+        }
+    }
+
+    return NULL;
+}
+
+/** @} */
+
+/**
  * @section Hash Integers
  */
 
