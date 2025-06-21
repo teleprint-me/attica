@@ -8,7 +8,7 @@
  * - Safe reallocation with metadata updates.
  * - Global deallocation of all tracked memory.
  *
- * Internally, the allocator stores metadata (`Page`) in the provided `HashMap` context.
+ * Internally, the allocator stores metadata (`PageEntry`) in the provided `PageAllocator` context.
  *
  * @note This API does not perform internal locking. The caller is responsible for synchronization.
  * @note All allocations and frees must use this API consistently to avoid memory leaks.
@@ -25,51 +25,108 @@ extern "C" {
 #endif
 
 /**
- * @brief Allocates a block of memory with the given size and alignment.
+ * @brief Alias for the internal hash map tracking page allocations.
+ */
+typedef HashMap PageAllocator;
+
+/**
+ * @name Page Allocation API
+ * @{
+ */
+
+/**
+ * @brief Allocates a memory block with the given size and alignment.
  *
- * A metadata entry is inserted into the provided `HashMap` context to track the allocation.
+ * Tracks the allocation in the given PageAllocator.
  *
- * @param ctx Pointer to a valid `HashMap` used for tracking.
+ * @param allocator Pointer to a valid PageAllocator.
  * @param size Number of bytes to allocate.
- * @param alignment Alignment constraint (must be power of two).
- * @return Pointer to the allocated memory, or NULL on failure.
+ * @param alignment Alignment requirement (must be power of two).
+ * @return Pointer to allocated memory, or NULL on failure.
  */
-void* hash_page_malloc(HashMap* ctx, size_t size, size_t alignment);
+void* page_malloc(PageAllocator* allocator, size_t size, size_t alignment);
 
 /**
- * @brief Reallocates a previously allocated memory block to a new size and alignment.
+ * @brief Reallocates a previously allocated memory block.
  *
- * - If `ptr` is NULL, this acts like `hash_page_malloc`.
- * - If `size` is zero, this frees the memory block.
- * - On success, metadata is updated in-place and reassigned to the new address.
+ * Updates tracking metadata and returns the new pointer.
+ * - If @p ptr is NULL, behaves like page_malloc().
+ * - If @p size is zero, frees the memory.
  *
- * @param ctx Pointer to a valid `HashMap` used for tracking.
- * @param ptr Pointer to the memory block to reallocate.
+ * @param allocator Pointer to a valid PageAllocator.
+ * @param ptr Pointer to existing allocation (may be NULL).
  * @param size New size in bytes.
- * @param alignment New alignment requirement.
- * @return Pointer to the reallocated memory, or NULL on failure.
+ * @param alignment Alignment requirement.
+ * @return Pointer to reallocated memory, or NULL on failure.
  */
-void* hash_page_realloc(HashMap* ctx, void* ptr, size_t size, size_t alignment);
+void* page_realloc(PageAllocator* allocator, void* ptr, size_t size, size_t alignment);
 
 /**
- * @brief Frees a memory block and removes its tracking metadata from the context.
+ * @brief Frees a previously allocated memory block and removes its metadata.
  *
- * Logs an error if the pointer was not tracked by the context.
+ * Logs an error if the pointer is not tracked.
  *
- * @param ctx Pointer to a valid `HashMap` used for tracking.
- * @param ptr Pointer to the memory block to free.
+ * @param allocator Pointer to a valid PageAllocator.
+ * @param ptr Pointer to memory block to free.
  */
-void hash_page_free(HashMap* ctx, void* ptr);
+void page_free(PageAllocator* allocator, void* ptr);
 
 /**
- * @brief Frees all memory blocks tracked by the context and clears the table.
+ * @brief Frees all memory blocks tracked by the allocator.
  *
- * This is useful for bulk cleanup or teardown of a scoped allocator.
+ * Clears the internal hash map but does not destroy the PageAllocator itself.
  *
- * @param ctx Pointer to a valid `HashMap` used for tracking.
- * @warning This is not thread-safe (yet).
+ * @param allocator Pointer to a valid PageAllocator.
+ *
+ * @warning This is not thread-safe. Thread-locks must be implemented externally.
+ *
  */
-void hash_page_free_all(HashMap* ctx);
+void page_free_all(PageAllocator* allocator);
+
+/** @} */
+
+/**
+ * @name Allocator Lifecycle
+ * @{
+ */
+
+/**
+ * @brief Creates a new PageAllocator with address-key tracking.
+ *
+ * @param initial_size Initial capacity of the allocator's hash map.
+ * @return Pointer to a new PageAllocator, or NULL on failure.
+ */
+PageAllocator* page_allocator_create(size_t initial_size);
+
+/**
+ * @brief Frees all memory tracked by the allocator and destroys it.
+ *
+ * Equivalent to calling page_free_all() followed by hash map destruction.
+ *
+ * @warning This is not thread-safe.
+ * @param allocator Pointer to the PageAllocator to destroy.
+ *
+ * @warning This is not thread-safe. Thread-locks must be implemented externally.
+ */
+void page_allocator_free(PageAllocator* allocator);
+
+/** @} */
+
+/**
+ * @name Debug Utilities
+ * @{
+ */
+
+/**
+ * @brief Dumps the internal state of the PageAllocator for debugging.
+ *
+ * @param allocator Pointer to a valid PageAllocator.
+ *
+ * @warning This is not thread-safe. Thread-locks must be implemented externally.
+ */
+void page_allocator_dump(PageAllocator* allocator);
+
+/** @} */
 
 #ifdef __cplusplus
 }
