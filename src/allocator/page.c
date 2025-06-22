@@ -11,14 +11,32 @@
  * {@
  */
 
-/// @brief Opaque object storing metadata as a value in a given PageTable
+/**
+ * @brief Internal page metadata for host allocations.
+ *
+ * `PageEntry` stores metadata associated with an allocation
+ * managed by the `PageAllocator`. It is used to track memory size
+ * and alignment for each allocation.
+ *
+ * This struct is stored in a hash map keyed by allocation address.
+ */
 typedef struct PageEntry {
     size_t size;
     size_t alignment;
 } PageEntry;
 
+/**
+ * @brief Allocates and initializes a PageEntry.
+ *
+ * Allocates a `PageEntry` on the heap and fills in the provided metadata.
+ * The returned pointer should be freed using `page_free()` when no longer needed.
+ *
+ * @param size Size of the allocation in bytes.
+ * @param alignment Alignment in bytes.
+ * @return Pointer to the initialized `PageEntry`, or NULL on failure.
+ */
 PageEntry* page_entry_create(size_t size, size_t alignment) {
-    PageEntry* page = memory_calloc(1, sizeof(PageEntry), alignof(PageEntry));
+    PageEntry* page = memory_alloc(sizeof(PageEntry), alignof(PageEntry));
     if (NULL == page) {
         return NULL;
     }
@@ -31,6 +49,14 @@ PageEntry* page_entry_create(size_t size, size_t alignment) {
     return page;
 }
 
+/**
+ * @brief Frees a previously allocated PageEntry.
+ *
+ * This function safely frees the metadata associated with a Vulkan allocation.
+ * Passing NULL is safe and has no effect.
+ *
+ * @param page Pointer to the `PageEntry` to free.
+ */
 void page_entry_free(PageEntry* page) {
     if (NULL == page) {
         return;
