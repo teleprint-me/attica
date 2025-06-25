@@ -114,9 +114,9 @@ void* page_malloc(PageAllocator* allocator, size_t size, size_t alignment) {
         return NULL;
     }
 
-#if defined(DEBUG) && (1 == DEBUG)
-    LOG_DEBUG("[PA_MALLOC] %p → %p (%zu bytes, %zu aligned)", address, page, size, alignment);
-#endif
+// #if defined(DEBUG) && (1 == DEBUG)
+//     LOG_DEBUG("[PA_MALLOC] %p → %p (%zu bytes, %zu aligned)", address, page, size, alignment);
+// #endif
 
     return address;
 }
@@ -192,9 +192,9 @@ void* page_realloc(PageAllocator* allocator, void* ptr, size_t size, size_t alig
         return NULL;
     }
 
-#if defined(DEBUG) && (1 == DEBUG)
-    LOG_DEBUG("[PA_REALLOC] %p → %p (%zu bytes)", ptr, address, size);
-#endif
+// #if defined(DEBUG) && (1 == DEBUG)
+//     LOG_DEBUG("[PA_REALLOC] %p → %p (%zu bytes)", ptr, address, size);
+// #endif
 
     return address;
 }
@@ -215,9 +215,9 @@ void page_free(PageAllocator* allocator, void* ptr) {
         return;
     }
 
-#if defined(DEBUG) && (1 == DEBUG)
-    LOG_DEBUG("[PA_FREE] %p (%zu bytes, %zu aligned)", ptr, page->size, page->alignment);
-#endif
+// #if defined(DEBUG) && (1 == DEBUG)
+//     LOG_DEBUG("[PA_FREE] %p (%zu bytes, %zu aligned)", ptr, page->size, page->alignment);
+// #endif
 
     page_entry_free(page);
     memory_free(ptr);
@@ -236,11 +236,11 @@ void page_free_all(PageAllocator* allocator) {
         PageEntry* page = (PageEntry*) entry->value;
 
         if (ptr && page) {
-#if defined(DEBUG) && (1 == DEBUG)
-            LOG_DEBUG(
-                "[PA_CLEAR] Freeing %p (%zu bytes, %zu aligned)", ptr, page->size, page->alignment
-            );
-#endif
+// #if defined(DEBUG) && (1 == DEBUG)
+//             LOG_DEBUG(
+//                 "[PA_CLEAR] Freeing %p (%zu bytes, %zu aligned)", ptr, page->size, page->alignment
+//             );
+// #endif
             page_entry_free(page);
             memory_free(ptr);
         }
