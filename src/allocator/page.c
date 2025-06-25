@@ -251,7 +251,7 @@ bool page_add(PageAllocator* allocator, void* ptr, size_t size, size_t alignment
     }
 
     // Optional: guard against double tracking
-    if (hash_map_contains(allocator, ptr)) {
+    if (hash_map_search(allocator, ptr)) {
         LOG_WARN("[PA_ADD] Pointer %p is already tracked", ptr);
         return false;
     }
