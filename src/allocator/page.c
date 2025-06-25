@@ -2,6 +2,7 @@
  * @file src/allocator/page.c
  */
 
+#include "core/posix.h"
 #include "core/memory.h"
 #include "core/logger.h"
 #include "allocator/page.h"
