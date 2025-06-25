@@ -17,6 +17,7 @@
 #ifndef ALLOCATOR_PAGE_H
 #define ALLOCATOR_PAGE_H
 
+#include "core/posix.h"
 #include "map/linear.h"
 #include <stddef.h>
 
