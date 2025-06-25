@@ -239,6 +239,46 @@ void page_free_all(PageAllocator* allocator) {
  * {@
  */
 
+bool page_add(PageAllocator* allocator, void* ptr, size_t size, size_t alignment) {
+    if (NULL == allocator) {
+        LOG_ERROR("[PA_MALLOC] Missing allocation context (PageAllocator)");
+        return false;
+    }
+
+    if (!ptr) {
+        LOG_ERROR("[PA_MALLOC] Invalid pointer context (void*)");
+        return false;
+    }
+
+    PageEntry* page = page_entry_create(size, alignment);
+    if (NULL == page) {
+        LOG_ERROR("[PA_MALLOC] Failed to allocate page metadata for %p", ptr);
+        return NULL;
+    }
+
+    HashMapState state = hash_map_insert(allocator, ptr, page);
+    if (HASH_MAP_STATE_FULL == state) {
+        // Attempt to resize
+        state = hash_map_resize(allocator, allocator->size * 2);
+        if (HASH_MAP_STATE_SUCCESS != state) {
+            page_entry_free(page);
+            LOG_ERROR("[PA_MALLOC] Failed to resize page allocator.");
+            return false;
+        }
+
+        // Retry insertion
+        state = hash_map_insert(allocator, ptr, page);
+    }
+
+    if (HASH_MAP_STATE_SUCCESS != state) {
+        page_entry_free(page);
+        LOG_ERROR("[PA_MALLOC] Failed to insert %p into page allocator (state = %d)", ptr, state);
+        return false;
+    }
+
+    return true;
+}
+
 /** @} */
 
 /**
