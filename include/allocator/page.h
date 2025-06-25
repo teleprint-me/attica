@@ -86,6 +86,26 @@ void page_free_all(PageAllocator* allocator);
 /** @} */
 
 /**
+ * @name Allocator Utilities
+ */
+
+/**
+ * Transfers ownership of a pre-allocated memory region to the PageAllocator.
+ * Once added, the allocator is responsible for freeing the memory.
+ *
+ * The memory should be allocated using a compatible allocation mechanism
+ * (e.g., malloc, strdup, or a known aligned allocator).
+ *
+ * The memory will be freed via `page_free()` or `page_free_all()`.
+ *
+ * This is useful for retroactive tracking of memory (e.g., UTF-8 strings,
+ * externally allocated buffers).
+ */
+bool page_add(PageAllocator* allocator, void* ptr, size_t size, size_t alignment);
+
+/** @} */
+
+/**
  * @name Allocator Lifecycle
  * @{
  */
