@@ -241,38 +241,43 @@ void page_free_all(PageAllocator* allocator) {
 
 bool page_add(PageAllocator* allocator, void* ptr, size_t size, size_t alignment) {
     if (NULL == allocator) {
-        LOG_ERROR("[PA_MALLOC] Missing allocation context (PageAllocator)");
+        LOG_ERROR("[PA_ADD] Missing allocation context (PageAllocator)");
         return false;
     }
 
-    if (!ptr) {
-        LOG_ERROR("[PA_MALLOC] Invalid pointer context (void*)");
+    if (NULL == ptr) {
+        LOG_ERROR("[PA_ADD] Cannot track NULL pointer");
+        return false;
+    }
+
+    // Optional: guard against double tracking
+    if (hash_map_contains(allocator, ptr)) {
+        LOG_WARN("[PA_ADD] Pointer %p is already tracked", ptr);
         return false;
     }
 
     PageEntry* page = page_entry_create(size, alignment);
     if (NULL == page) {
-        LOG_ERROR("[PA_MALLOC] Failed to allocate page metadata for %p", ptr);
-        return NULL;
+        LOG_ERROR("[PA_ADD] Failed to allocate page metadata for %p", ptr);
+        return false;
     }
 
     HashMapState state = hash_map_insert(allocator, ptr, page);
     if (HASH_MAP_STATE_FULL == state) {
-        // Attempt to resize
         state = hash_map_resize(allocator, allocator->size * 2);
         if (HASH_MAP_STATE_SUCCESS != state) {
             page_entry_free(page);
-            LOG_ERROR("[PA_MALLOC] Failed to resize page allocator.");
+            LOG_ERROR("[PA_ADD] Failed to resize page allocator");
             return false;
         }
 
-        // Retry insertion
+        // Retry insertion after resize
         state = hash_map_insert(allocator, ptr, page);
     }
 
     if (HASH_MAP_STATE_SUCCESS != state) {
         page_entry_free(page);
-        LOG_ERROR("[PA_MALLOC] Failed to insert %p into page allocator (state = %d)", ptr, state);
+        LOG_ERROR("[PA_ADD] Failed to insert %p into page allocator (state = %d)", ptr, state);
         return false;
     }
 
