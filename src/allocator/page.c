@@ -8,7 +8,7 @@
 
 /**
  * @section Private
- * {@
+ * @{
  */
 
 /**
@@ -68,7 +68,7 @@ void page_entry_free(PageEntry* page) {
 
 /**
  * @section Page Allocation API
- * {@
+ * @{
  */
 
 void* page_malloc(PageAllocator* allocator, size_t size, size_t alignment) {
@@ -236,7 +236,7 @@ void page_free_all(PageAllocator* allocator) {
 
 /**
  * @section Allocator Utilities
- * {@
+ * @{
  */
 
 bool page_add(PageAllocator* allocator, void* ptr, size_t size, size_t alignment) {
@@ -288,7 +288,7 @@ bool page_add(PageAllocator* allocator, void* ptr, size_t size, size_t alignment
 
 /**
  * @section Allocator Lifecycle
- * {@
+ * @{
  */
 
 PageAllocator* page_allocator_create(size_t initial_size) {
@@ -307,7 +307,7 @@ void page_allocator_free(PageAllocator* allocator) {
 
 /**
  * @section Debug Utilities
- * {@
+ * @{
  */
 
 void page_allocator_dump(PageAllocator* allocator) {
