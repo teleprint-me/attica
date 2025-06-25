@@ -207,7 +207,9 @@ char* utf8_raw_concat(const char* head, const char* tail) {
     size_t head_length = utf8_raw_byte_count(head);
     size_t tail_length = utf8_raw_byte_count(tail);
     size_t output_length = head_length + tail_length;
-    char* output = (char*) malloc(output_length);
+
+    // Add 1 for null terminator
+    char* output = (char*) malloc(output_length + 1);
     if (output == NULL) {
         LOG_ERROR("Failed to allocate memory for concatenated string.");
         return NULL;
